@@ -201,6 +201,13 @@
           self.showAddProjectModal();
         });
       }
+
+      var suggestBtn = document.getElementById('btn-suggest');
+      if (suggestBtn) {
+        suggestBtn.addEventListener('click', function () {
+          self.startSuggestMode();
+        });
+      }
     },
 
     toggleEditMode: function () {
@@ -1346,6 +1353,245 @@
         if (statusEl) statusEl.textContent = 'Edit Mode';
         self.showToast('Revert failed: ' + err.message, true);
       });
+    },
+
+    // --- Suggest Mode ---
+
+    suggestMode: false,
+    suggestHighlight: null,
+    suggestHandlers: null,
+
+    startSuggestMode: function () {
+      var self = this;
+      this.suggestMode = true;
+      document.body.classList.add('suggest-mode');
+
+      var suggestBtn = document.getElementById('btn-suggest');
+      if (suggestBtn) {
+        suggestBtn.classList.add('active');
+        suggestBtn.textContent = 'Cancel';
+      }
+
+      var statusEl = document.getElementById('editor-status');
+      if (statusEl) statusEl.textContent = 'Click an element to suggest an improvement';
+
+      // Create highlight overlay
+      this.suggestHighlight = document.createElement('div');
+      this.suggestHighlight.className = 'suggest-highlight';
+      document.body.appendChild(this.suggestHighlight);
+
+      var ignoreTags = ['NAV', 'HTML', 'BODY', 'SCRIPT', 'STYLE', 'LINK', 'META'];
+
+      function onMouseMove(e) {
+        var el = e.target;
+        if (!el || ignoreTags.indexOf(el.tagName) !== -1) return;
+        if (el.closest('.nav') || el.closest('.editor-toolbar') || el.closest('.suggest-highlight')) return;
+
+        var rect = el.getBoundingClientRect();
+        self.suggestHighlight.style.top = (rect.top + window.scrollY) + 'px';
+        self.suggestHighlight.style.left = (rect.left + window.scrollX) + 'px';
+        self.suggestHighlight.style.width = rect.width + 'px';
+        self.suggestHighlight.style.height = rect.height + 'px';
+        self.suggestHighlight.style.display = 'block';
+      }
+
+      function onClick(e) {
+        var el = e.target;
+        if (!el || ignoreTags.indexOf(el.tagName) !== -1) return;
+        if (el.closest('.nav') || el.closest('.editor-toolbar') || el.closest('.suggest-highlight')) return;
+        if (el.id === 'btn-suggest' || el.closest('#btn-suggest')) {
+          return;
+        }
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        // Gather element context
+        var elementDesc = self.describeElement(el);
+        self.endSuggestMode();
+        self.showSuggestModal(elementDesc);
+      }
+
+      // Cancel on Escape or clicking Suggest button again
+      function onKeydown(e) {
+        if (e.key === 'Escape') {
+          self.endSuggestMode();
+        }
+      }
+
+      function onSuggestBtnClick() {
+        self.endSuggestMode();
+      }
+
+      document.addEventListener('mousemove', onMouseMove, true);
+      document.addEventListener('click', onClick, true);
+      document.addEventListener('keydown', onKeydown);
+      if (suggestBtn) {
+        suggestBtn.addEventListener('click', onSuggestBtnClick);
+      }
+
+      this.suggestHandlers = {
+        mousemove: onMouseMove,
+        click: onClick,
+        keydown: onKeydown,
+        btnClick: onSuggestBtnClick
+      };
+    },
+
+    endSuggestMode: function () {
+      this.suggestMode = false;
+      document.body.classList.remove('suggest-mode');
+
+      var suggestBtn = document.getElementById('btn-suggest');
+      if (suggestBtn) {
+        suggestBtn.classList.remove('active');
+        suggestBtn.textContent = 'Suggest';
+      }
+
+      var statusEl = document.getElementById('editor-status');
+      if (statusEl) statusEl.textContent = 'Edit Mode';
+
+      if (this.suggestHighlight) {
+        this.suggestHighlight.remove();
+        this.suggestHighlight = null;
+      }
+
+      if (this.suggestHandlers) {
+        document.removeEventListener('mousemove', this.suggestHandlers.mousemove, true);
+        document.removeEventListener('click', this.suggestHandlers.click, true);
+        document.removeEventListener('keydown', this.suggestHandlers.keydown);
+        var suggestBtn2 = document.getElementById('btn-suggest');
+        if (suggestBtn2) {
+          suggestBtn2.removeEventListener('click', this.suggestHandlers.btnClick);
+        }
+        this.suggestHandlers = null;
+      }
+    },
+
+    describeElement: function (el) {
+      var tag = el.tagName.toLowerCase();
+      var text = (el.textContent || '').trim();
+      if (text.length > 80) text = text.substring(0, 80) + '...';
+
+      // Build a readable description
+      var parts = [];
+
+      // Check for meaningful class names
+      var cls = el.className;
+      if (typeof cls === 'string' && cls) {
+        var meaningful = cls.split(/\s+/).filter(function (c) {
+          return c && !c.startsWith('edit-') && !c.startsWith('card-edit');
+        });
+        if (meaningful.length) parts.push('.' + meaningful[0]);
+      }
+
+      // Check for identifiable parent context
+      var section = el.closest('section, article, footer, .hero, .about-page, .project-page');
+      if (section) {
+        var sectionCls = section.className || section.tagName.toLowerCase();
+        parts.push('in ' + sectionCls.split(/\s+/)[0]);
+      }
+
+      var desc = tag;
+      if (parts.length) desc += ' (' + parts.join(' ') + ')';
+
+      return {
+        element: desc,
+        text: text,
+        page: window.location.pathname.split('/').pop() || 'index.html'
+      };
+    },
+
+    showSuggestModal: function (elementDesc) {
+      var self = this;
+      var existing = document.getElementById('editor-modal-overlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-modal-overlay';
+      overlay.className = 'editor-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Suggest an Improvement';
+      modal.appendChild(heading);
+
+      // Show selected element context
+      var contextDiv = document.createElement('div');
+      contextDiv.className = 'suggest-context';
+      var contextLabel = document.createElement('span');
+      contextLabel.className = 'suggest-context__label';
+      contextLabel.textContent = 'Selected element';
+      contextDiv.appendChild(contextLabel);
+      var contextText = document.createElement('span');
+      contextText.className = 'suggest-context__text';
+      contextText.textContent = elementDesc.text || elementDesc.element;
+      contextDiv.appendChild(contextText);
+      modal.appendChild(contextDiv);
+
+      // Suggestion textarea
+      var fieldDiv = document.createElement('div');
+      fieldDiv.className = 'editor-modal__field';
+      var label = document.createElement('label');
+      label.textContent = 'What should be improved?';
+      fieldDiv.appendChild(label);
+      var textarea = document.createElement('textarea');
+      textarea.placeholder = 'Describe what you\'d like changed...';
+      textarea.style.minHeight = '100px';
+      fieldDiv.appendChild(textarea);
+      modal.appendChild(fieldDiv);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      var submitBtn = document.createElement('button');
+      submitBtn.textContent = 'Submit';
+      submitBtn.className = 'modal-btn-primary';
+      submitBtn.addEventListener('click', function () {
+        var suggestion = textarea.value.trim();
+        if (!suggestion) {
+          self.showToast('Please describe the improvement', true);
+          textarea.focus();
+          return;
+        }
+        overlay.remove();
+        self.submitSuggestion(elementDesc, suggestion);
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(submitBtn);
+      modal.appendChild(actions);
+
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      setTimeout(function () { textarea.focus(); }, 50);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) overlay.remove();
+      });
+    },
+
+    submitSuggestion: function (elementDesc, suggestion) {
+      var title = encodeURIComponent('Suggestion: ' + (elementDesc.text || elementDesc.element).substring(0, 60));
+      var body = encodeURIComponent(
+        '**Page:** ' + elementDesc.page + '\n' +
+        '**Element:** ' + elementDesc.element + '\n' +
+        '**Content:** ' + (elementDesc.text || '(no text)') + '\n\n' +
+        '**Suggestion:**\n' + suggestion
+      );
+
+      var url = 'https://github.com/' + GITHUB_REPO + '/issues/new?labels=suggestion&title=' + title + '&body=' + body;
+      window.open(url, '_blank');
+      this.showToast('Suggestion opened in GitHub');
     },
 
     // --- Toast ---

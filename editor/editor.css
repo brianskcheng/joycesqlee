@@ -357,6 +357,54 @@ body.edit-mode .project-card.drag-over-after {
   box-shadow: 0 3px 0 0 var(--color-text);
 }
 
+/* --- Suggest Mode --- */
+body.suggest-mode {
+  cursor: crosshair !important;
+}
+
+body.suggest-mode * {
+  cursor: crosshair !important;
+}
+
+.suggest-highlight {
+  display: none;
+  position: absolute;
+  border: 2px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.08);
+  pointer-events: none;
+  z-index: 98;
+  transition: top 0.1s ease, left 0.1s ease, width 0.1s ease, height 0.1s ease;
+}
+
+.suggest-context {
+  background: var(--color-bg-alt);
+  padding: 12px;
+  margin-bottom: var(--spacing-md);
+  border-left: 3px solid #3b82f6;
+}
+
+.suggest-context__label {
+  display: block;
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 4px;
+}
+
+.suggest-context__text {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+#btn-suggest.active {
+  background: #3b82f6;
+  color: #fff;
+  border-color: #3b82f6;
+}
+
 /* --- Responsive --- */
 @media (max-width: 768px) {
   .editor-toolbar__inner {

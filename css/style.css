@@ -654,6 +654,7 @@ p {
   letter-spacing: 0.04em;
 }
 
+
 /* --- Project card hover --- */
 .project-card__image {
   transition: transform var(--transition);
