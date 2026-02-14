@@ -83,7 +83,7 @@
       "thumbnail": "projects/mycocycle-studio/aerial-visualisation.jpg",
       "descriptions": [
         "Informed by finger-shaped peninsulas designed in a group masterplan on Saxonvale, the rectilinear mycelium brick workshop is a place for production, discovery and community. Combining traditional agricultural heritage with contemporary innovation in materiality, the project aims to position Frome as a pioneer in circular economy, where buildings grow, decompose, and return to the earth.",
-        "Drawn from the subterranean imagery of mycelium weaving through soil and the woodland atmosphere of where mushrooms grow, the workshop is structured like a tree: Roots — an energy-giving component, where mushrooms grow. Trunk — services and circulation, pumping mycelium nurtures from underground to the fabrication workshop. Canopy — exposed structure capturing light and rain.",
+        "Drawn from the subterranean imagery of mycelium weaving through soil and the woodland atmosphere of where mushrooms grow, the workshop is structured like a tree:&nbsp;<div><br></div><div>Roots — an energy-giving component, where mushrooms grow.&nbsp;</div><div><br></div><div>Trunk — services and circulation, pumping mycelium nurtures from underground to the fabrication workshop.&nbsp;</div><div><br></div><div>Canopy — exposed structure capturing light and rain.</div>",
         "Visitors trace this vertical journey through tree-like structures, experiencing the mushroom's life cycle and symbolically becoming part of the forest network."
       ],
       "meta": [
@@ -102,10 +102,6 @@
         {
           "label": "Tutor",
           "value": "Charlotte Walker"
-        },
-        {
-          "label": "Grade",
-          "value": "78"
         }
       ],
       "images": [
