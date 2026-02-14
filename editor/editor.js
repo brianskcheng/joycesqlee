@@ -345,6 +345,9 @@
 
     // --- Homepage Editing ---
 
+    // --- Drag-to-Reorder State ---
+    dragState: null,
+
     enableHomepageEditing: function () {
       var self = this;
 
@@ -368,6 +371,77 @@
         // Prevent navigation in edit mode
         card.addEventListener('click', function (e) {
           if (self.active) e.preventDefault();
+        });
+
+        // --- Drag-to-Reorder ---
+        card.setAttribute('draggable', 'true');
+        card.setAttribute('data-index', index);
+
+        card.addEventListener('dragstart', function (e) {
+          self.dragState = { fromIndex: index };
+          card.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', index);
+        });
+
+        card.addEventListener('dragend', function () {
+          card.classList.remove('dragging');
+          self.dragState = null;
+          // Remove all drop indicators
+          document.querySelectorAll('.project-card').forEach(function (c) {
+            c.classList.remove('drag-over-before', 'drag-over-after');
+          });
+        });
+
+        card.addEventListener('dragover', function (e) {
+          if (!self.dragState) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+
+          // Determine if cursor is in top or bottom half
+          var rect = card.getBoundingClientRect();
+          var midY = rect.top + rect.height / 2;
+          var allCards = document.querySelectorAll('.project-card');
+          allCards.forEach(function (c) {
+            c.classList.remove('drag-over-before', 'drag-over-after');
+          });
+
+          if (e.clientY < midY) {
+            card.classList.add('drag-over-before');
+          } else {
+            card.classList.add('drag-over-after');
+          }
+        });
+
+        card.addEventListener('dragleave', function () {
+          card.classList.remove('drag-over-before', 'drag-over-after');
+        });
+
+        card.addEventListener('drop', function (e) {
+          e.preventDefault();
+          if (!self.dragState) return;
+
+          var fromIndex = self.dragState.fromIndex;
+          var rect = card.getBoundingClientRect();
+          var midY = rect.top + rect.height / 2;
+          var toIndex = e.clientY < midY ? index : index + 1;
+
+          // Adjust if dragging from before the drop target
+          if (fromIndex < toIndex) toIndex--;
+
+          if (fromIndex !== toIndex && toIndex >= 0 && toIndex < self.data.projects.length) {
+            var project = self.data.projects.splice(fromIndex, 1)[0];
+            self.data.projects.splice(toIndex, 0, project);
+            window.PortfolioApp.data = self.data;
+            window.PortfolioApp.render();
+            self.enableEditing();
+            self.markChanged();
+          }
+
+          self.dragState = null;
+          document.querySelectorAll('.project-card').forEach(function (c) {
+            c.classList.remove('dragging', 'drag-over-before', 'drag-over-after');
+          });
         });
 
         // Add control buttons

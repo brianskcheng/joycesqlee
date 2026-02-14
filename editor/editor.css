@@ -339,6 +339,24 @@ body.edit-mode .desc-edit-controls {
   background: #c0392b;
 }
 
+/* --- Drag-to-Reorder --- */
+body.edit-mode .project-card[draggable="true"] {
+  cursor: grab;
+}
+
+body.edit-mode .project-card.dragging {
+  opacity: 0.3;
+  cursor: grabbing;
+}
+
+body.edit-mode .project-card.drag-over-before {
+  box-shadow: 0 -3px 0 0 var(--color-text);
+}
+
+body.edit-mode .project-card.drag-over-after {
+  box-shadow: 0 3px 0 0 var(--color-text);
+}
+
 /* --- Responsive --- */
 @media (max-width: 768px) {
   .editor-toolbar__inner {

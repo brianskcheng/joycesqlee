@@ -10,9 +10,9 @@
       "title": "Syraka",
       "type": "Masterplan for Siracusa, Italy",
       "cardMeta": "6th Year Group Project · 2025 · Siracusa, Italy",
-      "thumbnail": "",
+      "thumbnail": "projects/syraka/render-quarry-retention.jpg",
       "descriptions": [
-        "The Masterplan proposes a regenerative vision for Siracusa through integrating environmental resilience, social infrastructure and strategic phasing. Drawing on the city’s etymological roots in Syraka, meaning a city with an abundance of water, the masterplan responds to contemporary challenges of drought and pollution from its petrochemical legacy.",
+        "The Masterplan proposes a regenerative vision for Siracusa through integrating environmental resilience, social infrastructure and strategic phasing. Drawing on the city's etymological roots in Syraka, meaning a city with an abundance of water, the masterplan responds to contemporary challenges of drought and pollution from its petrochemical legacy.",
         "As the city transitions towards clean energy, climate-resilient agriculture and sustainable tourism, water is repositioned as the driver of regeneration, transforming it from a scarce resource into an urban, ecological and social catalyst. This vision is articulated through the Loop, an intersecting blue-green system where land meets water.",
         "The Loop forms a continuous infrastructure for infiltration, attenuation and retention through reactivating historic quarries, river channels and the coastline. The strategy supports regional mobility, climate adaptation and heritage revival, while guiding controlled densification to limit sprawl, envisioning a regenerative model for Siracusa and Sicily."
       ],
@@ -40,32 +40,32 @@
       ],
       "images": [
         {
-          "src": "",
+          "src": "projects/syraka/render-quarry-retention.jpg",
           "caption": "Visualisation of a reactivated water retention quarry (Rhino, Enscape, Photoshop)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/syraka/masterplan-loop.png",
           "caption": "Plan of the Loop, envisioning Syraka by 2075 (AutoCAD, Photoshop, Procreate)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/syraka/syraka-vision-panorama.jpg",
           "caption": "The Syraka Vision (Rhino, Enscape, Photoshop)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/syraka/kit-of-parts-walkway.png",
           "caption": "'Coltura Promiscua' Kit of Parts",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/syraka/syraka-vision-aerial.jpg",
           "caption": "Hand drawing (Procreate)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/syraka/section-city-systems.png",
           "caption": "Section of city-wide energy, water and waste systems (Photoshop on handdrawing)",
           "layout": "full"
         }
@@ -80,11 +80,11 @@
       "title": "MycoCycle Studio",
       "type": "The Journey of Frome's Mushrooms",
       "cardMeta": "5th Year Project · 2025 · Saxonvale, Frome",
-      "thumbnail": "",
+      "thumbnail": "projects/mycocycle-studio/aerial-visualisation.jpg",
       "descriptions": [
         "Informed by finger-shaped peninsulas designed in a group masterplan on Saxonvale, the rectilinear mycelium brick workshop is a place for production, discovery and community. Combining traditional agricultural heritage with contemporary innovation in materiality, the project aims to position Frome as a pioneer in circular economy, where buildings grow, decompose, and return to the earth.",
         "Drawn from the subterranean imagery of mycelium weaving through soil and the woodland atmosphere of where mushrooms grow, the workshop is structured like a tree: Roots — an energy-giving component, where mushrooms grow. Trunk — services and circulation, pumping mycelium nurtures from underground to the fabrication workshop. Canopy — exposed structure capturing light and rain.",
-        "Visitors trace this vertical journey through tree-like structures, experiencing the mushroom’s life cycle and symbolically becoming part of the forest network."
+        "Visitors trace this vertical journey through tree-like structures, experiencing the mushroom's life cycle and symbolically becoming part of the forest network."
       ],
       "meta": [
         {
@@ -110,37 +110,37 @@
       ],
       "images": [
         {
-          "src": "",
+          "src": "projects/mycocycle-studio/aerial-visualisation.jpg",
           "caption": "Aerial Visualisation (Rhino, Enscape, Photoshop)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/mycocycle-studio/render-exterior.jpg",
           "caption": "Renders showing tree structure — roots, trunk, canopy",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/mycocycle-studio/tree-structure-concept.png",
           "caption": "Hierarchy of Tree Structures diagram",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/mycocycle-studio/short-section.jpg",
           "caption": "Short Section 1:100 featuring the mushroom cafe (Rhino, Enscape, Photoshop)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/mycocycle-studio/model-discovery-roots.png",
           "caption": "Discovery roots 1:20 model",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/mycocycle-studio/model-tree-column.png",
           "caption": "Tree column and facade 1:50 model",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/mycocycle-studio/isometric-render-full.jpg",
           "caption": "Isometric render — subterranean and forest journey (Rhino, Grasshopper, Enscape, Photoshop)",
           "layout": "full"
         }
@@ -155,10 +155,10 @@
       "title": "Lucy's Room",
       "type": "Music Therapy Centre for Warneford Hospital",
       "cardMeta": "4th Year Project · 2023 · Headington, Oxford",
-      "thumbnail": "",
+      "thumbnail": "projects/lucys-room/render-sensory-garden.png",
       "descriptions": [
-        "Lucy Sessions, a young mother living with emotionally unstable disorder, found her only comfort in practicing music. After her passing in 2017, her parents partnered with Oxford Health Charity to propose a music room at Warneford Hospital, Oxford. Their initiative highlighted the potential of music as a therapeutic tool for mental health. This project, inspired by Lucy’s story, celebrates the healing power of music through spaces designed for sensory experiences, restoration, education and community engagement.",
-        "Awarded the Prize for Environmental Design & Wellbeing, the proposal adopts a protective courtyard form, surrounding the garden are music rooms resembling potted plants to symbolise nurture and growth. The palette of materials, lighting, acoustics and landscapes, underpinned by biophilic principles and sustainable systems, supports therapy and music use. Comfort and sustainability guide the design, positively shaping user experience and the building’s life cycle."
+        "Lucy Sessions, a young mother living with emotionally unstable disorder, found her only comfort in practicing music. After her passing in 2017, her parents partnered with Oxford Health Charity to propose a music room at Warneford Hospital, Oxford. Their initiative highlighted the potential of music as a therapeutic tool for mental health. This project, inspired by Lucy's story, celebrates the healing power of music through spaces designed for sensory experiences, restoration, education and community engagement.",
+        "Awarded the Prize for Environmental Design & Wellbeing, the proposal adopts a protective courtyard form, surrounding the garden are music rooms resembling potted plants to symbolise nurture and growth. The palette of materials, lighting, acoustics and landscapes, underpinned by biophilic principles and sustainable systems, supports therapy and music use. Comfort and sustainability guide the design, positively shaping user experience and the building's life cycle."
       ],
       "meta": [
         {
@@ -184,47 +184,47 @@
       ],
       "images": [
         {
-          "src": "",
+          "src": "projects/lucys-room/render-sensory-garden.png",
           "caption": "Visualisation of the sensory garden (Rhino, Enscape)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/location-plan.png",
           "caption": "Location Plan 1:1000 (AutoCAD, Illustrator, Photoshop)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/massing-strategy-04-cloister.jpg",
           "caption": "Massing Strategy diagram",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/long-section.png",
           "caption": "Long Section 1:200 — progression from public to private spaces (Rhino, Enscape, Photoshop)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/ground-floor-plan.png",
           "caption": "Ground Floor Plan 1:200 (AutoCAD, Photoshop)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/render-top-down.png",
           "caption": "Top-down render (Rhino, Enscape, Photoshop)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/exploded-isometric-rendered.png",
           "caption": "Exploded isometric diagram (Rhino, Enscape, Illustrator)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/render-therapy-room.png",
           "caption": "Internal visualisations — therapy room and cloister",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/lucys-room/detailed-section.png",
           "caption": "Detailed section 1:20 — blue roof, terracotta cladding, rainchain detail (AutoCAD, Rhino, Illustrator)",
           "layout": "full"
         }
@@ -239,10 +239,10 @@
       "title": "South West Campus",
       "type": "Polytechnic University Campus Redevelopment",
       "cardMeta": "LWK + Partners · 2024 · Hong Kong",
-      "thumbnail": "",
+      "thumbnail": "projects/south-west-campus/external-render.png",
       "descriptions": [
-        "I was heavily involved in the creative process, from concept generation at tender stage to finalizing the design and preparing all architectural drawings for planning. In response to PolyU’s long-standing need for flexible, high capacity academic and research space, the south west redevelopment of A Wing and GH Annex delivers a 15 storey building with 19,400 sqm of usable space, providing laboratories, workshops, classrooms, study areas, communal facilities, and offices.",
-        "The design enhances the university’s identity by extending the campus’ podium for improved connectivity. The lower levels introduce stepping terraces with planting to reduce impact at street level and retaining PolyU’s signature red brick. Above, curved glass facades and metal cladding of the ‘tower’ contrast with its solid base, symbolising the balanced values of heritage and innovation at the university."
+        "I was heavily involved in the creative process, from concept generation at tender stage to finalizing the design and preparing all architectural drawings for planning. In response to PolyU's long-standing need for flexible, high capacity academic and research space, the south west redevelopment of A Wing and GH Annex delivers a 15 storey building with 19,400 sqm of usable space, providing laboratories, workshops, classrooms, study areas, communal facilities, and offices.",
+        "The design enhances the university's identity by extending the campus' podium for improved connectivity. The lower levels introduce stepping terraces with planting to reduce impact at street level and retaining PolyU's signature red brick. Above, curved glass facades and metal cladding of the 'tower' contrast with its solid base, symbolising the balanced values of heritage and innovation at the university."
       ],
       "meta": [
         {
@@ -268,17 +268,17 @@
       ],
       "images": [
         {
-          "src": "",
+          "src": "projects/south-west-campus/external-render.png",
           "caption": "External render from road junction (Rhino, Vray, Photoshop)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/south-west-campus/design-option-01.png",
           "caption": "Matrix of design options for tender application",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/south-west-campus/massing-study.png",
           "caption": "Stacking masses / Void studies",
           "layout": "half"
         },
@@ -298,9 +298,9 @@
       "title": "Residential Works",
       "type": "Extension and Refurbishment of Dwelling",
       "cardMeta": "CaSA Architects · 2022 · North East Somerset",
-      "thumbnail": "",
+      "thumbnail": "projects/residential-works/hamilton-road-proposed-elevation.png",
       "descriptions": [
-        "I contributed to concept and options development in form, layout and materiality, and preparing full drawing packages for planning applications. A key focus was creating seamless connections with the surrounding landscape and Bath’s historic urban fabric, which gave me insight into design development and planning procedures.",
+        "I contributed to concept and options development in form, layout and materiality, and preparing full drawing packages for planning applications. A key focus was creating seamless connections with the surrounding landscape and Bath's historic urban fabric, which gave me insight into design development and planning procedures.",
         "<strong>3 Hamilton Road</strong> — Refurbishment including over-cladding and insulation, redevelopment of the first floor and garden extension and enhanced landscaping.",
         "<strong>9 Dower Cottage</strong> — Improvement works including an open-plan kitchen and dining extension opening onto the garden, replacement of a deteriorated dormer window to improve the first-floor bedroom."
       ],
@@ -328,32 +328,32 @@
       ],
       "images": [
         {
-          "src": "",
+          "src": "projects/residential-works/hamilton-road-existing.jpg",
           "caption": "3 Hamilton Road — Existing elevation",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/residential-works/hamilton-road-proposed-elevation.png",
           "caption": "3 Hamilton Road — Proposed elevation (Vectorworks)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/residential-works/hamilton-road-proposed-plan.png",
           "caption": "3 Hamilton Road — Proposed ground floor plan (Vectorworks)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/residential-works/dower-cottage-proposed-north-elevation.png",
           "caption": "9 Dower Cottage — Proposed north elevation (Vectorworks)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/residential-works/dower-cottage-proposed-east-elevation.png",
           "caption": "9 Dower Cottage — Proposed east elevation (Vectorworks)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/residential-works/handsketch-the-paddocks.jpg",
           "caption": "Handsketch of proposed scheme of The Paddocks (sketch on paper, Photoshop)",
           "layout": "full"
         }
@@ -368,10 +368,10 @@
       "title": "Waterway Bridge",
       "type": "Dongguan Taiping Waterway Bridge Design Competition",
       "cardMeta": "Wilkinson Eyre · 2021 · Dongguan, China",
-      "thumbnail": "",
+      "thumbnail": "projects/waterway-bridge/aerial-view.jpg",
       "descriptions": [
         "As a placement student, I was responsible for digital modeling, diagramming and a full set of architectural drawings for the competition submission. The proposal was awarded the Gold Winner for its world-class pedestrian-motorway bridge design.",
-        "The tied-arch bridge features a 370m main span with a steel box girder deck supported by hanger cables and compression arches. The concept integrated green space planning, water transport, city lighting and carbon reduction strategies. The design integrates the district’s masterplan, celebrating the city and water, day and night, natural and man-made landscapes.",
+        "The tied-arch bridge features a 370m main span with a steel box girder deck supported by hanger cables and compression arches. The concept integrated green space planning, water transport, city lighting and carbon reduction strategies. The design integrates the district's masterplan, celebrating the city and water, day and night, natural and man-made landscapes.",
         "The bridge creates a sustainable, multi-modal crossing that separates motorized and slow traffic, with pedestrian platforms hovering over the motorway that offer views of the bay, enhancing connectivity and public experience."
       ],
       "meta": [
@@ -402,22 +402,22 @@
       ],
       "images": [
         {
-          "src": "",
+          "src": "projects/waterway-bridge/aerial-view.jpg",
           "caption": "Aerial view render (Rhino, rendering outsourced)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/waterway-bridge/masterplan.png",
           "caption": "Masterplan 1:3000 on A1 (Rhino, AutoCAD, Photoshop)",
           "layout": "full"
         },
         {
-          "src": "",
+          "src": "projects/waterway-bridge/section-exploded.png",
           "caption": "Section drawings (Rhino, AutoCAD)",
           "layout": "half"
         },
         {
-          "src": "",
+          "src": "projects/waterway-bridge/sectional-perspective-01.png",
           "caption": "Sectional perspectives (Rhino, InDesign)",
           "layout": "half"
         }
