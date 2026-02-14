@@ -214,9 +214,11 @@ p {
 .hero {
   margin-top: var(--nav-height);
   position: relative;
-  min-height: 420px;
+  height: 70vh;
+  min-height: 480px;
+  max-height: 700px;
   background-size: cover;
-  background-position: center 40%;
+  background-position: center center;
   background-repeat: no-repeat;
   display: flex;
   align-items: flex-end;
@@ -228,17 +230,17 @@ p {
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(255, 255, 255, 0.92) 0%,
-    rgba(255, 255, 255, 0.6) 50%,
-    rgba(255, 255, 255, 0.15) 100%
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.85) 25%,
+    rgba(255, 255, 255, 0) 50%
   );
 }
 
 .hero__content {
   position: relative;
   z-index: 1;
-  padding-top: var(--spacing-2xl);
-  padding-bottom: var(--spacing-2xl);
+  padding-top: var(--spacing-lg);
+  padding-bottom: var(--spacing-lg);
 }
 
 .hero__title {
@@ -524,14 +526,11 @@ p {
 
 .about-page__photo {
   width: 100%;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
 }
 
 .about-page__photo img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
 
 .about-page__bio h1 {
@@ -733,7 +732,9 @@ p {
   }
 
   .hero {
-    min-height: 320px;
+    height: 50vh;
+    min-height: 300px;
+    max-height: 450px;
   }
 
   .projects-grid {
