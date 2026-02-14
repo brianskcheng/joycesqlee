@@ -150,6 +150,13 @@
         });
       });
 
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      actions.appendChild(cancelBtn);
       actions.appendChild(discardBtn);
       actions.appendChild(publishBtn);
       modal.appendChild(actions);
@@ -197,15 +204,15 @@
     },
 
     toggleEditMode: function () {
+      var self = this;
+
       // Password gate: require password on first activation per session
       if (!this.active && !this.unlocked) {
-        var password = prompt('Enter editor password:');
-        if (password === null) return;
-        if (simpleHash(password) !== EDITOR_PASSWORD_HASH) {
-          this.showToast('Incorrect password', true);
-          return;
-        }
-        this.unlocked = true;
+        this.showPasswordPrompt(function () {
+          self.unlocked = true;
+          self.enterEditMode();
+        });
+        return;
       }
 
       // If exiting edit mode with unsaved changes, warn
@@ -214,20 +221,109 @@
         return;
       }
 
-      this.active = !this.active;
-      document.body.classList.toggle('edit-mode', this.active);
+      if (this.active) {
+        this.exitEditMode();
+      } else {
+        this.enterEditMode();
+      }
+    },
+
+    enterEditMode: function () {
+      this.active = true;
+      document.body.classList.add('edit-mode');
 
       var toggleBtn = document.getElementById('edit-toggle');
       if (toggleBtn) {
-        toggleBtn.classList.toggle('active', this.active);
-        toggleBtn.textContent = this.active ? 'Exit Edit' : 'Edit';
+        toggleBtn.classList.add('active');
+        toggleBtn.textContent = 'Exit Edit';
       }
 
-      if (this.active) {
-        this.enableEditing();
-      } else {
-        this.disableEditing();
+      this.enableEditing();
+    },
+
+    exitEditMode: function () {
+      this.active = false;
+      document.body.classList.remove('edit-mode');
+
+      var toggleBtn = document.getElementById('edit-toggle');
+      if (toggleBtn) {
+        toggleBtn.classList.remove('active');
+        toggleBtn.textContent = 'Edit';
       }
+
+      this.disableEditing();
+    },
+
+    showPasswordPrompt: function (onSuccess) {
+      var self = this;
+      var existing = document.getElementById('editor-modal-overlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-modal-overlay';
+      overlay.className = 'editor-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Enter Password';
+      modal.appendChild(heading);
+
+      var fieldDiv = document.createElement('div');
+      fieldDiv.className = 'editor-modal__field';
+
+      var label = document.createElement('label');
+      label.textContent = 'Password';
+      fieldDiv.appendChild(label);
+
+      var input = document.createElement('input');
+      input.type = 'password';
+      input.placeholder = 'Enter editor password';
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') submitBtn.click();
+      });
+      fieldDiv.appendChild(input);
+
+      modal.appendChild(fieldDiv);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      var submitBtn = document.createElement('button');
+      submitBtn.textContent = 'Enter';
+      submitBtn.className = 'modal-btn-primary';
+      submitBtn.addEventListener('click', function () {
+        var password = input.value;
+        if (simpleHash(password) !== EDITOR_PASSWORD_HASH) {
+          self.showToast('Incorrect password', true);
+          input.value = '';
+          input.focus();
+          return;
+        }
+        overlay.remove();
+        if (onSuccess) onSuccess();
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(submitBtn);
+      modal.appendChild(actions);
+
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      // Focus the input
+      setTimeout(function () { input.focus(); }, 50);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) overlay.remove();
+      });
     },
 
     // --- Enable / Disable Editing ---
