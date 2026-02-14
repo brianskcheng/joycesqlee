@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Joyce Lee — Selected Works</title>
+  <title>Project — Joyce Lee</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
@@ -12,7 +12,6 @@
 </head>
 <body>
 
-  <!-- Navigation -->
   <nav class="nav">
     <div class="nav__inner">
       <a href="index.html" class="nav__logo">Joyce Lee</a>
@@ -29,7 +28,6 @@
     </div>
   </nav>
 
-  <!-- Mobile nav overlay -->
   <div class="nav__mobile">
     <a href="index.html">Projects</a>
     <a href="about.html">About</a>
@@ -40,7 +38,6 @@
     <div class="editor-toolbar__inner">
       <span class="editor-toolbar__status" id="editor-status">Edit Mode</span>
       <div class="editor-toolbar__actions">
-        <button class="editor-btn" id="btn-add-project">+ Add Project</button>
         <button class="editor-btn editor-btn--secondary" id="btn-save-draft">Save Draft</button>
         <button class="editor-btn editor-btn--primary" id="btn-publish">Publish</button>
         <button class="editor-btn editor-btn--settings" id="btn-settings" title="Settings">Settings</button>
@@ -48,32 +45,12 @@
     </div>
   </div>
 
-  <!-- Hero -->
-  <section class="hero">
-    <div class="container">
-      <h1 class="hero__title" id="site-title"></h1>
-      <p class="hero__subtitle" id="site-subtitle"></p>
-      <p class="hero__tagline" id="site-tagline"></p>
+  <article class="project-page">
+    <div class="container" id="project-content">
+      <!-- Rendered dynamically by main.js -->
     </div>
-  </section>
+  </article>
 
-  <!-- View Controls -->
-  <div class="container">
-    <div class="view-controls">
-      <span class="view-controls__label" id="project-count"></span>
-      <div class="view-toggle">
-        <button class="active" data-view="grid">Grid</button>
-        <button data-view="list">List</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Projects Grid -->
-  <main class="container">
-    <div class="projects-grid" id="projects-grid"></div>
-  </main>
-
-  <!-- Footer -->
   <footer class="footer">
     <div class="footer__inner">
       <span class="footer__copy">Joyce Lee &copy; 2025</span>

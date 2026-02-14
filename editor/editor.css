@@ -1,0 +1,362 @@
+/* ===== EDITOR MODE STYLES ===== */
+
+/* --- Edit Toggle Button --- */
+.edit-toggle-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  transition: all var(--transition);
+  margin-left: var(--spacing-lg);
+}
+
+.edit-toggle-btn:hover {
+  color: var(--color-text);
+  border-color: var(--color-text);
+}
+
+.edit-toggle-btn.active {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+
+/* --- Editor Toolbar --- */
+.editor-toolbar {
+  display: none;
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  background: #1a1a1a;
+  color: #ffffff;
+  z-index: 99;
+  border-bottom: 1px solid #333;
+}
+
+body.edit-mode .editor-toolbar {
+  display: block;
+}
+
+body.edit-mode .hero,
+body.edit-mode .project-page {
+  margin-top: calc(var(--nav-height) + 48px);
+}
+
+.editor-toolbar__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.editor-toolbar__status {
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #999;
+}
+
+.editor-toolbar__actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* --- Editor Buttons --- */
+.editor-btn {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid #555;
+  background: transparent;
+  color: #ccc;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.editor-btn:hover {
+  border-color: #999;
+  color: #fff;
+}
+
+.editor-btn--secondary {
+  border-color: #666;
+}
+
+.editor-btn--primary {
+  background: #fff;
+  color: #1a1a1a;
+  border-color: #fff;
+}
+
+.editor-btn--primary:hover {
+  background: #e0e0e0;
+  border-color: #e0e0e0;
+}
+
+.editor-btn--settings {
+  border: none;
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+/* --- Editable Fields --- */
+body.edit-mode [data-editable] {
+  outline: 1px dashed transparent;
+  transition: outline-color var(--transition), background-color var(--transition);
+  cursor: text;
+  min-height: 1em;
+}
+
+body.edit-mode [data-editable]:hover {
+  outline-color: var(--color-border);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+body.edit-mode [data-editable]:focus {
+  outline-color: var(--color-text);
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* --- Edit Action Buttons (inline) --- */
+.edit-action-btn {
+  display: none;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border: 1px dashed var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: var(--spacing-xs);
+}
+
+body.edit-mode .edit-action-btn {
+  display: inline-block;
+}
+
+.edit-action-btn:hover {
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+
+.edit-action-btn--danger {
+  color: #c0392b;
+  border-color: #e0b4ae;
+}
+
+.edit-action-btn--danger:hover {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+/* --- Card Edit Controls --- */
+.card-edit-controls {
+  display: none;
+  gap: 4px;
+  margin-top: var(--spacing-xs);
+}
+
+body.edit-mode .card-edit-controls {
+  display: flex;
+}
+
+.card-edit-controls button {
+  font-family: var(--font-primary);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.card-edit-controls button:hover {
+  border-color: var(--color-text);
+  color: var(--color-text);
+}
+
+.card-edit-controls button.delete-btn:hover {
+  color: #e74c3c;
+  border-color: #e74c3c;
+}
+
+/* --- Project Edit Controls on Project Page --- */
+.meta-edit-controls,
+.image-edit-controls,
+.desc-edit-controls {
+  display: none;
+  margin-top: var(--spacing-xs);
+}
+
+body.edit-mode .meta-edit-controls,
+body.edit-mode .image-edit-controls,
+body.edit-mode .desc-edit-controls {
+  display: block;
+}
+
+/* --- Modal Overlay --- */
+.editor-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor-modal-overlay.open {
+  display: flex;
+}
+
+.editor-modal {
+  background: var(--color-bg);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--spacing-lg);
+}
+
+.editor-modal h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.editor-modal__field {
+  margin-bottom: var(--spacing-md);
+}
+
+.editor-modal__field label {
+  display: block;
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin-bottom: 6px;
+}
+
+.editor-modal__field input,
+.editor-modal__field textarea,
+.editor-modal__field select {
+  width: 100%;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 300;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.editor-modal__field input:focus,
+.editor-modal__field textarea:focus {
+  border-color: var(--color-text);
+}
+
+.editor-modal__field textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.editor-modal__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
+}
+
+.editor-modal__actions button {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.editor-modal__actions button:hover {
+  border-color: var(--color-text);
+}
+
+.editor-modal__actions .modal-btn-primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+
+.editor-modal__actions .modal-btn-primary:hover {
+  opacity: 0.8;
+}
+
+/* --- Toast Notification --- */
+.editor-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1a1a1a;
+  color: #fff;
+  padding: 12px 20px;
+  font-family: var(--font-primary);
+  font-size: var(--font-size-sm);
+  z-index: 300;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+.editor-toast.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.editor-toast.error {
+  background: #c0392b;
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+  .edit-toggle-btn {
+    display: none;
+  }
+
+  .editor-toolbar__inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding: 8px var(--spacing-md);
+    gap: 8px;
+  }
+
+  .editor-toolbar__actions {
+    flex-wrap: wrap;
+  }
+}

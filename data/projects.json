@@ -1,0 +1,176 @@
+{
+  "site": {
+    "title": "Selected Works",
+    "subtitle": "Part II Architectural Assistant \u00b7 ARB/RIBA Part 2",
+    "tagline": "A portfolio of academic and practice-based projects spanning campus design, residential refurbishment, bridge engineering, urban masterplanning, and therapeutic architecture."
+  },
+  "projects": [
+    {
+      "slug": "south-west-campus",
+      "title": "South West Campus",
+      "type": "Polytechnic University Campus Redevelopment",
+      "cardMeta": "LWK + Partners \u00b7 2024 \u00b7 Hong Kong",
+      "thumbnail": "",
+      "descriptions": [
+        "I was heavily involved in the creative process, from concept generation at tender stage to finalizing the design and preparing all architectural drawings for planning. In response to PolyU\u2019s long-standing need for flexible, high capacity academic and research space, the south west redevelopment of A Wing and GH Annex delivers a 15 storey building with 19,400 sqm of usable space, providing laboratories, workshops, classrooms, study areas, communal facilities, and offices.",
+        "The design enhances the university\u2019s identity by extending the campus\u2019 podium for improved connectivity. The lower levels introduce stepping terraces with planting to reduce impact at street level and retaining PolyU\u2019s signature red brick. Above, curved glass facades and metal cladding of the \u2018tower\u2019 contrast with its solid base, symbolising the balanced values of heritage and innovation at the university."
+      ],
+      "meta": [
+        { "label": "Practice", "value": "LWK + Partners" },
+        { "label": "Date", "value": "Mar \u2013 Sep 2024" },
+        { "label": "Location", "value": "Hong Kong" },
+        { "label": "Client", "value": "Hong Kong Polytechnic University" },
+        { "label": "RIBA Stage", "value": "0\u20133" }
+      ],
+      "images": [
+        { "src": "", "caption": "External render from road junction (Rhino, Vray, Photoshop)", "layout": "full" },
+        { "src": "", "caption": "Matrix of design options for tender application", "layout": "half" },
+        { "src": "", "caption": "Stacking masses / Void studies", "layout": "half" },
+        { "src": "", "caption": "Tower Plan (8th floor) 1:250 \u2014 Technical Feasibility Study (Revit)", "layout": "full" }
+      ],
+      "relatedProjects": ["residential-works", "waterway-bridge"]
+    },
+    {
+      "slug": "residential-works",
+      "title": "Residential Works",
+      "type": "Extension and Refurbishment of Dwelling",
+      "cardMeta": "CaSA Architects \u00b7 2022 \u00b7 North East Somerset",
+      "thumbnail": "",
+      "descriptions": [
+        "I contributed to concept and options development in form, layout and materiality, and preparing full drawing packages for planning applications. A key focus was creating seamless connections with the surrounding landscape and Bath\u2019s historic urban fabric, which gave me insight into design development and planning procedures.",
+        "<strong>3 Hamilton Road</strong> \u2014 Refurbishment including over-cladding and insulation, redevelopment of the first floor and garden extension and enhanced landscaping.",
+        "<strong>9 Dower Cottage</strong> \u2014 Improvement works including an open-plan kitchen and dining extension opening onto the garden, replacement of a deteriorated dormer window to improve the first-floor bedroom."
+      ],
+      "meta": [
+        { "label": "Practice", "value": "CaSA Architects" },
+        { "label": "Date", "value": "Apr \u2013 Sep 2022" },
+        { "label": "Location", "value": "North East Somerset" },
+        { "label": "Client", "value": "Various" },
+        { "label": "RIBA Stage", "value": "1\u20133" }
+      ],
+      "images": [
+        { "src": "", "caption": "3 Hamilton Road \u2014 Existing elevation", "layout": "half" },
+        { "src": "", "caption": "3 Hamilton Road \u2014 Proposed elevation (Vectorworks)", "layout": "half" },
+        { "src": "", "caption": "3 Hamilton Road \u2014 Proposed ground floor plan (Vectorworks)", "layout": "full" },
+        { "src": "", "caption": "9 Dower Cottage \u2014 Proposed north elevation (Vectorworks)", "layout": "half" },
+        { "src": "", "caption": "9 Dower Cottage \u2014 Proposed east elevation (Vectorworks)", "layout": "half" },
+        { "src": "", "caption": "Handsketch of proposed scheme of The Paddocks (sketch on paper, Photoshop)", "layout": "full" }
+      ],
+      "relatedProjects": ["south-west-campus", "lucys-room"]
+    },
+    {
+      "slug": "waterway-bridge",
+      "title": "Waterway Bridge",
+      "type": "Dongguan Taiping Waterway Bridge Design Competition",
+      "cardMeta": "Wilkinson Eyre \u00b7 2021 \u00b7 Dongguan, China",
+      "thumbnail": "",
+      "descriptions": [
+        "As a placement student, I was responsible for digital modeling, diagramming and a full set of architectural drawings for the competition submission. The proposal was awarded the Gold Winner for its world-class pedestrian-motorway bridge design.",
+        "The tied-arch bridge features a 370m main span with a steel box girder deck supported by hanger cables and compression arches. The concept integrated green space planning, water transport, city lighting and carbon reduction strategies. The design integrates the district\u2019s masterplan, celebrating the city and water, day and night, natural and man-made landscapes.",
+        "The bridge creates a sustainable, multi-modal crossing that separates motorized and slow traffic, with pedestrian platforms hovering over the motorway that offer views of the bay, enhancing connectivity and public experience."
+      ],
+      "meta": [
+        { "label": "Practice", "value": "Wilkinson Eyre" },
+        { "label": "Date", "value": "Apr \u2013 Jul 2021" },
+        { "label": "Location", "value": "Dongguan, China" },
+        { "label": "Client", "value": "Dongguan Binhaiwan New District Management Committee" },
+        { "label": "RIBA Stage", "value": "0\u20131" },
+        { "label": "Award", "value": "Gold Winner" }
+      ],
+      "images": [
+        { "src": "", "caption": "Aerial view render (Rhino, rendering outsourced)", "layout": "full" },
+        { "src": "", "caption": "Masterplan 1:3000 on A1 (Rhino, AutoCAD, Photoshop)", "layout": "full" },
+        { "src": "", "caption": "Section drawings (Rhino, AutoCAD)", "layout": "half" },
+        { "src": "", "caption": "Sectional perspectives (Rhino, InDesign)", "layout": "half" }
+      ],
+      "relatedProjects": ["south-west-campus", "syraka"]
+    },
+    {
+      "slug": "syraka",
+      "title": "Syraka",
+      "type": "Masterplan for Siracusa, Italy",
+      "cardMeta": "6th Year Group Project \u00b7 2025 \u00b7 Siracusa, Italy",
+      "thumbnail": "",
+      "descriptions": [
+        "The Masterplan proposes a regenerative vision for Siracusa through integrating environmental resilience, social infrastructure and strategic phasing. Drawing on the city\u2019s etymological roots in Syraka, meaning a city with an abundance of water, the masterplan responds to contemporary challenges of drought and pollution from its petrochemical legacy.",
+        "As the city transitions towards clean energy, climate-resilient agriculture and sustainable tourism, water is repositioned as the driver of regeneration, transforming it from a scarce resource into an urban, ecological and social catalyst. This vision is articulated through the Loop, an intersecting blue-green system where land meets water.",
+        "The Loop forms a continuous infrastructure for infiltration, attenuation and retention through reactivating historic quarries, river channels and the coastline. The strategy supports regional mobility, climate adaptation and heritage revival, while guiding controlled densification to limit sprawl, envisioning a regenerative model for Siracusa and Sicily."
+      ],
+      "meta": [
+        { "label": "Unit", "value": "6th Year Design Studio 6.1" },
+        { "label": "Date", "value": "Sep \u2013 Dec 2025" },
+        { "label": "Location", "value": "Siracusa, Italy" },
+        { "label": "Tutors", "value": "Alexander Wright, Anne Claxton, Jayne Barlow, Rupert Grierson, Andy Jarvis" },
+        { "label": "Collaborators", "value": "Amanda Chan, Britney Tennant, Caitlin Hawkins, Solenn Maillard, Lizzie Stephens" }
+      ],
+      "images": [
+        { "src": "", "caption": "Visualisation of a reactivated water retention quarry (Rhino, Enscape, Photoshop)", "layout": "full" },
+        { "src": "", "caption": "Plan of the Loop, envisioning Syraka by 2075 (AutoCAD, Photoshop, Procreate)", "layout": "full" },
+        { "src": "", "caption": "The Syraka Vision (Rhino, Enscape, Photoshop)", "layout": "full" },
+        { "src": "", "caption": "'Coltura Promiscua' Kit of Parts", "layout": "half" },
+        { "src": "", "caption": "Hand drawing (Procreate)", "layout": "half" },
+        { "src": "", "caption": "Section of city-wide energy, water and waste systems (Photoshop on handdrawing)", "layout": "full" }
+      ],
+      "relatedProjects": ["mycocycle-studio", "lucys-room"]
+    },
+    {
+      "slug": "mycocycle-studio",
+      "title": "MycoCycle Studio",
+      "type": "The Journey of Frome's Mushrooms",
+      "cardMeta": "5th Year Project \u00b7 2025 \u00b7 Saxonvale, Frome",
+      "thumbnail": "",
+      "descriptions": [
+        "Informed by finger-shaped peninsulas designed in a group masterplan on Saxonvale, the rectilinear mycelium brick workshop is a place for production, discovery and community. Combining traditional agricultural heritage with contemporary innovation in materiality, the project aims to position Frome as a pioneer in circular economy, where buildings grow, decompose, and return to the earth.",
+        "Drawn from the subterranean imagery of mycelium weaving through soil and the woodland atmosphere of where mushrooms grow, the workshop is structured like a tree: Roots \u2014 an energy-giving component, where mushrooms grow. Trunk \u2014 services and circulation, pumping mycelium nurtures from underground to the fabrication workshop. Canopy \u2014 exposed structure capturing light and rain.",
+        "Visitors trace this vertical journey through tree-like structures, experiencing the mushroom\u2019s life cycle and symbolically becoming part of the forest network."
+      ],
+      "meta": [
+        { "label": "Unit", "value": "5th Year Design Studio" },
+        { "label": "Date", "value": "Feb \u2013 May 2025" },
+        { "label": "Location", "value": "Saxonvale, Frome" },
+        { "label": "Tutor", "value": "Charlotte Walker" },
+        { "label": "Grade", "value": "78" }
+      ],
+      "images": [
+        { "src": "", "caption": "Aerial Visualisation (Rhino, Enscape, Photoshop)", "layout": "full" },
+        { "src": "", "caption": "Renders showing tree structure \u2014 roots, trunk, canopy", "layout": "half" },
+        { "src": "", "caption": "Hierarchy of Tree Structures diagram", "layout": "half" },
+        { "src": "", "caption": "Short Section 1:100 featuring the mushroom cafe (Rhino, Enscape, Photoshop)", "layout": "full" },
+        { "src": "", "caption": "Discovery roots 1:20 model", "layout": "half" },
+        { "src": "", "caption": "Tree column and facade 1:50 model", "layout": "half" },
+        { "src": "", "caption": "Isometric render \u2014 subterranean and forest journey (Rhino, Grasshopper, Enscape, Photoshop)", "layout": "full" }
+      ],
+      "relatedProjects": ["syraka", "lucys-room"]
+    },
+    {
+      "slug": "lucys-room",
+      "title": "Lucy's Room",
+      "type": "Music Therapy Centre for Warneford Hospital",
+      "cardMeta": "4th Year Project \u00b7 2023 \u00b7 Headington, Oxford",
+      "thumbnail": "",
+      "descriptions": [
+        "Lucy Sessions, a young mother living with emotionally unstable disorder, found her only comfort in practicing music. After her passing in 2017, her parents partnered with Oxford Health Charity to propose a music room at Warneford Hospital, Oxford. Their initiative highlighted the potential of music as a therapeutic tool for mental health. This project, inspired by Lucy\u2019s story, celebrates the healing power of music through spaces designed for sensory experiences, restoration, education and community engagement.",
+        "Awarded the Prize for Environmental Design & Wellbeing, the proposal adopts a protective courtyard form, surrounding the garden are music rooms resembling potted plants to symbolise nurture and growth. The palette of materials, lighting, acoustics and landscapes, underpinned by biophilic principles and sustainable systems, supports therapy and music use. Comfort and sustainability guide the design, positively shaping user experience and the building\u2019s life cycle."
+      ],
+      "meta": [
+        { "label": "Unit", "value": "4th Year Design Studio" },
+        { "label": "Date", "value": "Jan \u2013 May 2023" },
+        { "label": "Location", "value": "Headington, Oxford" },
+        { "label": "Tutor", "value": "Elyse Howell-Price" },
+        { "label": "Award", "value": "Prize for Environmental Design & Wellbeing (D-NA)" }
+      ],
+      "images": [
+        { "src": "", "caption": "Visualisation of the sensory garden (Rhino, Enscape)", "layout": "full" },
+        { "src": "", "caption": "Location Plan 1:1000 (AutoCAD, Illustrator, Photoshop)", "layout": "half" },
+        { "src": "", "caption": "Massing Strategy diagram", "layout": "half" },
+        { "src": "", "caption": "Long Section 1:200 \u2014 progression from public to private spaces (Rhino, Enscape, Photoshop)", "layout": "full" },
+        { "src": "", "caption": "Ground Floor Plan 1:200 (AutoCAD, Photoshop)", "layout": "half" },
+        { "src": "", "caption": "Top-down render (Rhino, Enscape, Photoshop)", "layout": "half" },
+        { "src": "", "caption": "Exploded isometric diagram (Rhino, Enscape, Illustrator)", "layout": "half" },
+        { "src": "", "caption": "Internal visualisations \u2014 therapy room and cloister", "layout": "half" },
+        { "src": "", "caption": "Detailed section 1:20 \u2014 blue roof, terracotta cladding, rainchain detail (AutoCAD, Rhino, Illustrator)", "layout": "full" }
+      ],
+      "relatedProjects": ["mycocycle-studio", "residential-works"]
+    }
+  ]
+}
