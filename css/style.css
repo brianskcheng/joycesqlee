@@ -239,6 +239,11 @@ p {
   z-index: 1;
   padding-top: var(--spacing-2xl);
   padding-bottom: var(--spacing-2xl);
+  max-width: none;
+  width: 100%;
+  margin: 0;
+  padding-left: var(--spacing-xl);
+  padding-right: var(--spacing-md);
 }
 
 .hero__title {
@@ -525,14 +530,11 @@ p {
 
 .about-page__photo {
   width: 100%;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
 }
 
 .about-page__photo img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
 
 .about-page__bio h1 {
@@ -559,6 +561,59 @@ p {
 
 .about-page__contact a {
   font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+/* --- Contact Page --- */
+.contact-page {
+  margin-top: var(--nav-height);
+  padding: var(--spacing-2xl) 0;
+  min-height: calc(100vh - var(--nav-height) - 200px);
+  display: flex;
+  align-items: center;
+}
+
+.contact-page__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 300;
+  margin-bottom: var(--spacing-sm);
+}
+
+.contact-page__intro {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: 1.8;
+  max-width: 600px;
+  margin-bottom: var(--spacing-xl);
+}
+
+.contact-page__details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.contact-page__item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-page__label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.contact-page__item a {
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color var(--transition);
+}
+
+.contact-page__item a:hover {
   color: var(--color-text-secondary);
 }
 

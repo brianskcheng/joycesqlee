@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="editor/editor.css">
 </head>
 <body>
 
@@ -18,6 +19,8 @@
       <div class="nav__links">
         <a href="index.html">Projects</a>
         <a href="about.html" class="active">About</a>
+        <a href="contact.html">Contact</a>
+        <button class="edit-toggle-btn" id="edit-toggle" title="Toggle Edit Mode">Edit</button>
       </div>
       <button class="nav__hamburger" aria-label="Menu">
         <span></span>
@@ -31,6 +34,18 @@
   <div class="nav__mobile">
     <a href="index.html">Projects</a>
     <a href="about.html">About</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <!-- Editor Toolbar (hidden by default) -->
+  <div class="editor-toolbar" id="editor-toolbar">
+    <div class="editor-toolbar__inner">
+      <span class="editor-toolbar__status" id="editor-status">Edit Mode</span>
+      <div class="editor-toolbar__actions">
+        <button class="editor-btn" id="btn-suggest">Suggest</button>
+        <button class="editor-btn editor-btn--primary" id="btn-publish">Publish</button>
+      </div>
+    </div>
   </div>
 
   <!-- About Intro -->
@@ -212,5 +227,6 @@
   </footer>
 
   <script src="js/main.js"></script>
+  <script src="editor/editor.js"></script>
 </body>
 </html>

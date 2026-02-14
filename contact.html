@@ -3,23 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project — Joyce Lee</title>
+  <title>Contact — Joyce Lee</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="editor/editor.css">
 </head>
 <body>
 
+  <!-- Navigation -->
   <nav class="nav">
     <div class="nav__inner">
       <a href="index.html" class="nav__logo">Joyce Lee</a>
       <div class="nav__links">
-        <a href="index.html" class="active">Projects</a>
+        <a href="index.html">Projects</a>
         <a href="about.html">About</a>
-        <a href="contact.html">Contact</a>
-        <button class="edit-toggle-btn" id="edit-toggle" title="Toggle Edit Mode">Edit</button>
+        <a href="contact.html" class="active">Contact</a>
       </div>
       <button class="nav__hamburger" aria-label="Menu">
         <span></span>
@@ -29,29 +28,33 @@
     </div>
   </nav>
 
+  <!-- Mobile nav overlay -->
   <div class="nav__mobile">
     <a href="index.html">Projects</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
   </div>
 
-  <!-- Editor Toolbar (hidden by default) -->
-  <div class="editor-toolbar" id="editor-toolbar">
-    <div class="editor-toolbar__inner">
-      <span class="editor-toolbar__status" id="editor-status">Edit Mode</span>
-      <div class="editor-toolbar__actions">
-        <button class="editor-btn" id="btn-suggest">Suggest</button>
-        <button class="editor-btn editor-btn--primary" id="btn-publish">Publish</button>
+  <!-- Contact Content -->
+  <div class="contact-page">
+    <div class="container">
+      <h1 class="contact-page__title">Get in Touch</h1>
+      <p class="contact-page__intro">I am always open to new opportunities, collaborations, and conversations about architecture and design.</p>
+
+      <div class="contact-page__details">
+        <div class="contact-page__item">
+          <span class="contact-page__label">Email</span>
+          <a href="mailto:joyce.y.s.lee@bath.edu">joyce.y.s.lee@bath.edu</a>
+        </div>
+        <div class="contact-page__item">
+          <span class="contact-page__label">Phone</span>
+          <a href="tel:+4407789063939">07789 063 939</a>
+        </div>
       </div>
     </div>
   </div>
 
-  <article class="project-page">
-    <div class="container" id="project-content">
-      <!-- Rendered dynamically by main.js -->
-    </div>
-  </article>
-
+  <!-- Footer -->
   <footer class="footer">
     <div class="footer__logos">
       <span class="footer__logos-label">Previously at</span>
@@ -71,6 +74,5 @@
   </footer>
 
   <script src="js/main.js"></script>
-  <script src="editor/editor.js"></script>
 </body>
 </html>
