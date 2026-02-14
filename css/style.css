@@ -213,8 +213,32 @@ p {
 /* --- Hero --- */
 .hero {
   margin-top: var(--nav-height);
-  padding: var(--spacing-2xl) 0;
+  position: relative;
+  min-height: 420px;
+  background-size: cover;
+  background-position: center 40%;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: flex-end;
   border-bottom: 1px solid var(--color-border);
+}
+
+.hero__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+}
+
+.hero__content {
+  position: relative;
+  z-index: 1;
+  padding-top: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
 }
 
 .hero__title {
@@ -501,18 +525,13 @@ p {
 .about-page__photo {
   width: 100%;
   aspect-ratio: 3 / 4;
-  background-color: var(--color-bg-alt);
-  border: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
 }
 
-.about-page__photo .placeholder-text {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.about-page__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .about-page__bio h1 {
@@ -714,7 +733,7 @@ p {
   }
 
   .hero {
-    padding: var(--spacing-xl) 0;
+    min-height: 320px;
   }
 
   .projects-grid {
