@@ -239,11 +239,6 @@ p {
   z-index: 1;
   padding-top: var(--spacing-2xl);
   padding-bottom: var(--spacing-2xl);
-  max-width: none;
-  width: 100%;
-  margin: 0;
-  padding-left: var(--spacing-xl);
-  padding-right: var(--spacing-md);
 }
 
 .hero__title {
