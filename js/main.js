@@ -56,19 +56,7 @@
       var basePath = this.getBasePath();
       var self = this;
 
-      // Check for draft in localStorage first
-      var draft = localStorage.getItem('portfolio_draft');
-      if (draft) {
-        try {
-          self.data = JSON.parse(draft);
-          self.render();
-          return Promise.resolve(self.data);
-        } catch (e) {
-          localStorage.removeItem('portfolio_draft');
-        }
-      }
-
-      return fetch(basePath + 'data/projects.json')
+      return fetch(basePath + 'data/projects.json?v=' + Date.now())
         .then(function (response) { return response.json(); })
         .then(function (data) {
           self.data = data;

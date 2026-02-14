@@ -106,11 +106,6 @@ body.edit-mode .project-page {
   border-color: #e0e0e0;
 }
 
-.editor-btn--settings {
-  border: none;
-  padding: 6px 8px;
-  font-size: 14px;
-}
 
 /* --- Editable Fields --- */
 body.edit-mode [data-editable] {
