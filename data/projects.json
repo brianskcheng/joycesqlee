@@ -40,6 +40,11 @@
       ],
       "images": [
         {
+          "src": "projects/syraka/syraka-vision-panorama.jpg",
+          "caption": "The Syraka Vision (Rhino, Enscape, Photoshop)",
+          "layout": "hero"
+        },
+        {
           "src": "projects/syraka/render-quarry-retention.jpg",
           "caption": "Visualisation of a reactivated water retention quarry (Rhino, Enscape, Photoshop)",
           "layout": "full"
@@ -47,11 +52,6 @@
         {
           "src": "projects/syraka/masterplan-loop.png",
           "caption": "Plan of the Loop, envisioning Syraka by 2075 (AutoCAD, Photoshop, Procreate)",
-          "layout": "full"
-        },
-        {
-          "src": "projects/syraka/syraka-vision-panorama.jpg",
-          "caption": "The Syraka Vision (Rhino, Enscape, Photoshop)",
           "layout": "full"
         },
         {

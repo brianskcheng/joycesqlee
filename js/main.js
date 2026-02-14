@@ -222,7 +222,13 @@
           }
           if (rel) {
             html += '<a href="project.html?slug=' + rel.slug + '" class="project-card">';
-            html += '<div class="project-card__image"><span class="placeholder-text">Project Image</span></div>';
+            html += '<div class="project-card__image">';
+            if (rel.thumbnail) {
+              html += '<img src="' + self.escapeHtml(rel.thumbnail) + '" alt="' + self.escapeHtml(rel.title) + '" loading="lazy">';
+            } else {
+              html += '<span class="placeholder-text">Project Image</span>';
+            }
+            html += '</div>';
             html += '<h2 class="project-card__title">' + self.escapeHtml(rel.title) + '</h2>';
             html += '<p class="project-card__meta">' + self.escapeHtml(rel.cardMeta) + '</p>';
             html += '</a>';
@@ -236,7 +242,9 @@
     },
 
     buildImageHtml: function (img, isHalf) {
-      var cls = 'project-page__image' + (isHalf ? ' half' : '');
+      var cls = 'project-page__image';
+      if (img.layout === 'hero') cls += ' hero';
+      else if (isHalf) cls += ' half';
       var html = '<div class="' + cls + '">';
       if (img.src) {
         html += '<img src="' + this.escapeHtml(img.src) + '" alt="' + this.escapeHtml(img.caption) + '" loading="lazy">';
