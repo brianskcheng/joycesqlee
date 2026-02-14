@@ -2,6 +2,7 @@
 
 /* --- Edit Toggle Button --- */
 .edit-toggle-btn {
+  display: none;
   background: none;
   border: 1px solid var(--color-border);
   font-family: var(--font-primary);
@@ -345,10 +346,6 @@ body.edit-mode .desc-edit-controls {
 
 /* --- Responsive --- */
 @media (max-width: 768px) {
-  .edit-toggle-btn {
-    display: none;
-  }
-
   .editor-toolbar__inner {
     flex-wrap: wrap;
     height: auto;

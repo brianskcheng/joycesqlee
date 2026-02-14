@@ -3,13 +3,40 @@
 (function () {
   'use strict';
 
+  // Simple hash function for password verification (not cryptographic, but sufficient for client-side gating)
+  function simpleHash(str) {
+    var hash = 0;
+    for (var i = 0; i < str.length; i++) {
+      var char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return hash;
+  }
+
+  var EDITOR_PASSWORD_HASH = 1420961128;
+
   var Editor = {
     active: false,
     data: null,
     toastTimer: null,
+    unlocked: false,
 
     init: function () {
       var self = this;
+
+      // Listen for secret keyboard shortcut: Ctrl+Shift+E to reveal editor
+      document.addEventListener('keydown', function (e) {
+        if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+          e.preventDefault();
+          self.revealEditButton();
+        }
+      });
+
+      // Also allow ?admin URL parameter to reveal editor
+      if (window.location.search.indexOf('admin') !== -1) {
+        this.revealEditButton();
+      }
 
       // Wait for PortfolioApp to load data
       var checkReady = setInterval(function () {
@@ -19,6 +46,13 @@
           self.bindControls();
         }
       }, 100);
+    },
+
+    revealEditButton: function () {
+      var toggleBtn = document.getElementById('edit-toggle');
+      if (toggleBtn) {
+        toggleBtn.style.display = 'inline-block';
+      }
     },
 
     // --- Core Controls ---
@@ -63,6 +97,17 @@
     },
 
     toggleEditMode: function () {
+      // Password gate: require password on first activation per session
+      if (!this.active && !this.unlocked) {
+        var password = prompt('Enter editor password:');
+        if (password === null) return;
+        if (simpleHash(password) !== EDITOR_PASSWORD_HASH) {
+          this.showToast('Incorrect password', true);
+          return;
+        }
+        this.unlocked = true;
+      }
+
       this.active = !this.active;
       document.body.classList.toggle('edit-mode', this.active);
 
