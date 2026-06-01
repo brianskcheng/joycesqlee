@@ -11,6 +11,7 @@
     originalData: null,
     hasUnsavedChanges: false,
     toastTimer: null,
+    uploadPreviews: {},
 
     init: function () {
       var self = this;
@@ -248,6 +249,7 @@
       if (document.getElementById('about-content')) {
         this.enableAboutPageEditing();
       }
+      this.applyUploadPreviews();
     },
 
     disableEditing: function () {
@@ -569,20 +571,23 @@
           controlsDiv.style.right = '8px';
           imgDiv.style.position = 'relative';
 
-          // Image URL button
-          var urlBtn = document.createElement('button');
-          urlBtn.className = 'edit-action-btn';
-          urlBtn.textContent = 'Set Image URL';
-          urlBtn.style.marginTop = '0';
-          urlBtn.addEventListener('click', function () {
+          var setImgBtn = document.createElement('button');
+          setImgBtn.className = 'edit-action-btn';
+          setImgBtn.textContent = 'Set Image';
+          setImgBtn.style.marginTop = '0';
+          setImgBtn.addEventListener('click', function () {
             var imageIndex = self.findImageIndex(project, imgDiv);
             if (imageIndex === -1) return;
-            var url = prompt('Enter image URL:', project.images[imageIndex].src || '');
-            if (url !== null) {
-              project.images[imageIndex].src = url;
-              self.refreshProjectPage();
-              self.markChanged();
-            }
+            self.showImageSourceModal(
+              'Set Image',
+              project.images[imageIndex].src || '',
+              'projects/' + project.slug,
+              function (src) {
+                project.images[imageIndex].src = src;
+                self.refreshProjectPage();
+                self.markChanged();
+              }
+            );
           });
 
           var removeImgBtn = document.createElement('button');
@@ -597,7 +602,7 @@
             self.markChanged();
           });
 
-          controlsDiv.appendChild(urlBtn);
+          controlsDiv.appendChild(setImgBtn);
           controlsDiv.appendChild(removeImgBtn);
           imgDiv.appendChild(controlsDiv);
 
@@ -658,12 +663,14 @@
       window.PortfolioApp.data = this.data;
       window.PortfolioApp.renderProjectPage();
       this.enableProjectPageEditing();
+      this.applyUploadPreviews();
     },
 
     refreshAboutPage: function () {
       window.PortfolioApp.data = this.data;
       window.PortfolioApp.renderAboutPage();
       this.enableAboutPageEditing();
+      this.applyUploadPreviews();
     },
 
     // --- About Page Editing ---
@@ -715,15 +722,19 @@
       if (photoEl) {
         var photoBtn = document.createElement('button');
         photoBtn.className = 'edit-action-btn';
-        photoBtn.textContent = 'Set Image URL';
+        photoBtn.textContent = 'Set Photo';
         photoBtn.style.marginTop = '8px';
         photoBtn.addEventListener('click', function () {
-          var url = prompt('Enter photo URL:', self.data.about.photo || '');
-          if (url !== null) {
-            self.data.about.photo = url;
-            self.refreshAboutPage();
-            self.markChanged();
-          }
+          self.showImageSourceModal(
+            'Set Photo',
+            self.data.about.photo || '',
+            'portfolio',
+            function (src) {
+              self.data.about.photo = src;
+              self.refreshAboutPage();
+              self.markChanged();
+            }
+          );
         });
         photoEl.appendChild(photoBtn);
       }
@@ -974,46 +985,229 @@
     showEditProjectModal: function (index) {
       var self = this;
       var project = this.data.projects[index];
+      var destDir = 'projects/' + project.slug;
 
       this.showModal('Edit Project', [
         { name: 'title', label: 'Project Title', type: 'text', value: project.title },
         { name: 'slug', label: 'URL Slug', type: 'text', value: project.slug },
         { name: 'type', label: 'Project Type / Subtitle', type: 'text', value: project.type },
         { name: 'cardMeta', label: 'Card Meta', type: 'text', value: project.cardMeta },
-        { name: 'thumbnail', label: 'Thumbnail URL', type: 'text', value: project.thumbnail || '' }
+        { name: 'thumbnail', label: 'Thumbnail URL or path (optional)', type: 'text', value: project.thumbnail || '' },
+        { name: 'thumbnailFile', label: 'Upload thumbnail from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' }
       ], function (values) {
-        project.title = values.title || project.title;
-        project.slug = values.slug || project.slug;
-        project.type = values.type;
-        project.cardMeta = values.cardMeta;
-        project.thumbnail = values.thumbnail;
+        var finish = function () {
+          project.title = values.title || project.title;
+          project.slug = values.slug || project.slug;
+          project.type = values.type;
+          project.cardMeta = values.cardMeta;
+          if (!values.thumbnailFile) {
+            project.thumbnail = values.thumbnail;
+          }
 
-        window.PortfolioApp.data = self.data;
-        window.PortfolioApp.render();
-        self.enableEditing();
-        self.markChanged();
-        self.showToast('Project updated');
+          window.PortfolioApp.data = self.data;
+          window.PortfolioApp.render();
+          self.enableEditing();
+          self.markChanged();
+          self.showToast('Project updated');
+        };
+
+        if (values.thumbnailFile) {
+          self.uploadImage(values.thumbnailFile, destDir, function (err, path) {
+            if (!err && path) {
+              project.thumbnail = path;
+              finish();
+            }
+          });
+        } else {
+          finish();
+        }
       });
     },
 
     showAddImageModal: function (project) {
       var self = this;
+      var destDir = 'projects/' + project.slug;
+
       this.showModal('Add Image', [
         { name: 'caption', label: 'Caption / Description', type: 'text', value: '' },
-        { name: 'src', label: 'Image URL (optional)', type: 'text', value: '' },
+        { name: 'src', label: 'Image URL or path (optional)', type: 'text', value: '' },
+        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' },
         { name: 'layout', label: 'Layout', type: 'select', value: 'full', options: [
           { value: 'full', label: 'Full Width' },
           { value: 'half', label: 'Half Width' }
         ]}
       ], function (values) {
-        project.images.push({
-          src: values.src || '',
-          caption: values.caption || 'New Image',
-          layout: values.layout || 'full'
+        var addImage = function (src) {
+          project.images.push({
+            src: src || '',
+            caption: values.caption || 'New Image',
+            layout: values.layout || 'full'
+          });
+          self.refreshProjectPage();
+          self.markChanged();
+          self.showToast('Image added');
+        };
+
+        if (values.file) {
+          self.uploadImage(values.file, destDir, function (err, path) {
+            if (!err && path) addImage(path);
+          });
+        } else {
+          addImage(values.src ? values.src.trim() : '');
+        }
+      });
+    },
+
+    showImageSourceModal: function (title, currentSrc, destDir, onApply) {
+      var self = this;
+      this.showModal(title, [
+        { name: 'src', label: 'Image URL or path (optional)', type: 'text', value: currentSrc || '' },
+        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' }
+      ], function (values) {
+        if (values.file) {
+          self.uploadImage(values.file, destDir, function (err, path) {
+            if (!err && path) onApply(path);
+          });
+        } else if (values.src && values.src.trim()) {
+          onApply(values.src.trim());
+        } else {
+          self.showToast('Enter a URL/path or choose a file', true);
+        }
+      });
+    },
+
+    sanitizeFilename: function (name) {
+      var extMatch = name.match(/\.([^.]+)$/);
+      var ext = extMatch ? extMatch[1].toLowerCase() : 'jpg';
+      if (ext === 'jpeg') ext = 'jpg';
+      if (['jpg', 'png', 'gif', 'webp'].indexOf(ext) === -1) ext = 'jpg';
+      var base = name.replace(/\.[^.]+$/, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'image';
+      return base + '-' + Date.now().toString(36) + '.' + ext;
+    },
+
+    prepareImageFile: function (file, callback) {
+      var maxDim = 2400;
+      var maxBytes = 4 * 1024 * 1024;
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var w = img.width;
+        var h = img.height;
+        var needsResize = w > maxDim || h > maxDim;
+
+        if (!needsResize && file.size < maxBytes) {
+          var reader = new FileReader();
+          reader.onload = function () {
+            var parts = reader.result.split(',');
+            callback(null, parts[1], file.type || 'application/octet-stream', file.name);
+          };
+          reader.onerror = function () {
+            callback(new Error('Failed to read file'));
+          };
+          reader.readAsDataURL(file);
+          return;
+        }
+
+        var scale = Math.min(1, maxDim / Math.max(w, h));
+        var cw = Math.round(w * scale);
+        var ch = Math.round(h * scale);
+        var canvas = document.createElement('canvas');
+        canvas.width = cw;
+        canvas.height = ch;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, cw, ch);
+
+        var isPng = file.type === 'image/png';
+        var mime = isPng ? 'image/png' : 'image/jpeg';
+        var dataUrl = canvas.toDataURL(mime, isPng ? undefined : 0.85);
+        var b64 = dataUrl.split(',')[1];
+        var newName = file.name.replace(/\.[^.]+$/, '') + (isPng ? '.png' : '.jpg');
+        callback(null, b64, mime, newName);
+      };
+
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        callback(new Error('Invalid image file'));
+      };
+
+      img.src = url;
+    },
+
+    uploadImage: function (file, destDir, onDone) {
+      var self = this;
+      var token = this.getToken();
+
+      if (!token) {
+        this.promptForToken(function () {
+          self.uploadImage(file, destDir, onDone);
         });
-        self.refreshProjectPage();
-        self.markChanged();
-        self.showToast('Image added');
+        return;
+      }
+
+      this.showToast('Uploading image...');
+
+      this.prepareImageFile(file, function (err, b64, mime, suggestedName) {
+        if (err) {
+          self.showToast(err.message, true);
+          if (onDone) onDone(err);
+          return;
+        }
+
+        var filename = self.sanitizeFilename(suggestedName || file.name);
+        var path = destDir.replace(/\/$/, '') + '/' + filename;
+        var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + path;
+
+        fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': 'Bearer ' + token,
+            'Accept': 'application/vnd.github.v3+json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: 'Upload image: ' + filename,
+            content: b64
+          })
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              return response.json().then(function (data) {
+                var msg = (data && data.message) ? data.message : ('HTTP ' + response.status);
+                throw new Error(msg);
+              }).catch(function () {
+                throw new Error('Upload failed (HTTP ' + response.status + ')');
+              });
+            }
+            return response.json();
+          })
+          .then(function () {
+            self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
+            self.showToast('Image uploaded');
+            if (onDone) onDone(null, path);
+          })
+          .catch(function (uploadErr) {
+            self.showToast('Upload failed: ' + uploadErr.message, true);
+            if (onDone) onDone(uploadErr);
+          });
+      });
+    },
+
+    applyUploadPreviews: function () {
+      var previews = this.uploadPreviews;
+      var keys = Object.keys(previews);
+      if (!keys.length) return;
+
+      document.querySelectorAll('img[src]').forEach(function (img) {
+        var src = img.getAttribute('src') || '';
+        for (var i = 0; i < keys.length; i++) {
+          var path = keys[i];
+          if (src === path || src.indexOf(path) !== -1) {
+            img.src = previews[path];
+            break;
+          }
+        }
       });
     },
 
@@ -1139,6 +1333,13 @@
         }
         fieldDiv.appendChild(label);
 
+        if (field.hint) {
+          var hint = document.createElement('p');
+          hint.className = 'editor-modal__hint';
+          hint.textContent = field.hint;
+          fieldDiv.appendChild(hint);
+        }
+
         if (field.type === 'textarea') {
           var textarea = document.createElement('textarea');
           textarea.value = field.value || '';
@@ -1156,6 +1357,13 @@
           });
           fieldDiv.appendChild(select);
           inputs[field.name] = select;
+        } else if (field.type === 'file') {
+          var fileInput = document.createElement('input');
+          fileInput.type = 'file';
+          fileInput.accept = 'image/*';
+          fileInput.className = 'editor-modal__file';
+          fieldDiv.appendChild(fileInput);
+          inputs[field.name] = fileInput;
         } else {
           var input = document.createElement('input');
           input.type = field.type || 'text';
@@ -1183,7 +1391,12 @@
       saveBtn.addEventListener('click', function () {
         var values = {};
         for (var key in inputs) {
-          values[key] = inputs[key].value;
+          var el = inputs[key];
+          if (el.type === 'file') {
+            values[key] = el.files && el.files[0] ? el.files[0] : null;
+          } else {
+            values[key] = el.value;
+          }
         }
         overlay.remove();
         onSubmit(values);
