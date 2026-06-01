@@ -840,3 +840,74 @@ p {
     gap: var(--spacing-xs);
   }
 }
+
+/* --- Site update prompt --- */
+.update-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 300;
+  align-items: center;
+  justify-content: center;
+}
+
+.update-modal-overlay.open {
+  display: flex;
+}
+
+.update-modal {
+  background: var(--color-bg);
+  max-width: 420px;
+  width: 90%;
+  padding: var(--spacing-lg);
+}
+
+.update-modal h3 {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-sm);
+}
+
+.update-modal p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+.update-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: var(--spacing-lg);
+}
+
+.update-modal__actions button {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 20px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.update-modal__actions button:hover {
+  border-color: var(--color-text);
+}
+
+.update-modal__actions .update-modal__btn-primary {
+  background: var(--color-text);
+  color: var(--color-bg);
+  border-color: var(--color-text);
+}
+
+.update-modal__actions .update-modal__btn-primary:hover {
+  opacity: 0.8;
+}

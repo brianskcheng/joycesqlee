@@ -329,4 +329,130 @@
 
   // Load data on page ready
   window.PortfolioApp.loadData();
+
+  // --- Site update detection ---
+  (function () {
+    var POLL_INTERVAL = 60000;
+    var loadedVersion = null;
+    var latestRemoteVersion = null;
+    var promptVisible = false;
+    var dismissedVersion = null;
+
+    function getVersionUrl() {
+      if (window.location.pathname.indexOf('/projects/') !== -1) {
+        return '../../version.json';
+      }
+      return './version.json';
+    }
+
+    function fetchVersion() {
+      return fetch(getVersionUrl(), { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) throw new Error('version unavailable');
+          return response.json();
+        })
+        .then(function (data) {
+          return data && data.version ? String(data.version) : null;
+        });
+    }
+
+    function showUpdatePrompt() {
+      if (promptVisible || document.getElementById('update-modal-overlay')) return;
+      promptVisible = true;
+
+      var overlay = document.createElement('div');
+      overlay.id = 'update-modal-overlay';
+      overlay.className = 'update-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'update-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Site updated';
+      modal.appendChild(heading);
+
+      var message = document.createElement('p');
+      message.textContent = 'A new version of this site is available. Reload to see the latest content.';
+      modal.appendChild(message);
+
+      var actions = document.createElement('div');
+      actions.className = 'update-modal__actions';
+
+      var laterBtn = document.createElement('button');
+      laterBtn.type = 'button';
+      laterBtn.textContent = 'Later';
+      laterBtn.addEventListener('click', function () {
+        dismissedVersion = latestRemoteVersion;
+        overlay.remove();
+        promptVisible = false;
+      });
+
+      var hardBtn = document.createElement('button');
+      hardBtn.type = 'button';
+      hardBtn.textContent = 'Hard reload';
+      hardBtn.addEventListener('click', function () {
+        if ('caches' in window) {
+          caches.keys().then(function (keys) {
+            return Promise.all(keys.map(function (key) { return caches.delete(key); }));
+          }).finally(performHardReload);
+        } else {
+          performHardReload();
+        }
+      });
+
+      var reloadBtn = document.createElement('button');
+      reloadBtn.type = 'button';
+      reloadBtn.className = 'update-modal__btn-primary';
+      reloadBtn.textContent = 'Reload';
+      reloadBtn.addEventListener('click', function () {
+        window.location.reload();
+      });
+
+      actions.appendChild(laterBtn);
+      actions.appendChild(hardBtn);
+      actions.appendChild(reloadBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+    }
+
+    function performHardReload() {
+      var url = new URL(window.location.href);
+      url.searchParams.set('_reload', Date.now().toString());
+      window.location.replace(url.href);
+    }
+
+    function checkForUpdate() {
+      fetchVersion()
+        .then(function (remoteVersion) {
+          if (!remoteVersion) return;
+
+          if (loadedVersion === null) {
+            loadedVersion = remoteVersion;
+            return;
+          }
+
+          if (remoteVersion !== loadedVersion) {
+            latestRemoteVersion = remoteVersion;
+            if (remoteVersion !== dismissedVersion) {
+              showUpdatePrompt();
+            }
+          }
+        })
+        .catch(function () {});
+    }
+
+    if (window.location.protocol === 'file:') return;
+
+    fetchVersion()
+      .then(function (version) {
+        loadedVersion = version;
+        setInterval(checkForUpdate, POLL_INTERVAL);
+        document.addEventListener('visibilitychange', function () {
+          if (!document.hidden) checkForUpdate();
+        });
+        window.addEventListener('focus', checkForUpdate);
+      })
+      .catch(function () {});
+  })();
 })();

@@ -29,6 +29,10 @@ jobs:
         with:
           enablement: true
 
+      - name: Write site version
+        run: |
+          echo "{\"version\":\"${{ github.sha }}\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > version.json
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
