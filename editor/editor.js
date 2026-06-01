@@ -3,7 +3,7 @@
 (function () {
   'use strict';
 
-  var GITHUB_REPO = 'brianskcheng/joyce-portfolio';
+  var GITHUB_REPO = 'brianskcheng/joycesqlee';
 
   var Editor = {
     active: false,
