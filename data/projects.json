@@ -423,5 +423,107 @@
         "syraka"
       ]
     }
-  ]
+  ],
+  "about": {
+    "name": "Joyce Lee",
+    "title": "Part II Architectural Assistant",
+    "bio": "I am a Part 2 architecture student currently completing the sixth year of architectural studies, with a strong interest in collaborative and multidisciplinary practice. Trained as a designer and artist, I am motivated by creative environments that value openness, shared ideas and inclusivity. I believe that architecture is at its strongest when shaped through curiosity, collective effort and shared values.",
+    "photo": "portfolio/portfolio-main.png",
+    "email": "joyce.y.s.lee@bath.edu",
+    "phone": "07789 063 939",
+    "sections": [
+      {
+        "title": "Work Experience",
+        "type": "experience",
+        "items": [
+          {
+            "date": "Sep 2023 – Jan 2025",
+            "role": "Part 1 Architectural Assistant",
+            "org": "LWK + Partners, Hong Kong",
+            "desc": "Contributed to multiple projects including an elderly home, children care centre, universities and hospitals. Key projects included the Polytechnic University South West Campus (RIBA Stages 0-3) and Po Leung Kuk Service for the Elderly (RIBA Stages 3-4). Led the development of an internal Revit package and delivered BIM training to the project team."
+          },
+          {
+            "date": "Apr – Sep 2022",
+            "role": "Junior Architectural Assistant",
+            "org": "CaSA Architects, Bath",
+            "desc": "Worked primarily on RIBA Stages 1-3 projects involving home extensions, refurbishing existing house fabric and form for residential projects of different scales."
+          },
+          {
+            "date": "Apr – Sep 2021",
+            "role": "Architectural Assistant",
+            "org": "Wilkinson Eyre, Hong Kong",
+            "desc": "Assisted on the Dongguan Taiping Waterway Bridge competition submission and the University of Hong Kong Business School interiors (RIBA Stage 3). Involved in digital modelling, rendering, and coordinating with material suppliers."
+          }
+        ]
+      },
+      {
+        "title": "Education",
+        "type": "experience",
+        "items": [
+          {
+            "date": "2024 – 2026",
+            "role": "MArch (Hons) Architecture",
+            "org": "University of Bath",
+            "desc": "Syraka (6th Year Group Project) — city-scale masterplan for Siracusa, Italy. MycoCycle Studio (5th Year Project) — mycelium brick workshop, achieved 78."
+          },
+          {
+            "date": "2019 – 2023",
+            "role": "BSc (Hons) Architecture — First Class Honours",
+            "org": "University of Bath",
+            "desc": "Lucy's Room (4th Year Project) — Awarded the Prize for Environmental Design and Wellbeing sponsored by D-NA."
+          }
+        ]
+      },
+      {
+        "title": "Skills",
+        "type": "skills",
+        "groups": [
+          {
+            "heading": "Graphics",
+            "items": ["Adobe Photoshop", "Adobe Illustrator", "Adobe InDesign"]
+          },
+          {
+            "heading": "Digital Modelling",
+            "items": ["Rhinoceros", "Autodesk AutoCAD", "Autodesk Revit", "Vectorworks", "Grasshopper", "SketchUp"]
+          },
+          {
+            "heading": "Rendering",
+            "items": ["Enscape", "V-Ray"]
+          },
+          {
+            "heading": "Languages",
+            "items": ["English", "Cantonese", "Mandarin"]
+          },
+          {
+            "heading": "Other",
+            "items": ["Hand Drawing", "Model Making", "Video Editing", "Social Media Marketing", "Microsoft Office Suite"]
+          }
+        ]
+      },
+      {
+        "title": "Other Experience",
+        "type": "experience",
+        "items": [
+          {
+            "date": "2021 – 2022",
+            "role": "Secretary",
+            "org": "Architecture & Civil Engineering Society (ACE), University of Bath",
+            "desc": "Coordinated minutes for committee meetings, organized events, seminars and socials to help learning and networking between students, staff and professionals."
+          },
+          {
+            "date": "2020 – 2021",
+            "role": "Peer Mentor",
+            "org": "University of Bath",
+            "desc": "Supported first year architecture students by introducing the course and providing guidance on university life."
+          },
+          {
+            "date": "2020 – 2021",
+            "role": "Publication Officer",
+            "org": "Hong Kong Public Affairs and Social Service Society (HKPASS), University of Bath",
+            "desc": "Promoted events and flagship activities by social media marketing, facilitated networking between Hong Kong students in the United Kingdom."
+          }
+        ]
+      }
+    ]
+  }
 }

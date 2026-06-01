@@ -73,6 +73,9 @@
 
       // Render project page if present
       this.renderProjectPage();
+
+      // Render about page if present
+      this.renderAboutPage();
     },
 
     renderHomepage: function () {
@@ -237,6 +240,67 @@
 
         html += '</div></div>';
       }
+
+      container.innerHTML = html;
+    },
+
+    renderAboutPage: function () {
+      var container = document.getElementById('about-content');
+      if (!container || !this.data.about) return;
+
+      var about = this.data.about;
+      var html = '';
+
+      // Intro block
+      html += '<div class="about-page__intro">';
+      html += '<div class="about-page__photo" id="about-photo">';
+      if (about.photo) {
+        html += '<img src="' + this.escapeHtml(about.photo) + '" alt="' + this.escapeHtml(about.name) + '">';
+      }
+      html += '</div>';
+      html += '<div class="about-page__bio">';
+      html += '<h1 id="about-name">' + this.escapeHtml(about.name) + '</h1>';
+      html += '<span class="label" id="about-title">' + this.escapeHtml(about.title) + '</span>';
+      html += '<p id="about-bio">' + this.escapeHtml(about.bio) + '</p>';
+      html += '<div class="about-page__contact">';
+      html += '<a href="mailto:' + this.escapeHtml(about.email) + '" id="about-email">' + this.escapeHtml(about.email) + '</a>';
+      html += '<a href="tel:' + this.escapeHtml(about.phone.replace(/\s/g, '')) + '" id="about-phone">' + this.escapeHtml(about.phone) + '</a>';
+      html += '</div></div></div>';
+
+      // Sections
+      var self = this;
+      (about.sections || []).forEach(function (section, sIdx) {
+        html += '<section class="about-section" data-section-index="' + sIdx + '">';
+        html += '<h2 class="about-section__title" data-section-title="' + sIdx + '">' + self.escapeHtml(section.title) + '</h2>';
+
+        if (section.type === 'experience') {
+          (section.items || []).forEach(function (item, iIdx) {
+            html += '<div class="experience-item" data-section-index="' + sIdx + '" data-item-index="' + iIdx + '">';
+            html += '<span class="experience-item__date" data-field="date">' + self.escapeHtml(item.date) + '</span>';
+            html += '<div>';
+            html += '<p class="experience-item__role" data-field="role">' + self.escapeHtml(item.role) + '</p>';
+            html += '<p class="experience-item__org" data-field="org">' + self.escapeHtml(item.org) + '</p>';
+            html += '<p class="experience-item__desc" data-field="desc">' + self.escapeHtml(item.desc) + '</p>';
+            html += '</div></div>';
+          });
+        } else if (section.type === 'skills') {
+          html += '<div class="skills-grid">';
+          (section.groups || []).forEach(function (group, gIdx) {
+            html += '<div class="skills-group" data-section-index="' + sIdx + '" data-group-index="' + gIdx + '">';
+            html += '<h4 data-field="heading">' + self.escapeHtml(group.heading) + '</h4>';
+            html += '<ul>';
+            (group.items || []).forEach(function (skill, skIdx) {
+              html += '<li data-skill-index="' + skIdx + '">';
+              html += '<span data-field="skill">' + self.escapeHtml(skill) + '</span>';
+              html += '</li>';
+            });
+            html += '</ul></div>';
+          });
+          html += '</div>';
+        }
+
+        html += '</section>';
+      });
 
       container.innerHTML = html;
     },

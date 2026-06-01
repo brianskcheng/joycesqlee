@@ -245,6 +245,9 @@
       if (document.getElementById('project-content')) {
         this.enableProjectPageEditing();
       }
+      if (document.getElementById('about-content')) {
+        this.enableAboutPageEditing();
+      }
     },
 
     disableEditing: function () {
@@ -655,6 +658,266 @@
       window.PortfolioApp.data = this.data;
       window.PortfolioApp.renderProjectPage();
       this.enableProjectPageEditing();
+    },
+
+    refreshAboutPage: function () {
+      window.PortfolioApp.data = this.data;
+      window.PortfolioApp.renderAboutPage();
+      this.enableAboutPageEditing();
+    },
+
+    // --- About Page Editing ---
+
+    enableAboutPageEditing: function () {
+      var self = this;
+      if (!this.data.about) return;
+
+      // Intro fields
+      this.makeEditable('about-name', function (val) {
+        self.data.about.name = val;
+        self.markChanged();
+      });
+      this.makeEditable('about-title', function (val) {
+        self.data.about.title = val;
+        self.markChanged();
+      });
+      this.makeEditable('about-bio', function (val) {
+        self.data.about.bio = val;
+        self.markChanged();
+      });
+
+      var emailEl = document.getElementById('about-email');
+      if (emailEl) {
+        emailEl.setAttribute('contenteditable', 'true');
+        emailEl.setAttribute('data-editable', 'about-email');
+        emailEl.addEventListener('blur', function () {
+          var val = emailEl.textContent.trim();
+          self.data.about.email = val;
+          emailEl.href = 'mailto:' + val;
+          self.markChanged();
+        });
+      }
+
+      var phoneEl = document.getElementById('about-phone');
+      if (phoneEl) {
+        phoneEl.setAttribute('contenteditable', 'true');
+        phoneEl.setAttribute('data-editable', 'about-phone');
+        phoneEl.addEventListener('blur', function () {
+          var val = phoneEl.textContent.trim();
+          self.data.about.phone = val;
+          phoneEl.href = 'tel:' + val.replace(/\s/g, '');
+          self.markChanged();
+        });
+      }
+
+      // Photo control
+      var photoEl = document.getElementById('about-photo');
+      if (photoEl) {
+        var photoBtn = document.createElement('button');
+        photoBtn.className = 'edit-action-btn';
+        photoBtn.textContent = 'Set Image URL';
+        photoBtn.style.marginTop = '8px';
+        photoBtn.addEventListener('click', function () {
+          var url = prompt('Enter photo URL:', self.data.about.photo || '');
+          if (url !== null) {
+            self.data.about.photo = url;
+            self.refreshAboutPage();
+            self.markChanged();
+          }
+        });
+        photoEl.appendChild(photoBtn);
+      }
+
+      // Section titles and content
+      (this.data.about.sections || []).forEach(function (section, sIdx) {
+        var titleEl = document.querySelector('[data-section-title="' + sIdx + '"]');
+        if (titleEl) {
+          titleEl.setAttribute('contenteditable', 'true');
+          titleEl.setAttribute('data-editable', 'section-title-' + sIdx);
+          titleEl.addEventListener('blur', function () {
+            section.title = titleEl.textContent.trim();
+            self.markChanged();
+          });
+        }
+
+        if (section.type === 'experience') {
+          self.enableExperienceSectionEditing(section, sIdx);
+        } else if (section.type === 'skills') {
+          self.enableSkillsSectionEditing(section, sIdx);
+        }
+      });
+    },
+
+    enableExperienceSectionEditing: function (section, sIdx) {
+      var self = this;
+      var sectionEl = document.querySelector('.about-section[data-section-index="' + sIdx + '"]');
+      if (!sectionEl) return;
+
+      var items = sectionEl.querySelectorAll('.experience-item[data-section-index="' + sIdx + '"]');
+      items.forEach(function (itemEl) {
+        var iIdx = parseInt(itemEl.getAttribute('data-item-index'), 10);
+        var item = section.items[iIdx];
+        if (!item) return;
+
+        ['date', 'role', 'org', 'desc'].forEach(function (field) {
+          var fieldEl = itemEl.querySelector('[data-field="' + field + '"]');
+          if (fieldEl) {
+            fieldEl.setAttribute('contenteditable', 'true');
+            fieldEl.setAttribute('data-editable', 'exp-' + sIdx + '-' + iIdx + '-' + field);
+            fieldEl.addEventListener('blur', function () {
+              item[field] = fieldEl.textContent.trim();
+              self.markChanged();
+            });
+          }
+        });
+
+        var controls = document.createElement('div');
+        controls.className = 'about-item-controls';
+        controls.style.marginTop = '8px';
+
+        var upBtn = document.createElement('button');
+        upBtn.className = 'edit-action-btn';
+        upBtn.textContent = '\u2191';
+        upBtn.addEventListener('click', function () {
+          if (iIdx > 0) {
+            var temp = section.items[iIdx];
+            section.items[iIdx] = section.items[iIdx - 1];
+            section.items[iIdx - 1] = temp;
+            self.refreshAboutPage();
+            self.markChanged();
+          }
+        });
+
+        var downBtn = document.createElement('button');
+        downBtn.className = 'edit-action-btn';
+        downBtn.textContent = '\u2193';
+        downBtn.addEventListener('click', function () {
+          if (iIdx < section.items.length - 1) {
+            var temp = section.items[iIdx];
+            section.items[iIdx] = section.items[iIdx + 1];
+            section.items[iIdx + 1] = temp;
+            self.refreshAboutPage();
+            self.markChanged();
+          }
+        });
+
+        var removeBtn = document.createElement('button');
+        removeBtn.className = 'edit-action-btn edit-action-btn--danger';
+        removeBtn.textContent = 'Remove';
+        removeBtn.addEventListener('click', function () {
+          if (confirm('Remove this entry?')) {
+            section.items.splice(iIdx, 1);
+            self.refreshAboutPage();
+            self.markChanged();
+          }
+        });
+
+        controls.appendChild(upBtn);
+        controls.appendChild(downBtn);
+        controls.appendChild(removeBtn);
+        itemEl.querySelector('div').appendChild(controls);
+      });
+
+      var addBtn = document.createElement('button');
+      addBtn.className = 'edit-action-btn';
+      addBtn.textContent = '+ Add Entry';
+      addBtn.addEventListener('click', function () {
+        section.items.push({
+          date: 'Date',
+          role: 'Role',
+          org: 'Organisation',
+          desc: 'Description'
+        });
+        self.refreshAboutPage();
+        self.markChanged();
+      });
+      sectionEl.appendChild(addBtn);
+    },
+
+    enableSkillsSectionEditing: function (section, sIdx) {
+      var self = this;
+      var sectionEl = document.querySelector('.about-section[data-section-index="' + sIdx + '"]');
+      if (!sectionEl) return;
+
+      var groups = sectionEl.querySelectorAll('.skills-group[data-section-index="' + sIdx + '"]');
+      groups.forEach(function (groupEl) {
+        var gIdx = parseInt(groupEl.getAttribute('data-group-index'), 10);
+        var group = section.groups[gIdx];
+        if (!group) return;
+
+        var headingEl = groupEl.querySelector('[data-field="heading"]');
+        if (headingEl) {
+          headingEl.setAttribute('contenteditable', 'true');
+          headingEl.setAttribute('data-editable', 'skill-heading-' + sIdx + '-' + gIdx);
+          headingEl.addEventListener('blur', function () {
+            group.heading = headingEl.textContent.trim();
+            self.markChanged();
+          });
+        }
+
+        var skillEls = groupEl.querySelectorAll('[data-field="skill"]');
+        skillEls.forEach(function (skillEl) {
+          var liEl = skillEl.closest('li');
+          var skIdx = parseInt(liEl.getAttribute('data-skill-index'), 10);
+          skillEl.setAttribute('contenteditable', 'true');
+          skillEl.setAttribute('data-editable', 'skill-' + sIdx + '-' + gIdx + '-' + skIdx);
+          skillEl.addEventListener('blur', function () {
+            group.items[skIdx] = skillEl.textContent.trim();
+            self.markChanged();
+          });
+
+          var removeSkillBtn = document.createElement('button');
+          removeSkillBtn.className = 'edit-action-btn edit-action-btn--danger';
+          removeSkillBtn.textContent = '\u00d7';
+          removeSkillBtn.style.marginLeft = '4px';
+          removeSkillBtn.style.padding = '0 6px';
+          removeSkillBtn.addEventListener('click', function () {
+            group.items.splice(skIdx, 1);
+            self.refreshAboutPage();
+            self.markChanged();
+          });
+          liEl.appendChild(removeSkillBtn);
+        });
+
+        var groupControls = document.createElement('div');
+        groupControls.style.marginTop = '8px';
+
+        var addSkillBtn = document.createElement('button');
+        addSkillBtn.className = 'edit-action-btn';
+        addSkillBtn.textContent = '+ Add Skill';
+        addSkillBtn.addEventListener('click', function () {
+          group.items.push('New skill');
+          self.refreshAboutPage();
+          self.markChanged();
+        });
+
+        var removeGroupBtn = document.createElement('button');
+        removeGroupBtn.className = 'edit-action-btn edit-action-btn--danger';
+        removeGroupBtn.textContent = 'Remove Group';
+        removeGroupBtn.style.marginLeft = '8px';
+        removeGroupBtn.addEventListener('click', function () {
+          if (confirm('Remove this skills group?')) {
+            section.groups.splice(gIdx, 1);
+            self.refreshAboutPage();
+            self.markChanged();
+          }
+        });
+
+        groupControls.appendChild(addSkillBtn);
+        groupControls.appendChild(removeGroupBtn);
+        groupEl.appendChild(groupControls);
+      });
+
+      var addGroupBtn = document.createElement('button');
+      addGroupBtn.className = 'edit-action-btn';
+      addGroupBtn.textContent = '+ Add Group';
+      addGroupBtn.style.marginTop = '16px';
+      addGroupBtn.addEventListener('click', function () {
+        section.groups.push({ heading: 'New Group', items: ['New skill'] });
+        self.refreshAboutPage();
+        self.markChanged();
+      });
+      sectionEl.appendChild(addGroupBtn);
     },
 
     // --- Inline Editable Helper ---
