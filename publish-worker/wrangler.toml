@@ -1,0 +1,15 @@
+name = "joyce-portfolio-publish"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+# Deploy: npx wrangler deploy
+# Set secrets (one-time):
+#   npx wrangler secret put GITHUB_TOKEN
+# Paste a fine-grained PAT with Contents read/write on brianskcheng/joycesqlee
+#
+# Optional vars:
+#   ALLOWED_ORIGIN = "https://joycesqlee.com,http://localhost:8080"
+
+[vars]
+GITHUB_REPO = "brianskcheng/joycesqlee"
+ALLOWED_ORIGIN = "https://joycesqlee.com,http://localhost:8080,http://127.0.0.1:5500"

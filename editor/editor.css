@@ -66,6 +66,42 @@ body.edit-mode .project-page {
   color: #999;
 }
 
+.editor-toolbar__status--working {
+  color: #f5d76e;
+  animation: editor-status-pulse 1.5s ease-in-out infinite;
+}
+
+.editor-toolbar__status--live {
+  color: #7dcea0;
+}
+
+@keyframes editor-status-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.55; }
+}
+
+.editor-deploy-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #333;
+  overflow: hidden;
+}
+
+.editor-deploy-bar__fill {
+  height: 100%;
+  width: 35%;
+  background: #f5d76e;
+  animation: editor-deploy-indeterminate 1.4s ease-in-out infinite;
+}
+
+@keyframes editor-deploy-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
 .editor-toolbar__actions {
   display: flex;
   gap: 8px;
@@ -104,6 +140,12 @@ body.edit-mode .project-page {
 .editor-btn--primary:hover {
   background: #e0e0e0;
   border-color: #e0e0e0;
+}
+
+.editor-btn:disabled,
+.editor-btn--primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 

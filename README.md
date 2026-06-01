@@ -24,3 +24,12 @@ Reveal edit mode with `Ctrl+Shift+E` or `?admin` in the URL. In edit mode you ca
 ## Setup
 
 No build tools required. Open `index.html` in a browser or deploy to any static hosting provider. The site is currently hosted via GitHub Pages with a custom domain.
+
+### Editor publishing
+
+The built-in editor publishes changes to GitHub. For automated publishing (no token setup for Joyce):
+
+1. Deploy the Cloudflare Worker in `publish-worker/` (`npx wrangler deploy`, then `npx wrangler secret put GITHUB_TOKEN`)
+2. Set `PUBLISH_API_URL` in `editor/editor.js` to the worker URL (e.g. `https://joyce-portfolio-publish.<account>.workers.dev`)
+
+Without the worker, the editor falls back to a manual GitHub token stored in the browser.

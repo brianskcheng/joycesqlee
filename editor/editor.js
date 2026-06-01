@@ -4,6 +4,11 @@
   'use strict';
 
   var GITHUB_REPO = 'brianskcheng/joycesqlee';
+  // Set after deploying publish-worker (see publish-worker/wrangler.toml)
+  var PUBLISH_API_URL = 'https://joyce-portfolio-publish.brianskcheng.workers.dev';
+  var LIVE_SITE_URL = 'https://joycesqlee.com';
+  var DEPLOY_POLL_INTERVAL = 4000;
+  var DEPLOY_MAX_WAIT = 300000;
 
   var Editor = {
     active: false,
@@ -12,6 +17,7 @@
     hasUnsavedChanges: false,
     toastTimer: null,
     uploadPreviews: {},
+    publishDeployTimer: null,
 
     init: function () {
       var self = this;
@@ -33,13 +39,19 @@
       var urlParams = new URLSearchParams(window.location.search);
       var setupToken = urlParams.get('setup_token');
       if (setupToken) {
-        localStorage.setItem('github_token', setupToken);
-        // Clean URL to hide the token
         urlParams.delete('setup_token');
         var cleanUrl = window.location.pathname;
         var remaining = urlParams.toString();
         if (remaining) cleanUrl += '?' + remaining;
         window.history.replaceState({}, '', cleanUrl);
+        self.validateToken(setupToken)
+          .then(function () {
+            localStorage.setItem('github_token', setupToken);
+            self.showToast('GitHub token saved');
+          })
+          .catch(function (err) {
+            self.showToast('Token setup failed: ' + err.message, true);
+          });
       }
 
       // Warn before leaving with unsaved changes
@@ -1215,7 +1227,88 @@
       return localStorage.getItem('github_token');
     },
 
-    promptForToken: function (callback) {
+    clearToken: function () {
+      localStorage.removeItem('github_token');
+    },
+
+    usesPublishApi: function () {
+      return !!PUBLISH_API_URL;
+    },
+
+    apiRequest: function (path, options) {
+      var url = PUBLISH_API_URL.replace(/\/$/, '') + path;
+      return fetch(url, options || {}).then(function (response) {
+        return response.json().catch(function () {
+          return {};
+        }).then(function (data) {
+          if (!response.ok) {
+            throw new Error(data.error || ('Request failed (HTTP ' + response.status + ')'));
+          }
+          return data;
+        });
+      });
+    },
+
+    isAuthError: function (status) {
+      return status === 401 || status === 403;
+    },
+
+    handleAuthFailure: function (callback) {
+      this.clearToken();
+      this.showToast('GitHub token expired or invalid. Please sign in again.', true);
+      this.promptForToken(callback, true);
+    },
+
+    ensureAuth: function (callback) {
+      if (this.usesPublishApi()) {
+        callback();
+        return;
+      }
+      var self = this;
+      var token = this.getToken();
+      if (!token) {
+        this.promptForToken(function () {
+          self.ensureAuth(callback);
+        });
+        return;
+      }
+      this.validateToken(token)
+        .then(function () {
+          callback();
+        })
+        .catch(function () {
+          self.handleAuthFailure(callback);
+        });
+    },
+
+    validateToken: function (token) {
+      var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO;
+      return fetch(apiUrl, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      })
+      .then(function (response) {
+        if (response.status === 401) {
+          throw new Error('Invalid token. Check that it has not expired.');
+        }
+        if (response.status === 404) {
+          throw new Error('Token cannot access repository ' + GITHUB_REPO + '.');
+        }
+        if (!response.ok) {
+          throw new Error('Token validation failed (HTTP ' + response.status + ').');
+        }
+        return response.json();
+      })
+      .then(function (repo) {
+        if (repo.permissions && !repo.permissions.push) {
+          throw new Error('Token does not have write access. Enable Contents read/write permission.');
+        }
+      });
+    },
+
+    promptForToken: function (callback, tokenExpired) {
       var self = this;
       var existing = document.getElementById('editor-modal-overlay');
       if (existing) existing.remove();
@@ -1228,7 +1321,7 @@
       modal.className = 'editor-modal';
 
       var heading = document.createElement('h3');
-      heading.textContent = 'Setup Required';
+      heading.textContent = tokenExpired ? 'Token Expired' : 'Setup Required';
       modal.appendChild(heading);
 
       var instructions = document.createElement('div');
@@ -1237,14 +1330,17 @@
       instructions.style.fontSize = '14px';
       instructions.style.lineHeight = '1.6';
       instructions.innerHTML =
-        '<p style="margin-bottom:12px">A GitHub token is needed to publish. This is a one-time setup.</p>' +
+        (tokenExpired
+          ? '<p style="margin-bottom:12px">Your saved GitHub token is no longer valid. Generate a new one and paste it below.</p>'
+          : '<p style="margin-bottom:12px">A GitHub token is needed to publish. This is a one-time setup.</p>') +
         '<ol style="margin:0;padding-left:20px">' +
-        '<li>Go to <strong>github.com/settings/tokens</strong></li>' +
-        '<li>Click <strong>Generate new token (classic)</strong></li>' +
-        '<li>Give it a name (e.g. "Portfolio Editor")</li>' +
-        '<li>Select the <strong>repo</strong> scope</li>' +
-        '<li>Click <strong>Generate token</strong> and paste it below</li>' +
-        '</ol>';
+        '<li>Go to <strong>github.com/settings/tokens?type=beta</strong></li>' +
+        '<li>Click <strong>Generate new token</strong></li>' +
+        '<li>Select repository access: <strong>' + GITHUB_REPO + '</strong></li>' +
+        '<li>Under Repository permissions, set <strong>Contents</strong> to <strong>Read and write</strong></li>' +
+        '<li>Generate the token and paste it below</li>' +
+        '</ol>' +
+        '<p style="margin-top:12px;margin-bottom:0">Classic tokens also work: use the <strong>repo</strong> scope at <strong>github.com/settings/tokens</strong>.</p>';
       modal.appendChild(instructions);
 
       var fieldDiv = document.createElement('div');
@@ -1259,8 +1355,8 @@
       fieldDiv.appendChild(label);
 
       var input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'ghp_...';
+      input.type = 'password';
+      input.placeholder = 'ghp_... or github_pat_...';
       fieldDiv.appendChild(input);
 
       modal.appendChild(fieldDiv);
@@ -1283,10 +1379,20 @@
           self.showToast('Token is required', true);
           return;
         }
-        localStorage.setItem('github_token', token);
-        overlay.remove();
-        self.showToast('Token saved');
-        if (callback) callback();
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Validating...';
+        self.validateToken(token)
+          .then(function () {
+            localStorage.setItem('github_token', token);
+            overlay.remove();
+            self.showToast('Token saved');
+            if (callback) callback();
+          })
+          .catch(function (err) {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Save';
+            self.showToast(err.message, true);
+          });
       });
 
       actions.appendChild(cancelBtn);
@@ -1494,33 +1600,253 @@
 
     // --- Publish ---
 
-    publish: function (onSuccess) {
-      var self = this;
-      var token = this.getToken();
+    setPublishStatus: function (text, state) {
+      var statusEl = document.getElementById('editor-status');
+      if (!statusEl) return;
+      statusEl.textContent = text;
+      statusEl.className = 'editor-toolbar__status';
+      if (state) {
+        statusEl.classList.add('editor-toolbar__status--' + state);
+      }
+    },
 
-      if (!token) {
-        this.promptForToken(function () {
-          self.publish(onSuccess);
+    disablePublish: function (disabled) {
+      var btn = document.getElementById('btn-publish');
+      if (btn) {
+        btn.disabled = disabled;
+      }
+    },
+
+    ensureDeployBar: function () {
+      if (document.getElementById('editor-deploy-bar')) return;
+      var toolbar = document.getElementById('editor-toolbar');
+      if (!toolbar) return;
+      var bar = document.createElement('div');
+      bar.id = 'editor-deploy-bar';
+      bar.className = 'editor-deploy-bar';
+      bar.innerHTML = '<div class="editor-deploy-bar__fill"></div>';
+      toolbar.appendChild(bar);
+    },
+
+    hideDeployBar: function () {
+      var bar = document.getElementById('editor-deploy-bar');
+      if (bar) bar.remove();
+    },
+
+    getLiveDataUrl: function () {
+      var host = window.location.hostname;
+      if (host === 'joycesqlee.com' || host === 'www.joycesqlee.com') {
+        return '/data/projects.json';
+      }
+      return LIVE_SITE_URL.replace(/\/$/, '') + '/data/projects.json';
+    },
+
+    contentFingerprint: function (data) {
+      return JSON.stringify(data, null, 2);
+    },
+
+    fetchLiveContent: function () {
+      return fetch(this.getLiveDataUrl() + '?t=' + Date.now(), { cache: 'no-store' })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error('Live site not reachable');
+          }
+          return response.json();
         });
-        return;
+    },
+
+    fetchDeployStatus: function (commitSha) {
+      if (this.usesPublishApi()) {
+        var query = commitSha ? '?sha=' + encodeURIComponent(commitSha) : '';
+        return this.apiRequest('/deploy-status' + query);
       }
 
-      var repo = GITHUB_REPO;
-      var statusEl = document.getElementById('editor-status');
-      if (statusEl) statusEl.textContent = 'Publishing...';
+      var token = this.getToken();
+      if (!token) {
+        return Promise.resolve({ status: 'unknown' });
+      }
 
-      var content = btoa(unescape(encodeURIComponent(JSON.stringify(this.data, null, 2))));
-      var apiUrl = 'https://api.github.com/repos/' + repo + '/contents/data/projects.json';
-
-      fetch(apiUrl, {
+      return fetch('https://api.github.com/repos/' + GITHUB_REPO + '/actions/runs?event=push&branch=main&per_page=10', {
         headers: {
           'Authorization': 'Bearer ' + token,
           'Accept': 'application/vnd.github.v3+json'
         }
       })
       .then(function (response) {
+        if (!response.ok) {
+          return { status: 'unknown' };
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        var runs = data.workflow_runs || [];
+        var run = null;
+        var i;
+
+        if (commitSha) {
+          for (i = 0; i < runs.length; i++) {
+            if (runs[i].head_sha === commitSha) {
+              run = runs[i];
+              break;
+            }
+          }
+        }
+        if (!run && runs.length) {
+          run = runs[0];
+        }
+        if (!run) {
+          return { status: 'unknown' };
+        }
+
+        return {
+          status: run.status,
+          conclusion: run.conclusion,
+          url: run.html_url
+        };
+      });
+    },
+
+    waitForLiveDeploy: function (fingerprint, commitSha) {
+      var self = this;
+      var started = Date.now();
+
+      this.ensureDeployBar();
+      this.disablePublish(true);
+      this.setPublishStatus('Building site...', 'working');
+      this.showToast('Changes saved — waiting for the live site to update', false, 0);
+
+      return new Promise(function (resolve) {
+        function poll() {
+          if (Date.now() - started > DEPLOY_MAX_WAIT) {
+            resolve({ timedOut: true });
+            return;
+          }
+
+          self.fetchDeployStatus(commitSha)
+            .then(function (deploy) {
+              if (deploy.status === 'completed' && deploy.conclusion === 'failure') {
+                throw new Error('GitHub Pages deployment failed');
+              }
+              if (deploy.status === 'queued' || deploy.status === 'waiting' || deploy.status === 'pending') {
+                self.setPublishStatus('Queued for deployment...', 'working');
+              } else if (deploy.status === 'in_progress') {
+                self.setPublishStatus('Building site...', 'working');
+              } else if (deploy.status === 'completed') {
+                self.setPublishStatus('Updating live site...', 'working');
+              } else {
+                self.setPublishStatus('Deploying to site...', 'working');
+              }
+
+              return self.fetchLiveContent();
+            })
+            .then(function (liveData) {
+              if (self.contentFingerprint(liveData) === fingerprint) {
+                resolve({ live: true });
+                return;
+              }
+              self.publishDeployTimer = setTimeout(poll, DEPLOY_POLL_INTERVAL);
+            })
+            .catch(function (err) {
+              resolve({ error: err.message || 'Deployment check failed' });
+            });
+        }
+
+        poll();
+      }).then(function (result) {
+        self.disablePublish(false);
+        self.hideDeployBar();
+        if (self.publishDeployTimer) {
+          clearTimeout(self.publishDeployTimer);
+          self.publishDeployTimer = null;
+        }
+
+        if (result.live) {
+          self.setPublishStatus('Live on site', 'live');
+          self.showToast('Your changes are now live on joycesqlee.com');
+          setTimeout(function () {
+            self.setPublishStatus('Edit Mode', '');
+          }, 5000);
+        } else if (result.timedOut) {
+          self.setPublishStatus('Edit Mode', '');
+          self.showToast('Changes saved — the site may still be updating. Check back in a minute.', false, 8000);
+        } else if (result.error) {
+          self.setPublishStatus('Edit Mode', '');
+          self.showToast(result.error, true);
+        }
+
+        return result;
+      });
+    },
+
+    publish: function (onSuccess) {
+      var self = this;
+
+      this.ensureAuth(function () {
+        self.setPublishStatus('Saving changes...', 'working');
+        self.disablePublish(true);
+
+        var content = btoa(unescape(encodeURIComponent(JSON.stringify(self.data, null, 2))));
+        var fingerprint = self.contentFingerprint(self.data);
+
+        var publishPromise;
+        if (self.usesPublishApi()) {
+          publishPromise = self.apiRequest('/publish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: content })
+          });
+        } else {
+          publishPromise = self.publishViaGitHub(content);
+        }
+
+        publishPromise
+          .then(function (result) {
+            localStorage.removeItem('portfolio_draft');
+            self.hasUnsavedChanges = false;
+            self.originalData = JSON.stringify(self.data);
+            var commitSha = result && result.sha ? result.sha : null;
+            return self.waitForLiveDeploy(fingerprint, commitSha);
+          })
+          .then(function (result) {
+            if (onSuccess && (!result || result.live || result.timedOut)) {
+              onSuccess();
+            }
+          })
+          .catch(function (err) {
+            self.disablePublish(false);
+            self.hideDeployBar();
+            self.setPublishStatus('Edit Mode', '');
+            if (err && err.authError) {
+              self.handleAuthFailure(function () {
+                self.publish(onSuccess);
+              });
+              return;
+            }
+            self.showToast('Publish failed: ' + (err.message || err), true);
+          });
+      });
+    },
+
+    publishViaGitHub: function (content) {
+      var self = this;
+      var token = this.getToken();
+      var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/data/projects.json';
+
+      return fetch(apiUrl, {
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      })
+      .then(function (response) {
+        if (self.isAuthError(response.status)) {
+          throw { authError: true, status: response.status };
+        }
         if (response.status === 404) {
           return { sha: null };
+        }
+        if (!response.ok) {
+          throw new Error('Failed to read file (HTTP ' + response.status + ')');
         }
         return response.json();
       })
@@ -1544,25 +1870,16 @@
         });
       })
       .then(function (response) {
+        if (self.isAuthError(response.status)) {
+          throw { authError: true, status: response.status };
+        }
         if (!response.ok) {
           throw new Error('Publish failed (HTTP ' + response.status + ')');
         }
         return response.json();
       })
-      .then(function () {
-        localStorage.removeItem('portfolio_draft');
-        self.hasUnsavedChanges = false;
-        self.originalData = JSON.stringify(self.data);
-        if (statusEl) statusEl.textContent = 'Published';
-        self.showToast('Published successfully');
-        setTimeout(function () {
-          if (statusEl) statusEl.textContent = 'Edit Mode';
-        }, 3000);
-        if (onSuccess) onSuccess();
-      })
-      .catch(function (err) {
-        if (statusEl) statusEl.textContent = 'Edit Mode';
-        self.showToast('Publish failed: ' + err.message, true);
+      .then(function (data) {
+        return { sha: data.commit && data.commit.sha ? data.commit.sha : null };
       });
     },
 
@@ -1570,50 +1887,57 @@
 
     showRevertModal: function () {
       var self = this;
-      var token = this.getToken();
 
-      if (!token) {
-        this.promptForToken(function () {
-          self.showRevertModal();
+      this.ensureAuth(function () {
+        var existing = document.getElementById('editor-modal-overlay');
+        if (existing) existing.remove();
+
+        var overlay = document.createElement('div');
+        overlay.id = 'editor-modal-overlay';
+        overlay.className = 'editor-modal-overlay open';
+
+        var modal = document.createElement('div');
+        modal.className = 'editor-modal';
+
+        var heading = document.createElement('h3');
+        heading.textContent = 'Revert to Previous Version';
+        modal.appendChild(heading);
+
+        var loading = document.createElement('p');
+        loading.textContent = 'Loading version history...';
+        loading.style.color = '#666';
+        modal.appendChild(loading);
+
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener('click', function (e) {
+          if (e.target === overlay) overlay.remove();
         });
-        return;
-      }
 
-      var existing = document.getElementById('editor-modal-overlay');
-      if (existing) existing.remove();
-
-      var overlay = document.createElement('div');
-      overlay.id = 'editor-modal-overlay';
-      overlay.className = 'editor-modal-overlay open';
-
-      var modal = document.createElement('div');
-      modal.className = 'editor-modal';
-
-      var heading = document.createElement('h3');
-      heading.textContent = 'Revert to Previous Version';
-      modal.appendChild(heading);
-
-      var loading = document.createElement('p');
-      loading.textContent = 'Loading version history...';
-      loading.style.color = '#666';
-      modal.appendChild(loading);
-
-      overlay.appendChild(modal);
-      document.body.appendChild(overlay);
-
-      overlay.addEventListener('click', function (e) {
-        if (e.target === overlay) overlay.remove();
-      });
-
-      // Fetch commit history for projects.json
-      var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/commits?path=data/projects.json&per_page=10';
-      fetch(apiUrl, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Accept': 'application/vnd.github.v3+json'
+        var historyPromise;
+        if (self.usesPublishApi()) {
+          historyPromise = self.apiRequest('/history');
+        } else {
+          historyPromise = fetch('https://api.github.com/repos/' + GITHUB_REPO + '/commits?path=data/projects.json&per_page=10', {
+            headers: {
+              'Authorization': 'Bearer ' + self.getToken(),
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          })
+          .then(function (response) { return response.json(); })
+          .then(function (commits) {
+            return (commits || []).map(function (commit) {
+              return {
+                sha: commit.sha,
+                message: commit.commit.message,
+                date: commit.commit.author.date
+              };
+            });
+          });
         }
-      })
-      .then(function (response) { return response.json(); })
+
+        historyPromise
       .then(function (commits) {
         loading.remove();
 
@@ -1645,7 +1969,7 @@
           item.style.cursor = 'pointer';
           item.style.transition = 'background 0.2s';
 
-          var date = new Date(commit.commit.author.date);
+          var date = new Date(commit.date);
           var dateStr = date.toLocaleDateString('en-GB', {
             day: 'numeric', month: 'short', year: 'numeric',
             hour: '2-digit', minute: '2-digit'
@@ -1659,7 +1983,7 @@
           msgEl.style.fontSize = '13px';
           msgEl.style.color = '#888';
           msgEl.style.marginTop = '4px';
-          msgEl.textContent = commit.commit.message;
+          msgEl.textContent = commit.message;
 
           item.appendChild(dateEl);
           item.appendChild(msgEl);
@@ -1697,23 +2021,31 @@
         loading.textContent = 'Failed to load version history.';
         self.showToast('Error: ' + err.message, true);
       });
+      });
     },
 
     revertToCommit: function (commitSha) {
       var self = this;
-      var token = this.getToken();
       var statusEl = document.getElementById('editor-status');
       if (statusEl) statusEl.textContent = 'Reverting...';
 
-      // Fetch the file content at that commit
-      var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/data/projects.json?ref=' + commitSha;
-      fetch(apiUrl, {
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      })
-      .then(function (response) { return response.json(); })
+      var contentPromise;
+      if (this.usesPublishApi()) {
+        contentPromise = this.apiRequest('/content?ref=' + encodeURIComponent(commitSha));
+      } else {
+        contentPromise = fetch('https://api.github.com/repos/' + GITHUB_REPO + '/contents/data/projects.json?ref=' + commitSha, {
+          headers: {
+            'Authorization': 'Bearer ' + this.getToken(),
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        })
+        .then(function (response) { return response.json(); })
+        .then(function (fileData) {
+          return { content: fileData.content.replace(/\n/g, '') };
+        });
+      }
+
+      contentPromise
       .then(function (fileData) {
         var decoded = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, ''))));
         var oldData = JSON.parse(decoded);
@@ -1975,7 +2307,7 @@
 
     // --- Toast ---
 
-    showToast: function (message, isError) {
+    showToast: function (message, isError, duration) {
       var existing = document.querySelector('.editor-toast');
       if (existing) existing.remove();
 
@@ -1984,16 +2316,18 @@
       toast.textContent = message;
       document.body.appendChild(toast);
 
-      // Trigger animation
       requestAnimationFrame(function () {
         toast.classList.add('visible');
       });
 
       clearTimeout(this.toastTimer);
-      this.toastTimer = setTimeout(function () {
-        toast.classList.remove('visible');
-        setTimeout(function () { toast.remove(); }, 300);
-      }, 3000);
+      if (duration !== 0) {
+        var ms = duration !== undefined ? duration : 3000;
+        this.toastTimer = setTimeout(function () {
+          toast.classList.remove('visible');
+          setTimeout(function () { toast.remove(); }, 300);
+        }, ms);
+      }
     }
   };
 
