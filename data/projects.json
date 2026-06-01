@@ -60,7 +60,7 @@
           "layout": "half"
         },
         {
-          "src": "projects/syraka/syraka-vision-aerial.jpg",
+          "src": "projects/syraka/lido-seating-mpvu9tr7.png",
           "caption": "Hand drawing (Procreate)",
           "layout": "half"
         },
@@ -480,23 +480,47 @@
         "groups": [
           {
             "heading": "Graphics",
-            "items": ["Adobe Photoshop", "Adobe Illustrator", "Adobe InDesign"]
+            "items": [
+              "Adobe Photoshop",
+              "Adobe Illustrator",
+              "Adobe InDesign"
+            ]
           },
           {
             "heading": "Digital Modelling",
-            "items": ["Rhinoceros", "Autodesk AutoCAD", "Autodesk Revit", "Vectorworks", "Grasshopper", "SketchUp"]
+            "items": [
+              "Rhinoceros",
+              "Autodesk AutoCAD",
+              "Autodesk Revit",
+              "Vectorworks",
+              "Grasshopper",
+              "SketchUp"
+            ]
           },
           {
             "heading": "Rendering",
-            "items": ["Enscape", "V-Ray"]
+            "items": [
+              "Enscape",
+              "V-Ray"
+            ]
           },
           {
             "heading": "Languages",
-            "items": ["English", "Cantonese", "Mandarin"]
+            "items": [
+              "English",
+              "Cantonese",
+              "Mandarin"
+            ]
           },
           {
             "heading": "Other",
-            "items": ["Hand Drawing", "Model Making", "Video Editing", "Social Media Marketing", "Microsoft Office Suite"]
+            "items": [
+              "Hand Drawing",
+              "Model Making",
+              "Video Editing",
+              "Social Media Marketing",
+              "Microsoft Office Suite"
+            ]
           }
         ]
       },
