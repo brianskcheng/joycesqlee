@@ -3,19 +3,6 @@
 (function () {
   'use strict';
 
-  // Simple hash function for password verification (not cryptographic, but sufficient for client-side gating)
-  function simpleHash(str) {
-    var hash = 0;
-    for (var i = 0; i < str.length; i++) {
-      var char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
-    }
-    return hash;
-  }
-
-  var EDITOR_PASSWORD_HASH = 1420961128;
-
   var GITHUB_REPO = 'brianskcheng/joyce-portfolio';
 
   var Editor = {
@@ -24,7 +11,6 @@
     originalData: null,
     hasUnsavedChanges: false,
     toastTimer: null,
-    unlocked: false,
 
     init: function () {
       var self = this;
@@ -211,17 +197,6 @@
     },
 
     toggleEditMode: function () {
-      var self = this;
-
-      // Password gate: require password on first activation per session
-      if (!this.active && !this.unlocked) {
-        this.showPasswordPrompt(function () {
-          self.unlocked = true;
-          self.enterEditMode();
-        });
-        return;
-      }
-
       // If exiting edit mode with unsaved changes, warn
       if (this.active && this.hasUnsavedChanges) {
         this.showUnsavedWarning(null);
@@ -259,78 +234,6 @@
       }
 
       this.disableEditing();
-    },
-
-    showPasswordPrompt: function (onSuccess) {
-      var self = this;
-      var existing = document.getElementById('editor-modal-overlay');
-      if (existing) existing.remove();
-
-      var overlay = document.createElement('div');
-      overlay.id = 'editor-modal-overlay';
-      overlay.className = 'editor-modal-overlay open';
-
-      var modal = document.createElement('div');
-      modal.className = 'editor-modal';
-
-      var heading = document.createElement('h3');
-      heading.textContent = 'Enter Password';
-      modal.appendChild(heading);
-
-      var fieldDiv = document.createElement('div');
-      fieldDiv.className = 'editor-modal__field';
-
-      var label = document.createElement('label');
-      label.textContent = 'Password';
-      fieldDiv.appendChild(label);
-
-      var input = document.createElement('input');
-      input.type = 'password';
-      input.placeholder = 'Enter editor password';
-      input.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') submitBtn.click();
-      });
-      fieldDiv.appendChild(input);
-
-      modal.appendChild(fieldDiv);
-
-      var actions = document.createElement('div');
-      actions.className = 'editor-modal__actions';
-
-      var cancelBtn = document.createElement('button');
-      cancelBtn.textContent = 'Cancel';
-      cancelBtn.addEventListener('click', function () {
-        overlay.remove();
-      });
-
-      var submitBtn = document.createElement('button');
-      submitBtn.textContent = 'Enter';
-      submitBtn.className = 'modal-btn-primary';
-      submitBtn.addEventListener('click', function () {
-        var password = input.value;
-        if (simpleHash(password) !== EDITOR_PASSWORD_HASH) {
-          self.showToast('Incorrect password', true);
-          input.value = '';
-          input.focus();
-          return;
-        }
-        overlay.remove();
-        if (onSuccess) onSuccess();
-      });
-
-      actions.appendChild(cancelBtn);
-      actions.appendChild(submitBtn);
-      modal.appendChild(actions);
-
-      overlay.appendChild(modal);
-      document.body.appendChild(overlay);
-
-      // Focus the input
-      setTimeout(function () { input.focus(); }, 50);
-
-      overlay.addEventListener('click', function (e) {
-        if (e.target === overlay) overlay.remove();
-      });
     },
 
     // --- Enable / Disable Editing ---
