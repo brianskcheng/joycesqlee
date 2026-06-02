@@ -149,16 +149,25 @@
         {
           "src": "projects/mycocycle-studio/model-discovery-roots.png",
           "caption": "Discovery roots 1:20 model",
-          "layout": "half"
+          "layout": "half",
+          "aspectRatio": "original",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/mycocycle-studio/model-tree-column.png",
           "caption": "Tree column and facade 1:50 model",
-          "layout": "half"
+          "layout": "half",
+          "aspectRatio": "original",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/mycocycle-studio/isometric-render-full.jpg",
           "caption": "Isometric render — subterranean and forest journey (Rhino, Grasshopper, Enscape, Photoshop)",
+          "layout": "full"
+        },
+        {
+          "src": "projects/mycocycle-studio/water-mpx2hdvq.png",
+          "caption": "The tree columns are structural and systematic devices, devices that capture sunlight and water",
           "layout": "full"
         }
       ],
