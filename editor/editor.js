@@ -347,6 +347,13 @@
           self.startSuggestMode();
         });
       }
+
+      var exitBtn = document.getElementById('btn-exit-edit');
+      if (exitBtn) {
+        exitBtn.addEventListener('click', function () {
+          self.toggleEditMode();
+        });
+      }
     },
 
     toggleEditMode: function () {

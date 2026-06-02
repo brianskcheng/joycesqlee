@@ -543,14 +543,11 @@ p {
 
 .about-page__photo {
   width: 100%;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
 }
 
 .about-page__photo img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
 }
 
 .about-page__bio h1 {
