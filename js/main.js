@@ -387,10 +387,11 @@
         promptVisible = false;
       });
 
-      var hardBtn = document.createElement('button');
-      hardBtn.type = 'button';
-      hardBtn.textContent = 'Hard reload';
-      hardBtn.addEventListener('click', function () {
+      var reloadBtn = document.createElement('button');
+      reloadBtn.type = 'button';
+      reloadBtn.className = 'update-modal__btn-primary';
+      reloadBtn.textContent = 'Reload';
+      reloadBtn.addEventListener('click', function () {
         if ('caches' in window) {
           caches.keys().then(function (keys) {
             return Promise.all(keys.map(function (key) { return caches.delete(key); }));
@@ -400,16 +401,7 @@
         }
       });
 
-      var reloadBtn = document.createElement('button');
-      reloadBtn.type = 'button';
-      reloadBtn.className = 'update-modal__btn-primary';
-      reloadBtn.textContent = 'Reload';
-      reloadBtn.addEventListener('click', function () {
-        window.location.reload();
-      });
-
       actions.appendChild(laterBtn);
-      actions.appendChild(hardBtn);
       actions.appendChild(reloadBtn);
       modal.appendChild(actions);
       overlay.appendChild(modal);
