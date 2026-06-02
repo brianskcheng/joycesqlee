@@ -594,6 +594,18 @@
       this.markChanged();
     },
 
+    moveImage: function (project, index, direction) {
+      var target = index + direction;
+      if (target < 0 || target >= project.images.length) return;
+
+      var temp = project.images[index];
+      project.images[index] = project.images[target];
+      project.images[target] = temp;
+
+      this.refreshProjectPage();
+      this.markChanged();
+    },
+
     // --- Project Page Editing ---
 
     enableProjectPageEditing: function () {
@@ -733,6 +745,69 @@
           var imgDiv = figureEl.querySelector('.project-page__image');
           if (!imgDiv) return;
 
+          figureEl.setAttribute('draggable', 'true');
+
+          figureEl.addEventListener('dragstart', function (e) {
+            self.dragState = { fromIndex: imageIndex };
+            figureEl.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', imageIndex);
+          });
+
+          figureEl.addEventListener('dragend', function () {
+            figureEl.classList.remove('dragging');
+            self.dragState = null;
+            imagesContainer.querySelectorAll('.project-page__figure').forEach(function (el) {
+              el.classList.remove('drag-over-before', 'drag-over-after');
+            });
+          });
+
+          figureEl.addEventListener('dragover', function (e) {
+            if (!self.dragState) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            var rect = figureEl.getBoundingClientRect();
+            var midY = rect.top + rect.height / 2;
+            imagesContainer.querySelectorAll('.project-page__figure').forEach(function (el) {
+              el.classList.remove('drag-over-before', 'drag-over-after');
+            });
+
+            if (e.clientY < midY) {
+              figureEl.classList.add('drag-over-before');
+            } else {
+              figureEl.classList.add('drag-over-after');
+            }
+          });
+
+          figureEl.addEventListener('dragleave', function () {
+            figureEl.classList.remove('drag-over-before', 'drag-over-after');
+          });
+
+          figureEl.addEventListener('drop', function (e) {
+            e.preventDefault();
+            if (!self.dragState) return;
+
+            var fromIndex = self.dragState.fromIndex;
+            var rect = figureEl.getBoundingClientRect();
+            var midY = rect.top + rect.height / 2;
+            var toIndex = e.clientY < midY ? imageIndex : imageIndex + 1;
+
+            if (fromIndex < toIndex) toIndex--;
+
+            if (fromIndex !== toIndex && toIndex >= 0 && toIndex < project.images.length) {
+              var image = project.images.splice(fromIndex, 1)[0];
+              project.images.splice(toIndex, 0, image);
+              self.refreshProjectPage();
+              self.markChanged();
+            }
+
+            self.dragState = null;
+            imagesContainer.querySelectorAll('.project-page__figure').forEach(function (el) {
+              el.classList.remove('dragging', 'drag-over-before', 'drag-over-after');
+            });
+          });
+
           var controlsDiv = document.createElement('div');
           controlsDiv.style.display = 'flex';
           controlsDiv.style.gap = '4px';
@@ -741,11 +816,33 @@
           controlsDiv.style.right = '8px';
           imgDiv.style.position = 'relative';
 
+          var upImgBtn = document.createElement('button');
+          upImgBtn.className = 'edit-action-btn';
+          upImgBtn.textContent = '\u2191';
+          upImgBtn.style.marginTop = '0';
+          upImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.moveImage(project, imageIndex, -1);
+          });
+
+          var downImgBtn = document.createElement('button');
+          downImgBtn.className = 'edit-action-btn';
+          downImgBtn.textContent = '\u2193';
+          downImgBtn.style.marginTop = '0';
+          downImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.moveImage(project, imageIndex, 1);
+          });
+
           var setImgBtn = document.createElement('button');
           setImgBtn.className = 'edit-action-btn';
           setImgBtn.textContent = 'Set Image';
           setImgBtn.style.marginTop = '0';
-          setImgBtn.addEventListener('click', function () {
+          setImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             self.showImageSourceModal(
               'Set Image',
               project.images[imageIndex].src || '',
@@ -762,7 +859,9 @@
           framingBtn.className = 'edit-action-btn';
           framingBtn.textContent = 'Crop / Fit';
           framingBtn.style.marginTop = '0';
-          framingBtn.addEventListener('click', function () {
+          framingBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             self.showFramingModal(project.images[imageIndex], function () {
               self.refreshProjectPage();
               self.markChanged();
@@ -773,12 +872,16 @@
           removeImgBtn.className = 'edit-action-btn edit-action-btn--danger';
           removeImgBtn.textContent = 'Remove';
           removeImgBtn.style.marginTop = '0';
-          removeImgBtn.addEventListener('click', function () {
+          removeImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             project.images.splice(imageIndex, 1);
             self.refreshProjectPage();
             self.markChanged();
           });
 
+          controlsDiv.appendChild(upImgBtn);
+          controlsDiv.appendChild(downImgBtn);
           controlsDiv.appendChild(setImgBtn);
           controlsDiv.appendChild(framingBtn);
           controlsDiv.appendChild(removeImgBtn);
