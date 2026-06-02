@@ -1,42 +1,5 @@
 /* ===== EDITOR MODE STYLES ===== */
 
-/* --- Edit Toggle Button --- */
-.edit-toggle-btn {
-  display: none;
-  background: none;
-  border: 1px solid var(--color-border);
-  font-family: var(--font-primary);
-  font-size: var(--font-size-xs);
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 4px 12px;
-  transition: all var(--transition);
-  margin-left: var(--spacing-lg);
-}
-
-.edit-toggle-btn:hover {
-  color: var(--color-text);
-  border-color: var(--color-text);
-}
-
-.edit-toggle-btn.active {
-  background: var(--color-text);
-  color: var(--color-bg);
-  border-color: var(--color-text);
-}
-
-.edit-toggle-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.edit-toggle-btn:disabled:hover {
-  color: var(--color-text-secondary);
-  border-color: var(--color-border);
-}
-
 body.editor-publishing [contenteditable="true"],
 body.editor-publishing [data-editable],
 body.editor-publishing .edit-action-btn,
@@ -72,7 +35,8 @@ body.edit-mode .editor-toolbar {
 }
 
 body.edit-mode .hero,
-body.edit-mode .project-page {
+body.edit-mode .project-page,
+body.edit-mode .about-page {
   margin-top: calc(var(--nav-height) + 48px);
 }
 
@@ -418,6 +382,158 @@ body.edit-mode .desc-edit-controls {
   opacity: 0.8;
 }
 
+/* --- Focal point picker --- */
+.editor-focal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-width: 120px;
+  margin-top: 8px;
+}
+
+.editor-focal-grid__cell {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-alt);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.editor-focal-grid__cell:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.editor-focal-grid__cell.active {
+  background: var(--color-text);
+  border-color: var(--color-text);
+}
+
+/* --- Interactive crop modal --- */
+.editor-crop-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 350;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.editor-crop-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.editor-crop-modal {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 24px;
+  max-width: 640px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.editor-crop-modal h3 {
+  margin: 0 0 16px;
+  font-weight: 400;
+}
+
+.editor-crop-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.editor-crop-preset {
+  font-family: var(--font-primary);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  cursor: pointer;
+}
+
+.editor-crop-preset.active,
+.editor-crop-preset:hover {
+  border-color: var(--color-text);
+}
+
+.editor-crop-stage {
+  position: relative;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  background: #111;
+  user-select: none;
+  touch-action: none;
+}
+
+.editor-crop-stage__img {
+  display: block;
+  pointer-events: none;
+}
+
+.editor-crop-shade {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+}
+
+.editor-crop-shade--top {
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.editor-crop-shade--left {
+  left: 0;
+}
+
+.editor-crop-shade--right {
+  right: 0;
+}
+
+.editor-crop-shade--bottom {
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.editor-crop-box {
+  position: absolute;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+  cursor: move;
+  box-sizing: border-box;
+}
+
+.editor-crop-handle {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #fff;
+  border: 1px solid #333;
+  box-sizing: border-box;
+}
+
+.editor-crop-handle--nw { top: -5px; left: -5px; cursor: nwse-resize; }
+.editor-crop-handle--n { top: -5px; left: 50%; margin-left: -5px; cursor: ns-resize; }
+.editor-crop-handle--ne { top: -5px; right: -5px; cursor: nesw-resize; }
+.editor-crop-handle--e { top: 50%; right: -5px; margin-top: -5px; cursor: ew-resize; }
+.editor-crop-handle--se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+.editor-crop-handle--s { bottom: -5px; left: 50%; margin-left: -5px; cursor: ns-resize; }
+.editor-crop-handle--sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+.editor-crop-handle--w { top: 50%; left: -5px; margin-top: -5px; cursor: ew-resize; }
+
 /* --- Toast Notification --- */
 .editor-toast {
   position: fixed;
@@ -446,23 +562,23 @@ body.edit-mode .desc-edit-controls {
 
 /* --- Drag-to-Reorder --- */
 body.edit-mode .project-card[draggable="true"],
-body.edit-mode .project-page__image[draggable="true"] {
+body.edit-mode .project-page__figure[draggable="true"] {
   cursor: grab;
 }
 
 body.edit-mode .project-card.dragging,
-body.edit-mode .project-page__image.dragging {
+body.edit-mode .project-page__figure.dragging {
   opacity: 0.3;
   cursor: grabbing;
 }
 
 body.edit-mode .project-card.drag-over-before,
-body.edit-mode .project-page__image.drag-over-before {
+body.edit-mode .project-page__figure.drag-over-before {
   box-shadow: 0 -3px 0 0 var(--color-text);
 }
 
 body.edit-mode .project-card.drag-over-after,
-body.edit-mode .project-page__image.drag-over-after {
+body.edit-mode .project-page__figure.drag-over-after {
   box-shadow: 0 3px 0 0 var(--color-text);
 }
 

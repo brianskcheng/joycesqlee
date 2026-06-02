@@ -33,6 +33,19 @@ jobs:
         run: |
           echo "{\"version\":\"${{ github.sha }}\",\"built\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > version.json
 
+      - name: Cache-bust CSS and JS in HTML
+        run: |
+          SHA="${{ github.sha }}"
+          for file in *.html; do
+            [ -f "$file" ] || continue
+            sed -i \
+              -e "s|href=\"css/style.css\"|href=\"css/style.css?v=${SHA}\"|g" \
+              -e "s|href=\"editor/editor.css\"|href=\"editor/editor.css?v=${SHA}\"|g" \
+              -e "s|src=\"js/main.js\"|src=\"js/main.js?v=${SHA}\"|g" \
+              -e "s|src=\"editor/editor.js\"|src=\"editor/editor.js?v=${SHA}\"|g" \
+              "$file"
+          done
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

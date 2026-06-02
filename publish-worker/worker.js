@@ -35,6 +35,13 @@ async function githubFetch(path, options, env) {
   }));
 }
 
+function isAllowedUploadPath(path) {
+  if (!path || typeof path !== 'string') return false;
+  if (path.indexOf('..') !== -1) return false;
+  if (path.charAt(0) === '/') return false;
+  return path.indexOf('projects/') === 0 || path.indexOf('portfolio/') === 0;
+}
+
 export default {
   fetch: async function (request, env) {
     var origin = request.headers.get('Origin') || '';
@@ -94,6 +101,55 @@ export default {
         return json({
           ok: true,
           sha: putData.commit && putData.commit.sha ? putData.commit.sha : null
+        }, 200, cors);
+      }
+
+      if (url.pathname === '/upload' && request.method === 'POST') {
+        var uploadBody = await request.json();
+        if (!uploadBody.path || !uploadBody.content) {
+          return json({ error: 'Missing path or content' }, 400, cors);
+        }
+        if (!isAllowedUploadPath(uploadBody.path)) {
+          return json({ error: 'Upload path must be under projects/ or portfolio/' }, 403, cors);
+        }
+
+        var uploadGetResp = await githubFetch('/repos/{repo}/contents/' + uploadBody.path, {}, env);
+        var uploadSha = null;
+
+        if (uploadGetResp.status === 404) {
+          uploadSha = null;
+        } else if (!uploadGetResp.ok) {
+          var uploadReadErr = await uploadGetResp.json().catch(function () { return {}; });
+          return json({ error: uploadReadErr.message || 'Failed to read file' }, uploadGetResp.status, cors);
+        } else {
+          var uploadFileData = await uploadGetResp.json();
+          uploadSha = uploadFileData.sha;
+        }
+
+        var uploadPutBody = {
+          message: uploadBody.message || ('Upload image: ' + uploadBody.path.split('/').pop()),
+          content: uploadBody.content
+        };
+        if (uploadSha) {
+          uploadPutBody.sha = uploadSha;
+        }
+
+        var uploadPutResp = await githubFetch('/repos/{repo}/contents/' + uploadBody.path, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(uploadPutBody)
+        }, env);
+
+        if (!uploadPutResp.ok) {
+          var uploadPutErr = await uploadPutResp.json().catch(function () { return {}; });
+          return json({ error: uploadPutErr.message || 'Upload failed' }, uploadPutResp.status, cors);
+        }
+
+        var uploadPutData = await uploadPutResp.json();
+        return json({
+          ok: true,
+          path: uploadBody.path,
+          sha: uploadPutData.content && uploadPutData.content.sha ? uploadPutData.content.sha : null
         }, 200, cors);
       }
 

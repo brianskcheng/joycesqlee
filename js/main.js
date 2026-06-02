@@ -62,7 +62,36 @@
           self.data = data;
           self.render();
           return data;
+        })
+        .catch(function () {
+          self.revealPage();
         });
+    },
+
+    revealPage: function () {
+      var el = document.querySelector('.page-main');
+      if (!el || el.classList.contains('is-ready')) return;
+      el.classList.add('is-ready');
+    },
+
+    revealAboutPage: function () {
+      this.revealPage();
+    },
+
+    whenFontsReady: function (cb) {
+      if (document.fonts && document.fonts.ready) {
+        var done = false;
+        var fire = function () {
+          if (!done) {
+            done = true;
+            cb();
+          }
+        };
+        document.fonts.ready.then(fire);
+        setTimeout(fire, 1500);
+      } else {
+        cb();
+      }
     },
 
     render: function () {
@@ -106,6 +135,7 @@
 
       // Render project cards
       gridEl.innerHTML = '';
+      var self = this;
       projects.forEach(function (project) {
         var card = document.createElement('a');
         card.href = 'project.html?slug=' + project.slug;
@@ -119,6 +149,7 @@
           img.src = project.thumbnail;
           img.alt = project.title;
           img.loading = 'lazy';
+          self.applyFramingStyle(img, project.thumbnailFraming);
           imgDiv.appendChild(img);
         } else {
           var placeholder = document.createElement('span');
@@ -140,11 +171,15 @@
         card.appendChild(meta);
         gridEl.appendChild(card);
       });
+
+      this.whenFontsReady(function () { self.revealPage(); });
     },
 
     renderProjectPage: function () {
       var container = document.getElementById('project-content');
       if (!container) return; // Not on project page
+
+      var self = this;
 
       var params = new URLSearchParams(window.location.search);
       var slug = params.get('slug');
@@ -159,6 +194,7 @@
       }
       if (!project) {
         container.innerHTML = '<p>Project not found.</p>';
+        this.whenFontsReady(function () { self.revealPage(); });
         return;
       }
 
@@ -197,12 +233,12 @@
         var img = project.images[i];
         if (img.layout === 'half' && i + 1 < project.images.length && project.images[i + 1].layout === 'half') {
           html += '<div class="project-page__image-row">';
-          html += this.buildImageHtml(img, true);
-          html += this.buildImageHtml(project.images[i + 1], true);
+          html += this.buildImageHtml(img, true, i);
+          html += this.buildImageHtml(project.images[i + 1], true, i + 1);
           html += '</div>';
           i += 2;
         } else {
-          html += this.buildImageHtml(img, false);
+          html += this.buildImageHtml(img, false, i);
           i++;
         }
       }
@@ -227,7 +263,7 @@
             html += '<a href="project.html?slug=' + rel.slug + '" class="project-card">';
             html += '<div class="project-card__image">';
             if (rel.thumbnail) {
-              html += '<img src="' + self.escapeHtml(rel.thumbnail) + '" alt="' + self.escapeHtml(rel.title) + '" loading="lazy">';
+              html += '<img src="' + self.escapeHtml(rel.thumbnail) + '" alt="' + self.escapeHtml(rel.title) + '" loading="lazy"' + self.buildFramingStyleAttr(rel.thumbnailFraming) + '>';
             } else {
               html += '<span class="placeholder-text">Project Image</span>';
             }
@@ -242,6 +278,7 @@
       }
 
       container.innerHTML = html;
+      this.whenFontsReady(function () { self.revealPage(); });
     },
 
     renderAboutPage: function () {
@@ -251,11 +288,10 @@
       var about = this.data.about;
       var html = '';
 
-      // Intro block
       html += '<div class="about-page__intro">';
       html += '<div class="about-page__photo" id="about-photo">';
       if (about.photo) {
-        html += '<img src="' + this.escapeHtml(about.photo) + '" alt="' + this.escapeHtml(about.name) + '">';
+        html += '<img src="' + this.escapeHtml(about.photo) + '" alt="' + this.escapeHtml(about.name) + '"' + this.buildFramingStyleAttr(about.photoFraming) + '>';
       }
       html += '</div>';
       html += '<div class="about-page__bio">';
@@ -271,7 +307,6 @@
       }
       html += '</div></div></div>';
 
-      // Sections
       var self = this;
       (about.sections || []).forEach(function (section, sIdx) {
         html += '<section class="about-section" data-section-index="' + sIdx + '">';
@@ -307,19 +342,84 @@
       });
 
       container.innerHTML = html;
+
+      var self2 = this;
+      var photoImg = container.querySelector('#about-photo img');
+      this.whenFontsReady(function () {
+        if (photoImg && !photoImg.complete) {
+          photoImg.addEventListener('load', function () { self2.revealPage(); });
+          photoImg.addEventListener('error', function () { self2.revealPage(); });
+        } else {
+          self2.revealPage();
+        }
+      });
     },
 
-    buildImageHtml: function (img, isHalf) {
+    buildFramingStyleAttr: function (framing) {
+      if (!framing || (!framing.fit && !framing.focal)) return '';
+      var fit = framing.fit || 'cover';
+      var focal = framing.focal || '50% 50%';
+      return ' style="object-fit:' + fit + ';object-position:' + focal + ';"';
+    },
+
+    applyFramingStyle: function (imgEl, framing) {
+      if (!framing) return;
+      if (framing.fit) imgEl.style.objectFit = framing.fit;
+      if (framing.focal) imgEl.style.objectPosition = framing.focal;
+    },
+
+    getImageFramingStyles: function (img, isHalf) {
+      var boxStyle = '';
+      var imgStyle = '';
+      var aspectRatio = img.aspectRatio;
+
+      if (!aspectRatio) {
+        if (img.layout === 'hero') {
+          aspectRatio = 'original';
+        } else if (isHalf || img.layout === 'half') {
+          aspectRatio = '4/3';
+        } else {
+          aspectRatio = '16/9';
+        }
+      }
+
+      if (aspectRatio === 'original') {
+        boxStyle = 'aspect-ratio:auto;';
+      } else {
+        boxStyle = 'aspect-ratio:' + aspectRatio.replace('/', ' / ') + ';';
+      }
+
+      var fit = img.fit || (aspectRatio === 'original' ? 'contain' : 'cover');
+      imgStyle = 'object-fit:' + fit + ';';
+      if (img.focal) {
+        imgStyle += 'object-position:' + img.focal + ';';
+      }
+
+      return { boxStyle: boxStyle, imgStyle: imgStyle, aspectRatio: aspectRatio };
+    },
+
+    buildImageHtml: function (img, isHalf, imageIndex) {
       var cls = 'project-page__image';
       if (img.layout === 'hero') cls += ' hero';
       else if (isHalf) cls += ' half';
-      var html = '<div class="' + cls + '">';
+
+      var framing = this.getImageFramingStyles(img, isHalf);
+      if (framing.aspectRatio === 'original') cls += ' aspect-original';
+
+      var html = '<figure class="project-page__figure" data-image-index="' + imageIndex + '">';
+      html += '<div class="' + cls + '" style="' + framing.boxStyle + '">';
       if (img.src) {
-        html += '<img src="' + this.escapeHtml(img.src) + '" alt="' + this.escapeHtml(img.caption) + '" loading="lazy">';
+        html += '<img src="' + this.escapeHtml(img.src) + '" alt="' + this.escapeHtml(img.caption) + '" loading="lazy" style="' + framing.imgStyle + '">';
       } else {
         html += '<span class="placeholder-text">' + this.escapeHtml(img.caption) + '</span>';
       }
       html += '</div>';
+      if (img.caption) {
+        html += '<figcaption class="project-page__caption">' + this.escapeHtml(img.caption) + '</figcaption>';
+      } else {
+        html += '<figcaption class="project-page__caption project-page__caption--empty"></figcaption>';
+      }
+      html += '</figure>';
       return html;
     },
 
@@ -369,12 +469,79 @@
     }
   };
 
-  // Load data on page ready
-  window.PortfolioApp.loadData();
+  // Strip cache-bust params from URL after reload
+  (function cleanReloadParams() {
+    var url = new URL(window.location.href);
+    if (!url.searchParams.has('_v') && !url.searchParams.has('_reload')) return;
+    url.searchParams.delete('_v');
+    url.searchParams.delete('_reload');
+    window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+  })();
 
-  // --- Site update detection ---
-  (function () {
-    var POLL_INTERVAL = 60000;
+  // Static pages (Contact): reveal after fonts load
+  if (document.querySelector('.page-main') &&
+      !document.getElementById('site-title') &&
+      !document.getElementById('about-content') &&
+      !document.getElementById('project-content')) {
+    window.PortfolioApp.whenFontsReady(function () {
+      window.PortfolioApp.revealPage();
+    });
+  }
+
+  window.PortfolioApp.loadData();
+  setTimeout(function () {
+    window.PortfolioApp.revealPage();
+  }, 3000);
+
+  // --- Nav prefetch and exit fade ---
+  (function setupNavTransitions() {
+    var prefetched = {};
+    var jsonPrefetched = false;
+
+    function prefetchHref(href) {
+      if (!href || prefetched[href]) return;
+      if (href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+      prefetched[href] = true;
+      var link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = href;
+      document.head.appendChild(link);
+    }
+
+    function prefetchJson() {
+      if (jsonPrefetched) return;
+      jsonPrefetched = true;
+      fetch('./data/projects.json', { cache: 'force-cache' }).catch(function () {});
+    }
+
+    function onNavIntent(link) {
+      prefetchHref(link.getAttribute('href'));
+      prefetchJson();
+    }
+
+    document.querySelectorAll('.nav__links a, .nav__mobile a, .nav__logo').forEach(function (link) {
+      link.addEventListener('mouseenter', function () { onNavIntent(link); });
+      link.addEventListener('focusin', function () { onNavIntent(link); });
+      link.addEventListener('click', function (e) {
+        var href = link.getAttribute('href');
+        if (!href || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+        if (link.target === '_blank') return;
+        if (document.body.classList.contains('edit-mode')) return;
+        var pageMain = document.querySelector('.page-main');
+        if (!pageMain || pageMain.classList.contains('is-exiting')) return;
+        e.preventDefault();
+        pageMain.classList.add('is-exiting');
+        setTimeout(function () {
+          window.location.assign(href);
+        }, 180);
+      });
+    });
+  })();
+
+  // --- Site update detection and reload ---
+  window.SiteUpdates = (function () {
+    var POLL_INTERVAL = 15000;
+    var STORAGE_KEY = 'portfolio_site_version';
     var loadedVersion = null;
     var latestRemoteVersion = null;
     var promptVisible = false;
@@ -388,7 +555,7 @@
     }
 
     function fetchVersion() {
-      return fetch(getVersionUrl(), { cache: 'no-store' })
+      return fetch(getVersionUrl() + '?t=' + Date.now(), { cache: 'no-store' })
         .then(function (response) {
           if (!response.ok) throw new Error('version unavailable');
           return response.json();
@@ -398,7 +565,36 @@
         });
     }
 
-    function showUpdatePrompt() {
+    function performReload() {
+      var doReload = function () {
+        if (window.navigation && typeof window.navigation.reload === 'function') {
+          window.navigation.reload({ cacheMode: 'no-store' }).catch(function () {
+            var url = new URL(window.location.href);
+            url.searchParams.delete('_v');
+            url.searchParams.delete('_reload');
+            url.searchParams.set('_v', Date.now().toString());
+            window.location.replace(url.href);
+          });
+          return;
+        }
+        var url = new URL(window.location.href);
+        url.searchParams.delete('_v');
+        url.searchParams.delete('_reload');
+        url.searchParams.set('_v', Date.now().toString());
+        window.location.replace(url.href);
+      };
+
+      if ('caches' in window) {
+        caches.keys().then(function (keys) {
+          return Promise.all(keys.map(function (key) { return caches.delete(key); }));
+        }).finally(doReload);
+      } else {
+        doReload();
+      }
+    }
+
+    function showPrompt(opts) {
+      opts = opts || {};
       if (promptVisible || document.getElementById('update-modal-overlay')) return;
       promptVisible = true;
 
@@ -410,50 +606,40 @@
       modal.className = 'update-modal';
 
       var heading = document.createElement('h3');
-      heading.textContent = 'Site updated';
+      heading.textContent = opts.title || 'Site updated';
       modal.appendChild(heading);
 
       var message = document.createElement('p');
-      message.textContent = 'A new version of this site is available. Reload to see the latest content.';
+      message.textContent = opts.message || 'A new version of this site is available. Reload to see the latest content.';
       modal.appendChild(message);
 
       var actions = document.createElement('div');
       actions.className = 'update-modal__actions';
 
-      var laterBtn = document.createElement('button');
-      laterBtn.type = 'button';
-      laterBtn.textContent = 'Later';
-      laterBtn.addEventListener('click', function () {
-        dismissedVersion = latestRemoteVersion;
-        overlay.remove();
-        promptVisible = false;
-      });
+      if (opts.allowLater !== false) {
+        var laterBtn = document.createElement('button');
+        laterBtn.type = 'button';
+        laterBtn.textContent = 'Later';
+        laterBtn.addEventListener('click', function () {
+          dismissedVersion = latestRemoteVersion;
+          overlay.remove();
+          promptVisible = false;
+        });
+        actions.appendChild(laterBtn);
+      }
 
       var reloadBtn = document.createElement('button');
       reloadBtn.type = 'button';
       reloadBtn.className = 'update-modal__btn-primary';
       reloadBtn.textContent = 'Reload';
       reloadBtn.addEventListener('click', function () {
-        if ('caches' in window) {
-          caches.keys().then(function (keys) {
-            return Promise.all(keys.map(function (key) { return caches.delete(key); }));
-          }).finally(performHardReload);
-        } else {
-          performHardReload();
-        }
+        performReload();
       });
 
-      actions.appendChild(laterBtn);
       actions.appendChild(reloadBtn);
       modal.appendChild(actions);
       overlay.appendChild(modal);
       document.body.appendChild(overlay);
-    }
-
-    function performHardReload() {
-      var url = new URL(window.location.href);
-      url.searchParams.set('_reload', Date.now().toString());
-      window.location.replace(url.href);
     }
 
     function checkForUpdate() {
@@ -469,24 +655,62 @@
           if (remoteVersion !== loadedVersion) {
             latestRemoteVersion = remoteVersion;
             if (remoteVersion !== dismissedVersion) {
-              showUpdatePrompt();
+              showPrompt();
             }
           }
         })
         .catch(function () {});
     }
 
-    if (window.location.protocol === 'file:') return;
+    function notifyPublished(version) {
+      if (version) {
+        latestRemoteVersion = String(version);
+        try {
+          localStorage.setItem(STORAGE_KEY, latestRemoteVersion);
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {}
+      }
+      showPrompt({
+        title: 'Published successfully',
+        message: 'Reload to load the latest styles and content across this page.',
+        allowLater: true
+      });
+    }
 
-    fetchVersion()
-      .then(function (version) {
-        loadedVersion = version;
-        setInterval(checkForUpdate, POLL_INTERVAL);
-        document.addEventListener('visibilitychange', function () {
-          if (!document.hidden) checkForUpdate();
-        });
-        window.addEventListener('focus', checkForUpdate);
-      })
-      .catch(function () {});
+    if (window.location.protocol !== 'file:') {
+      fetchVersion()
+        .then(function (version) {
+          loadedVersion = version;
+          setInterval(checkForUpdate, POLL_INTERVAL);
+          document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) checkForUpdate();
+          });
+          window.addEventListener('focus', checkForUpdate);
+        })
+        .catch(function () {});
+
+      window.addEventListener('storage', function (e) {
+        if (e.key !== STORAGE_KEY || !e.newValue) return;
+        fetchVersion()
+          .then(function (remoteVersion) {
+            if (!remoteVersion || remoteVersion === loadedVersion) return;
+            latestRemoteVersion = remoteVersion;
+            if (remoteVersion !== dismissedVersion) {
+              showPrompt({
+                title: 'Site updated',
+                message: 'New changes were published. Reload to see the latest content.'
+              });
+            }
+          })
+          .catch(function () {});
+      });
+    }
+
+    return {
+      fetchVersion: fetchVersion,
+      performReload: performReload,
+      showPrompt: showPrompt,
+      notifyPublished: notifyPublished
+    };
   })();
 })();

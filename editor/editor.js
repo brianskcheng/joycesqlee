@@ -9,6 +9,8 @@
   var LIVE_SITE_URL = 'https://joycesqlee.com';
   var DEPLOY_POLL_INTERVAL = 4000;
   var DEPLOY_MAX_WAIT = 300000;
+  var EDIT_PASSWORD = 'admin';
+  var EDIT_AUTH_STORAGE_KEY = 'portfolio_editor_auth';
 
   var Editor = {
     active: false,
@@ -17,23 +19,24 @@
     hasUnsavedChanges: false,
     toastTimer: null,
     uploadPreviews: {},
+    pendingUploads: {},
     publishDeployTimer: null,
     isPublishing: false,
 
     init: function () {
       var self = this;
 
-      // Listen for secret keyboard shortcut: Ctrl+Shift+E to reveal editor
+      // Listen for secret keyboard shortcut: Ctrl+Shift+E to enter edit mode (password gated)
       document.addEventListener('keydown', function (e) {
         if (e.ctrlKey && e.shiftKey && e.key === 'E') {
           e.preventDefault();
-          self.revealEditButton();
+          self.promptForEditPassword();
         }
       });
 
-      // Also allow ?admin URL parameter to reveal editor
+      // Also allow ?admin URL parameter to open edit password prompt
       if (window.location.search.indexOf('admin') !== -1) {
-        this.revealEditButton();
+        this.promptForEditPassword();
       }
 
       // Hidden setup: ?setup_token=ghp_xxx stores the token (one-time by developer)
@@ -140,13 +143,10 @@
           // Restore original data and exit edit mode
           self.data = JSON.parse(self.originalData);
           window.PortfolioApp.data = self.data;
+          self.pendingUploads = {};
+          self.uploadPreviews = {};
           self.active = false;
           document.body.classList.remove('edit-mode');
-          var toggleBtn = document.getElementById('edit-toggle');
-          if (toggleBtn) {
-            toggleBtn.classList.remove('active');
-            toggleBtn.textContent = 'Edit';
-          }
           window.PortfolioApp.render();
         }
       });
@@ -218,26 +218,119 @@
       document.body.appendChild(overlay);
     },
 
-    revealEditButton: function () {
-      var toggleBtn = document.getElementById('edit-toggle');
-      if (toggleBtn) {
-        toggleBtn.style.display = 'inline-block';
+    promptForEditPassword: function () {
+      if (this.active) {
+        this.toggleEditMode();
+        return;
       }
+
+      if (this.isEditAuthorized()) {
+        this.enterEditMode();
+        this.showToast('Edit mode enabled');
+        return;
+      }
+
+      var self = this;
+      var existing = document.getElementById('editor-modal-overlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-modal-overlay';
+      overlay.className = 'editor-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Edit Mode';
+      modal.appendChild(heading);
+
+      var instructions = document.createElement('p');
+      instructions.textContent = 'Enter the password to edit this site.';
+      instructions.style.marginBottom = '20px';
+      instructions.style.color = '#666';
+      instructions.style.fontSize = '14px';
+      modal.appendChild(instructions);
+
+      var fieldDiv = document.createElement('div');
+      fieldDiv.className = 'editor-modal__field';
+
+      var label = document.createElement('label');
+      label.textContent = 'Password';
+      fieldDiv.appendChild(label);
+
+      var input = document.createElement('input');
+      input.type = 'password';
+      input.placeholder = 'Password';
+      input.autocomplete = 'off';
+      fieldDiv.appendChild(input);
+      modal.appendChild(fieldDiv);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      var unlockBtn = document.createElement('button');
+      unlockBtn.textContent = 'Unlock';
+      unlockBtn.className = 'modal-btn-primary';
+
+      function tryUnlock() {
+        if (input.value === EDIT_PASSWORD) {
+          overlay.remove();
+          self.saveEditAuth();
+          self.enterEditMode();
+          self.showToast('Edit mode enabled');
+        } else {
+          self.showToast('Incorrect password', true);
+          input.value = '';
+          input.focus();
+        }
+      }
+
+      unlockBtn.addEventListener('click', tryUnlock);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          tryUnlock();
+        }
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(unlockBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) overlay.remove();
+      });
+
+      setTimeout(function () { input.focus(); }, 50);
+    },
+
+    isEditAuthorized: function () {
+      return localStorage.getItem(EDIT_AUTH_STORAGE_KEY) === '1';
+    },
+
+    saveEditAuth: function () {
+      localStorage.setItem(EDIT_AUTH_STORAGE_KEY, '1');
+    },
+
+    clearEditAuth: function () {
+      localStorage.removeItem(EDIT_AUTH_STORAGE_KEY);
     },
 
     // --- Core Controls ---
 
     bindControls: function () {
       var self = this;
-      var toggleBtn = document.getElementById('edit-toggle');
       var publishBtn = document.getElementById('btn-publish');
       var addProjectBtn = document.getElementById('btn-add-project');
-
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', function () {
-          self.toggleEditMode();
-        });
-      }
 
       if (publishBtn) {
         publishBtn.addEventListener('click', function () {
@@ -255,6 +348,13 @@
       if (suggestBtn) {
         suggestBtn.addEventListener('click', function () {
           self.startSuggestMode();
+        });
+      }
+
+      var exitBtn = document.getElementById('btn-exit-edit');
+      if (exitBtn) {
+        exitBtn.addEventListener('click', function () {
+          self.toggleEditMode();
         });
       }
     },
@@ -281,26 +381,12 @@
     enterEditMode: function () {
       this.active = true;
       document.body.classList.add('edit-mode');
-
-      var toggleBtn = document.getElementById('edit-toggle');
-      if (toggleBtn) {
-        toggleBtn.classList.add('active');
-        toggleBtn.textContent = 'Exit Edit';
-      }
-
       this.enableEditing();
     },
 
     exitEditMode: function () {
       this.active = false;
       document.body.classList.remove('edit-mode');
-
-      var toggleBtn = document.getElementById('edit-toggle');
-      if (toggleBtn) {
-        toggleBtn.classList.remove('active');
-        toggleBtn.textContent = 'Edit';
-      }
-
       this.disableEditing();
     },
 
@@ -438,6 +524,21 @@
           self.showEditProjectModal(index);
         });
 
+        var thumbFramingBtn = document.createElement('button');
+        thumbFramingBtn.textContent = 'Crop / Fit';
+        thumbFramingBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var project = self.data.projects[index];
+          if (!project.thumbnailFraming) project.thumbnailFraming = {};
+          self.showFramingModal(project.thumbnailFraming, function () {
+            window.PortfolioApp.data = self.data;
+            window.PortfolioApp.render();
+            self.enableEditing();
+            self.markChanged();
+          }, { hideAspect: true });
+        });
+
         var upBtn = document.createElement('button');
         upBtn.textContent = '\u2191';
         upBtn.addEventListener('click', function (e) {
@@ -470,6 +571,7 @@
         });
 
         controls.appendChild(editBtn);
+        controls.appendChild(thumbFramingBtn);
         controls.appendChild(upBtn);
         controls.appendChild(downBtn);
         controls.appendChild(deleteBtn);
@@ -635,59 +737,61 @@
       // Image controls
       var imagesContainer = container.querySelector('.project-page__images');
       if (imagesContainer) {
-        // Add edit/remove/reorder controls to each image
-        var allImageDivs = imagesContainer.querySelectorAll('.project-page__image');
-        allImageDivs.forEach(function (imgDiv, idx) {
-          var captionEl = imgDiv.querySelector('.placeholder-text');
+        var allFigures = imagesContainer.querySelectorAll('.project-page__figure');
+        allFigures.forEach(function (figureEl) {
+          var imageIndex = parseInt(figureEl.getAttribute('data-image-index'), 10);
+          if (isNaN(imageIndex) || !project.images[imageIndex]) return;
 
-          imgDiv.setAttribute('draggable', 'true');
-          imgDiv.setAttribute('data-image-index', idx);
+          var imgDiv = figureEl.querySelector('.project-page__image');
+          if (!imgDiv) return;
 
-          imgDiv.addEventListener('dragstart', function (e) {
-            self.dragState = { fromIndex: idx };
-            imgDiv.classList.add('dragging');
+          figureEl.setAttribute('draggable', 'true');
+
+          figureEl.addEventListener('dragstart', function (e) {
+            self.dragState = { fromIndex: imageIndex };
+            figureEl.classList.add('dragging');
             e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', idx);
+            e.dataTransfer.setData('text/plain', imageIndex);
           });
 
-          imgDiv.addEventListener('dragend', function () {
-            imgDiv.classList.remove('dragging');
+          figureEl.addEventListener('dragend', function () {
+            figureEl.classList.remove('dragging');
             self.dragState = null;
-            imagesContainer.querySelectorAll('.project-page__image').forEach(function (el) {
+            imagesContainer.querySelectorAll('.project-page__figure').forEach(function (el) {
               el.classList.remove('drag-over-before', 'drag-over-after');
             });
           });
 
-          imgDiv.addEventListener('dragover', function (e) {
+          figureEl.addEventListener('dragover', function (e) {
             if (!self.dragState) return;
             e.preventDefault();
             e.dataTransfer.dropEffect = 'move';
 
-            var rect = imgDiv.getBoundingClientRect();
+            var rect = figureEl.getBoundingClientRect();
             var midY = rect.top + rect.height / 2;
-            imagesContainer.querySelectorAll('.project-page__image').forEach(function (el) {
+            imagesContainer.querySelectorAll('.project-page__figure').forEach(function (el) {
               el.classList.remove('drag-over-before', 'drag-over-after');
             });
 
             if (e.clientY < midY) {
-              imgDiv.classList.add('drag-over-before');
+              figureEl.classList.add('drag-over-before');
             } else {
-              imgDiv.classList.add('drag-over-after');
+              figureEl.classList.add('drag-over-after');
             }
           });
 
-          imgDiv.addEventListener('dragleave', function () {
-            imgDiv.classList.remove('drag-over-before', 'drag-over-after');
+          figureEl.addEventListener('dragleave', function () {
+            figureEl.classList.remove('drag-over-before', 'drag-over-after');
           });
 
-          imgDiv.addEventListener('drop', function (e) {
+          figureEl.addEventListener('drop', function (e) {
             e.preventDefault();
             if (!self.dragState) return;
 
             var fromIndex = self.dragState.fromIndex;
-            var rect = imgDiv.getBoundingClientRect();
+            var rect = figureEl.getBoundingClientRect();
             var midY = rect.top + rect.height / 2;
-            var toIndex = e.clientY < midY ? idx : idx + 1;
+            var toIndex = e.clientY < midY ? imageIndex : imageIndex + 1;
 
             if (fromIndex < toIndex) toIndex--;
 
@@ -699,7 +803,7 @@
             }
 
             self.dragState = null;
-            imagesContainer.querySelectorAll('.project-page__image').forEach(function (el) {
+            imagesContainer.querySelectorAll('.project-page__figure').forEach(function (el) {
               el.classList.remove('dragging', 'drag-over-before', 'drag-over-after');
             });
           });
@@ -719,7 +823,7 @@
           upImgBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            self.moveImage(project, idx, -1);
+            self.moveImage(project, imageIndex, -1);
           });
 
           var downImgBtn = document.createElement('button');
@@ -729,7 +833,7 @@
           downImgBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            self.moveImage(project, idx, 1);
+            self.moveImage(project, imageIndex, 1);
           });
 
           var setImgBtn = document.createElement('button');
@@ -741,14 +845,27 @@
             e.stopPropagation();
             self.showImageSourceModal(
               'Set Image',
-              project.images[idx].src || '',
+              project.images[imageIndex].src || '',
               'projects/' + project.slug,
               function (src) {
-                project.images[idx].src = src;
+                project.images[imageIndex].src = src;
                 self.refreshProjectPage();
                 self.markChanged();
               }
             );
+          });
+
+          var framingBtn = document.createElement('button');
+          framingBtn.className = 'edit-action-btn';
+          framingBtn.textContent = 'Crop / Fit';
+          framingBtn.style.marginTop = '0';
+          framingBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.showFramingModal(project.images[imageIndex], function () {
+              self.refreshProjectPage();
+              self.markChanged();
+            }, {});
           });
 
           var removeImgBtn = document.createElement('button');
@@ -758,7 +875,7 @@
           removeImgBtn.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            project.images.splice(idx, 1);
+            project.images.splice(imageIndex, 1);
             self.refreshProjectPage();
             self.markChanged();
           });
@@ -766,15 +883,21 @@
           controlsDiv.appendChild(upImgBtn);
           controlsDiv.appendChild(downImgBtn);
           controlsDiv.appendChild(setImgBtn);
+          controlsDiv.appendChild(framingBtn);
           controlsDiv.appendChild(removeImgBtn);
           imgDiv.appendChild(controlsDiv);
 
-          // Make caption editable
+          var captionEl = figureEl.querySelector('.project-page__caption');
           if (captionEl) {
             captionEl.setAttribute('contenteditable', 'true');
             captionEl.setAttribute('data-editable', 'img-caption');
             captionEl.addEventListener('blur', function () {
-              project.images[idx].caption = captionEl.textContent.trim();
+              var caption = captionEl.textContent.trim();
+              project.images[imageIndex].caption = caption;
+              var imgEl = imgDiv.querySelector('img');
+              if (imgEl) {
+                imgEl.alt = caption;
+              }
               self.markChanged();
             });
           }
@@ -806,6 +929,160 @@
         });
         headerDiv.appendChild(cardMetaBtn);
       }
+    },
+
+    findImageIndex: function (project, imgDiv) {
+      var figure = imgDiv.closest('.project-page__figure');
+      if (figure) {
+        var idx = parseInt(figure.getAttribute('data-image-index'), 10);
+        if (!isNaN(idx) && project.images[idx]) return idx;
+      }
+      return -1;
+    },
+
+    showFramingModal: function (framingObj, onApply, opts) {
+      var self = this;
+      opts = opts || {};
+      var img = framingObj;
+      if (!img) return;
+
+      var existing = document.getElementById('editor-modal-overlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-modal-overlay';
+      overlay.className = 'editor-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Crop / Fit';
+      modal.appendChild(heading);
+
+      var aspectSelectEl = null;
+
+      if (!opts.hideAspect) {
+        var aspectField = document.createElement('div');
+        aspectField.className = 'editor-modal__field';
+        var aspectLabel = document.createElement('label');
+        aspectLabel.textContent = 'Aspect ratio';
+        aspectField.appendChild(aspectLabel);
+        aspectSelectEl = document.createElement('select');
+        [
+          { value: '', label: 'Default (by layout)' },
+          { value: '16/9', label: '16:9 (wide)' },
+          { value: '4/3', label: '4:3' },
+          { value: '1/1', label: '1:1 (square)' },
+          { value: 'original', label: 'Original (natural height)' }
+        ].forEach(function (opt) {
+          var option = document.createElement('option');
+          option.value = opt.value;
+          option.textContent = opt.label;
+          if ((img.aspectRatio || '') === opt.value) option.selected = true;
+          aspectSelectEl.appendChild(option);
+        });
+        aspectField.appendChild(aspectSelectEl);
+        modal.appendChild(aspectField);
+      }
+
+      var fitField = document.createElement('div');
+      fitField.className = 'editor-modal__field';
+      var fitLabel = document.createElement('label');
+      fitLabel.textContent = 'Fit';
+      fitField.appendChild(fitLabel);
+      var fitSelect = document.createElement('select');
+      [
+        { value: '', label: opts.hideAspect ? 'Default (cover)' : 'Default (cover / contain for original)' },
+        { value: 'cover', label: 'Cover (fill frame, may crop)' },
+        { value: 'contain', label: 'Contain (show full image)' }
+      ].forEach(function (opt) {
+        var option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.label;
+        if ((img.fit || '') === opt.value) option.selected = true;
+        fitSelect.appendChild(option);
+      });
+      fitField.appendChild(fitSelect);
+      modal.appendChild(fitField);
+
+      var focalField = document.createElement('div');
+      focalField.className = 'editor-modal__field';
+      var focalLabel = document.createElement('label');
+      focalLabel.textContent = 'Focal point';
+      focalField.appendChild(focalLabel);
+
+      var focalPositions = [
+        { value: '0% 0%', label: 'Top left' },
+        { value: '50% 0%', label: 'Top center' },
+        { value: '100% 0%', label: 'Top right' },
+        { value: '0% 50%', label: 'Center left' },
+        { value: '50% 50%', label: 'Center' },
+        { value: '100% 50%', label: 'Center right' },
+        { value: '0% 100%', label: 'Bottom left' },
+        { value: '50% 100%', label: 'Bottom center' },
+        { value: '100% 100%', label: 'Bottom right' }
+      ];
+      var currentFocal = img.focal || '50% 50%';
+      var focalGrid = document.createElement('div');
+      focalGrid.className = 'editor-focal-grid';
+      var selectedFocal = currentFocal;
+
+      focalPositions.forEach(function (pos) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'editor-focal-grid__cell';
+        btn.title = pos.label;
+        btn.setAttribute('data-focal', pos.value);
+        if (pos.value === currentFocal) btn.classList.add('active');
+        btn.addEventListener('click', function () {
+          selectedFocal = pos.value;
+          focalGrid.querySelectorAll('.editor-focal-grid__cell').forEach(function (c) {
+            c.classList.remove('active');
+          });
+          btn.classList.add('active');
+        });
+        focalGrid.appendChild(btn);
+      });
+      focalField.appendChild(focalGrid);
+      modal.appendChild(focalField);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      var saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.className = 'modal-btn-primary';
+      saveBtn.addEventListener('click', function () {
+        if (aspectSelectEl) {
+          var aspectVal = aspectSelectEl.value;
+          if (aspectVal) img.aspectRatio = aspectVal;
+          else delete img.aspectRatio;
+        }
+        var fitVal = fitSelect.value;
+        if (fitVal) img.fit = fitVal;
+        else delete img.fit;
+        img.focal = selectedFocal;
+        overlay.remove();
+        if (onApply) onApply();
+        self.showToast('Framing updated');
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) overlay.remove();
+      });
     },
 
     refreshProjectPage: function () {
@@ -881,10 +1158,16 @@
       // Photo control
       var photoEl = document.getElementById('about-photo');
       if (photoEl) {
+        var photoControls = document.createElement('div');
+        photoControls.style.display = 'flex';
+        photoControls.style.gap = '8px';
+        photoControls.style.marginTop = '8px';
+        photoControls.style.flexWrap = 'wrap';
+
         var photoBtn = document.createElement('button');
         photoBtn.className = 'edit-action-btn';
         photoBtn.textContent = 'Set Photo';
-        photoBtn.style.marginTop = '8px';
+        photoBtn.style.marginTop = '0';
         photoBtn.addEventListener('click', function () {
           self.showImageSourceModal(
             'Set Photo',
@@ -897,7 +1180,22 @@
             }
           );
         });
-        photoEl.appendChild(photoBtn);
+
+        var photoFramingBtn = document.createElement('button');
+        photoFramingBtn.className = 'edit-action-btn';
+        photoFramingBtn.textContent = 'Crop / Fit';
+        photoFramingBtn.style.marginTop = '0';
+        photoFramingBtn.addEventListener('click', function () {
+          if (!self.data.about.photoFraming) self.data.about.photoFraming = {};
+          self.showFramingModal(self.data.about.photoFraming, function () {
+            self.refreshAboutPage();
+            self.markChanged();
+          }, { hideAspect: true });
+        });
+
+        photoControls.appendChild(photoBtn);
+        photoControls.appendChild(photoFramingBtn);
+        photoEl.appendChild(photoControls);
       }
 
       // Section titles and content
@@ -1169,7 +1467,7 @@
         { name: 'type', label: 'Project Type / Subtitle', type: 'text', value: project.type },
         { name: 'cardMeta', label: 'Card Meta', type: 'text', value: project.cardMeta },
         { name: 'thumbnail', label: 'Thumbnail URL or path (optional)', type: 'text', value: project.thumbnail || '' },
-        { name: 'thumbnailFile', label: 'Upload thumbnail from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' }
+        { name: 'thumbnailFile', label: 'Upload thumbnail from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Staged in your edits; uploaded when you Publish.' }
       ], function (values) {
         var finish = function () {
           project.title = values.title || project.title;
@@ -1207,7 +1505,7 @@
       this.showModal('Add Image', [
         { name: 'caption', label: 'Caption / Description', type: 'text', value: '' },
         { name: 'src', label: 'Image URL or path (optional)', type: 'text', value: '' },
-        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' },
+        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Staged in your edits; uploaded when you Publish.' },
         { name: 'layout', label: 'Layout', type: 'select', value: 'full', options: [
           { value: 'full', label: 'Full Width' },
           { value: 'half', label: 'Half Width' }
@@ -1238,7 +1536,7 @@
       var self = this;
       this.showModal(title, [
         { name: 'src', label: 'Image URL or path (optional)', type: 'text', value: currentSrc || '' },
-        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' }
+        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Staged in your edits; uploaded when you Publish.' }
       ], function (values) {
         if (values.file) {
           self.uploadImage(values.file, destDir, function (err, path) {
@@ -1250,6 +1548,318 @@
           self.showToast('Enter a URL/path or choose a file', true);
         }
       });
+    },
+
+    showCropModal: function (file, onResult) {
+      var self = this;
+      var existing = document.getElementById('editor-crop-overlay');
+      if (existing) existing.remove();
+
+      var objectUrl = URL.createObjectURL(file);
+      var image = new Image();
+      var aspectLock = null;
+      var crop = { x: 0, y: 0, w: 1, h: 1 };
+      var displayW = 0;
+      var displayH = 0;
+      var natW = 0;
+      var natH = 0;
+      var dragState = null;
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-crop-overlay';
+      overlay.className = 'editor-crop-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-crop-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Crop Image';
+      modal.appendChild(heading);
+
+      var presets = document.createElement('div');
+      presets.className = 'editor-crop-presets';
+      var presetDefs = [
+        { label: 'Free', ratio: null },
+        { label: '1:1', ratio: 1 },
+        { label: '4:3', ratio: 4 / 3 },
+        { label: '16:9', ratio: 16 / 9 },
+        { label: '3:2', ratio: 3 / 2 }
+      ];
+      var presetButtons = [];
+
+      var stage = document.createElement('div');
+      stage.className = 'editor-crop-stage';
+
+      var imgEl = document.createElement('img');
+      imgEl.className = 'editor-crop-stage__img';
+      imgEl.draggable = false;
+
+      var shadeTop = document.createElement('div');
+      shadeTop.className = 'editor-crop-shade editor-crop-shade--top';
+      var shadeLeft = document.createElement('div');
+      shadeLeft.className = 'editor-crop-shade editor-crop-shade--left';
+      var shadeRight = document.createElement('div');
+      shadeRight.className = 'editor-crop-shade editor-crop-shade--right';
+      var shadeBottom = document.createElement('div');
+      shadeBottom.className = 'editor-crop-shade editor-crop-shade--bottom';
+
+      var cropBox = document.createElement('div');
+      cropBox.className = 'editor-crop-box';
+
+      ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(function (h) {
+        var handle = document.createElement('div');
+        handle.className = 'editor-crop-handle editor-crop-handle--' + h;
+        handle.setAttribute('data-handle', h);
+        cropBox.appendChild(handle);
+      });
+
+      stage.appendChild(imgEl);
+      stage.appendChild(shadeTop);
+      stage.appendChild(shadeLeft);
+      stage.appendChild(shadeRight);
+      stage.appendChild(shadeBottom);
+      stage.appendChild(cropBox);
+      modal.appendChild(presets);
+      modal.appendChild(stage);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      function clampCrop() {
+        var minSize = 0.05;
+        if (crop.w < minSize) crop.w = minSize;
+        if (crop.h < minSize) crop.h = minSize;
+        if (crop.x < 0) crop.x = 0;
+        if (crop.y < 0) crop.y = 0;
+        if (crop.x + crop.w > 1) crop.x = 1 - crop.w;
+        if (crop.y + crop.h > 1) crop.y = 1 - crop.h;
+      }
+
+      function updateCropBox() {
+        clampCrop();
+        var px = crop.x * displayW;
+        var py = crop.y * displayH;
+        var pw = crop.w * displayW;
+        var ph = crop.h * displayH;
+        cropBox.style.left = px + 'px';
+        cropBox.style.top = py + 'px';
+        cropBox.style.width = pw + 'px';
+        cropBox.style.height = ph + 'px';
+        shadeTop.style.height = py + 'px';
+        shadeLeft.style.top = py + 'px';
+        shadeLeft.style.width = px + 'px';
+        shadeLeft.style.height = ph + 'px';
+        shadeRight.style.top = py + 'px';
+        shadeRight.style.left = (px + pw) + 'px';
+        shadeRight.style.width = Math.max(0, displayW - px - pw) + 'px';
+        shadeRight.style.height = ph + 'px';
+        shadeBottom.style.top = (py + ph) + 'px';
+        shadeBottom.style.height = Math.max(0, displayH - py - ph) + 'px';
+      }
+
+      function initCropBox() {
+        if (aspectLock) {
+          var w = 0.9;
+          var h = w / aspectLock * (displayW / displayH);
+          if (h > 0.9) {
+            h = 0.9;
+            w = h * aspectLock * (displayH / displayW);
+          }
+          crop.w = w;
+          crop.h = h;
+        } else {
+          crop.w = 0.9;
+          crop.h = 0.9;
+        }
+        crop.x = (1 - crop.w) / 2;
+        crop.y = (1 - crop.h) / 2;
+        updateCropBox();
+      }
+
+      function pointerToNorm(clientX, clientY) {
+        var rect = stage.getBoundingClientRect();
+        return {
+          x: Math.max(0, Math.min(1, (clientX - rect.left) / displayW)),
+          y: Math.max(0, Math.min(1, (clientY - rect.top) / displayH))
+        };
+      }
+
+      function onPointerMove(e) {
+        if (!dragState) return;
+        e.preventDefault();
+        var pt = pointerToNorm(e.clientX, e.clientY);
+        var dx = pt.x - dragState.startPt.x;
+        var dy = pt.y - dragState.startPt.y;
+        var start = dragState.startCrop;
+
+        if (dragState.mode === 'move') {
+          crop.x = start.x + dx;
+          crop.y = start.y + dy;
+          clampCrop();
+        } else {
+          var c = { x: start.x, y: start.y, w: start.w, h: start.h };
+          var handle = dragState.handle;
+          if (handle.indexOf('e') !== -1) c.w = start.w + dx;
+          if (handle.indexOf('w') !== -1) {
+            c.x = start.x + dx;
+            c.w = start.w - dx;
+          }
+          if (handle.indexOf('s') !== -1) c.h = start.h + dy;
+          if (handle.indexOf('n') !== -1) {
+            c.y = start.y + dy;
+            c.h = start.h - dy;
+          }
+          if (c.w < 0.05) c.w = 0.05;
+          if (c.h < 0.05) c.h = 0.05;
+          if (aspectLock) {
+            if (handle === 'n' || handle === 's') {
+              c.w = c.h * aspectLock * (displayH / displayW);
+            } else {
+              c.h = c.w / aspectLock * (displayW / displayH);
+            }
+          }
+          crop.x = c.x;
+          crop.y = c.y;
+          crop.w = c.w;
+          crop.h = c.h;
+          clampCrop();
+        }
+        updateCropBox();
+      }
+
+      function onPointerUp() {
+        dragState = null;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+      }
+
+      cropBox.addEventListener('pointerdown', function (e) {
+        if (e.target !== cropBox) return;
+        e.preventDefault();
+        dragState = {
+          mode: 'move',
+          startPt: pointerToNorm(e.clientX, e.clientY),
+          startCrop: { x: crop.x, y: crop.y, w: crop.w, h: crop.h }
+        };
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+      });
+
+      cropBox.querySelectorAll('.editor-crop-handle').forEach(function (handleEl) {
+        handleEl.addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dragState = {
+            mode: 'resize',
+            handle: handleEl.getAttribute('data-handle'),
+            startPt: pointerToNorm(e.clientX, e.clientY),
+            startCrop: { x: crop.x, y: crop.y, w: crop.w, h: crop.h }
+          };
+          document.addEventListener('pointermove', onPointerMove);
+          document.addEventListener('pointerup', onPointerUp);
+        });
+      });
+
+      presetDefs.forEach(function (def, idx) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = def.label;
+        btn.className = 'editor-crop-preset' + (idx === 0 ? ' active' : '');
+        btn.addEventListener('click', function () {
+          aspectLock = def.ratio;
+          presetButtons.forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          initCropBox();
+        });
+        presetButtons.push(btn);
+        presets.appendChild(btn);
+      });
+
+      function closeOverlay() {
+        URL.revokeObjectURL(objectUrl);
+        overlay.remove();
+      }
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        closeOverlay();
+        if (onResult) onResult(null);
+      });
+
+      var skipBtn = document.createElement('button');
+      skipBtn.textContent = 'Use full image';
+      skipBtn.addEventListener('click', function () {
+        closeOverlay();
+        if (onResult) onResult(file);
+      });
+
+      var cropBtn = document.createElement('button');
+      cropBtn.textContent = 'Crop';
+      cropBtn.className = 'modal-btn-primary';
+      cropBtn.addEventListener('click', function () {
+        var sx = Math.round(crop.x * natW);
+        var sy = Math.round(crop.y * natH);
+        var sw = Math.max(1, Math.round(crop.w * natW));
+        var sh = Math.max(1, Math.round(crop.h * natH));
+        var canvas = document.createElement('canvas');
+        canvas.width = sw;
+        canvas.height = sh;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
+        var isPng = file.type === 'image/png';
+        var mime = isPng ? 'image/png' : 'image/jpeg';
+        canvas.toBlob(function (blob) {
+          if (!blob) {
+            self.showToast('Crop failed', true);
+            return;
+          }
+          var baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+          var ext = isPng ? '.png' : '.jpg';
+          var croppedFile = new File([blob], baseName + '-cropped' + ext, { type: mime });
+          closeOverlay();
+          if (onResult) onResult(croppedFile);
+        }, mime, isPng ? undefined : 0.9);
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(skipBtn);
+      actions.appendChild(cropBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) {
+          closeOverlay();
+          if (onResult) onResult(null);
+        }
+      });
+
+      image.onload = function () {
+        natW = image.naturalWidth;
+        natH = image.naturalHeight;
+        var maxW = 560;
+        var maxH = 400;
+        var scale = Math.min(1, maxW / natW, maxH / natH);
+        displayW = Math.round(natW * scale);
+        displayH = Math.round(natH * scale);
+        stage.style.width = displayW + 'px';
+        stage.style.height = displayH + 'px';
+        imgEl.src = objectUrl;
+        imgEl.style.width = displayW + 'px';
+        imgEl.style.height = displayH + 'px';
+        initCropBox();
+      };
+
+      image.onerror = function () {
+        URL.revokeObjectURL(objectUrl);
+        overlay.remove();
+        self.showToast('Could not load image for cropping', true);
+        if (onResult) onResult(file);
+      };
+
+      image.src = objectUrl;
     },
 
     sanitizeFilename: function (name) {
@@ -1311,18 +1921,20 @@
       img.src = url;
     },
 
-    uploadImage: function (file, destDir, onDone) {
+    uploadImage: function (file, destDir, onDone, skipCrop) {
       var self = this;
-      var token = this.getToken();
 
-      if (!token) {
-        this.promptForToken(function () {
-          self.uploadImage(file, destDir, onDone);
+      if (!skipCrop && !file._cropProcessed) {
+        this.showCropModal(file, function (result) {
+          if (result === null) {
+            if (onDone) onDone(new Error('Upload cancelled'));
+            return;
+          }
+          result._cropProcessed = true;
+          self.uploadImage(result, destDir, onDone, true);
         });
         return;
       }
-
-      this.showToast('Uploading image...');
 
       this.prepareImageFile(file, function (err, b64, mime, suggestedName) {
         if (err) {
@@ -1333,40 +1945,86 @@
 
         var filename = self.sanitizeFilename(suggestedName || file.name);
         var path = destDir.replace(/\/$/, '') + '/' + filename;
-        var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + path;
 
-        fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
+        self.pendingUploads[path] = {
+          content: b64,
+          mime: mime,
+          message: 'Upload image: ' + filename
+        };
+        self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
+        self.markChanged();
+        self.showToast('Image staged — will upload when you Publish');
+        if (onDone) onDone(null, path);
+      });
+    },
+
+    commitImageFile: function (path, b64, mime, message) {
+      var self = this;
+
+      if (this.usesPublishApi()) {
+        return this.apiRequest('/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            message: 'Upload image: ' + filename,
-            content: b64
+            path: path,
+            content: b64,
+            message: message
           })
+        });
+      }
+
+      var token = this.getToken();
+      if (!token) {
+        return Promise.reject(new Error('GitHub token required to publish images'));
+      }
+
+      var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + path;
+
+      return fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: message,
+          content: b64
         })
-          .then(function (response) {
-            if (!response.ok) {
-              return response.json().then(function (data) {
-                var msg = (data && data.message) ? data.message : ('HTTP ' + response.status);
-                throw new Error(msg);
-              }).catch(function () {
-                throw new Error('Upload failed (HTTP ' + response.status + ')');
-              });
-            }
-            return response.json();
-          })
-          .then(function () {
-            self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
-            self.showToast('Image uploaded');
-            if (onDone) onDone(null, path);
-          })
-          .catch(function (uploadErr) {
-            self.showToast('Upload failed: ' + uploadErr.message, true);
-            if (onDone) onDone(uploadErr);
-          });
+      })
+        .then(function (response) {
+          if (self.isAuthError(response.status)) {
+            throw { authError: true, status: response.status };
+          }
+          if (!response.ok) {
+            return response.json().then(function (data) {
+              var msg = (data && data.message) ? data.message : ('HTTP ' + response.status);
+              throw new Error(msg);
+            }).catch(function () {
+              throw new Error('Upload failed (HTTP ' + response.status + ')');
+            });
+          }
+          return response.json();
+        });
+    },
+
+    flushPendingUploads: function () {
+      var self = this;
+      var paths = Object.keys(this.pendingUploads);
+      if (!paths.length) {
+        return Promise.resolve();
+      }
+
+      var chain = Promise.resolve();
+      paths.forEach(function (path) {
+        chain = chain.then(function () {
+          var entry = self.pendingUploads[path];
+          return self.commitImageFile(path, entry.content, entry.mime, entry.message);
+        });
+      });
+
+      return chain.then(function () {
+        self.pendingUploads = {};
       });
     },
 
@@ -1792,7 +2450,7 @@
     },
 
     setEditorControlsDisabled: function (disabled) {
-      var ids = ['btn-publish', 'btn-add-project', 'btn-suggest', 'edit-toggle'];
+      var ids = ['btn-publish', 'btn-add-project', 'btn-suggest'];
       var i;
       for (i = 0; i < ids.length; i++) {
         var el = document.getElementById(ids[i]);
@@ -1915,7 +2573,7 @@
       return new Promise(function (resolve) {
         function poll() {
           if (Date.now() - started > DEPLOY_MAX_WAIT) {
-            resolve({ timedOut: true });
+            resolve({ timedOut: true, sha: commitSha });
             return;
           }
 
@@ -1938,7 +2596,7 @@
             })
             .then(function (liveData) {
               if (self.contentFingerprint(liveData) === fingerprint) {
-                resolve({ live: true });
+                resolve({ live: true, sha: commitSha });
                 return;
               }
               self.publishDeployTimer = setTimeout(poll, DEPLOY_POLL_INTERVAL);
@@ -1979,32 +2637,49 @@
       var self = this;
 
       this.ensureAuth(function () {
-        self.setPublishStatus('Saving changes...', 'working');
+        self.setPublishStatus('Uploading images...', 'working');
         self.setPublishing(true);
 
-        var content = btoa(unescape(encodeURIComponent(JSON.stringify(self.data, null, 2))));
-        var fingerprint = self.contentFingerprint(self.data);
+        self.flushPendingUploads()
+          .then(function () {
+            self.setPublishStatus('Saving changes...', 'working');
 
-        var publishPromise;
-        if (self.usesPublishApi()) {
-          publishPromise = self.apiRequest('/publish', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: content })
-          });
-        } else {
-          publishPromise = self.publishViaGitHub(content);
-        }
+            var content = btoa(unescape(encodeURIComponent(JSON.stringify(self.data, null, 2))));
+            var fingerprint = self.contentFingerprint(self.data);
 
-        publishPromise
-          .then(function (result) {
-            localStorage.removeItem('portfolio_draft');
-            self.hasUnsavedChanges = false;
-            self.originalData = JSON.stringify(self.data);
-            var commitSha = result && result.sha ? result.sha : null;
-            return self.waitForLiveDeploy(fingerprint, commitSha);
+            var publishPromise;
+            if (self.usesPublishApi()) {
+              publishPromise = self.apiRequest('/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+              });
+            } else {
+              publishPromise = self.publishViaGitHub(content);
+            }
+
+            return publishPromise.then(function (result) {
+              localStorage.removeItem('portfolio_draft');
+              self.hasUnsavedChanges = false;
+              self.originalData = JSON.stringify(self.data);
+              self.uploadPreviews = {};
+              var commitSha = result && result.sha ? result.sha : null;
+              return self.waitForLiveDeploy(fingerprint, commitSha);
+            });
           })
           .then(function (result) {
+            if (result && result.live && window.SiteUpdates) {
+              window.SiteUpdates.notifyPublished(result.sha);
+            } else if (result && result.timedOut && window.SiteUpdates) {
+              window.SiteUpdates.showPrompt({
+                title: 'Changes saved',
+                message: 'Reload when ready to pick up the latest site build.',
+                allowLater: true
+              });
+            }
+            if (result && (result.live || result.timedOut) && self.active) {
+              self.exitEditMode();
+            }
             if (onSuccess && (!result || result.live || result.timedOut)) {
               onSuccess();
             }

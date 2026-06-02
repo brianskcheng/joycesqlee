@@ -40,6 +40,9 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scrollbar-gutter: stable;
+  overflow-x: clip;
+  overflow-y: scroll;
 }
 
 body {
@@ -49,6 +52,21 @@ body {
   background-color: var(--color-bg);
   line-height: 1.7;
   letter-spacing: 0.01em;
+  overflow-x: clip;
+}
+
+.page-main {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.page-main.is-ready {
+  opacity: 1;
+}
+
+.page-main.is-exiting {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 a {
@@ -145,11 +163,12 @@ p {
   font-weight: 400;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
 }
 
 .nav__links a.active {
-  border-bottom: 1px solid var(--color-text);
-  padding-bottom: 2px;
+  border-bottom-color: var(--color-text);
 }
 
 /* Hamburger */
@@ -434,6 +453,10 @@ p {
   margin-bottom: var(--spacing-xl);
 }
 
+.project-page__figure {
+  margin: 0;
+}
+
 .project-page__image {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -463,6 +486,15 @@ p {
   width: 100%;
   height: auto;
   object-fit: contain;
+}
+
+.project-page__image.aspect-original {
+  aspect-ratio: auto;
+}
+
+.project-page__image.aspect-original img {
+  width: 100%;
+  height: auto;
 }
 
 .project-page__image-row {
