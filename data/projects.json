@@ -427,7 +427,7 @@
   "about": {
     "name": "Joyce Lee",
     "title": "Part II Architectural Assistant",
-    "bio": "MArch candidate at the University of Bath, graduating summer 2026. I have 6 months of undergraduate placement experience at Wilkinson Eyre and CaSA Architects, and 1.5 years of Part 1 experience at LWK + Partners. My skills include early concept research, iterative development, visual delivery (3D modelling, rendering, presentation), and distilling complex information into clear drawings and narratives.",
+    "bio": "Part II architectural assistant and MArch candidate at the University of Bath (graduating summer 2026), with 2.5 years of practice experience across Wilkinson Eyre, LWK + Partners and CaSA Architects.\n\nI work across the full design arc — concept research, iterative development, 3D modelling, rendering and presentation — with a focus on turning complex information into clear, review-ready drawings and narratives. I collaborate easily across multidisciplinary teams, pick up new tools fast, and deliver to tight deadlines.",
     "photo": "portfolio/portfolio-main.png",
     "email": "joyce.y.s.lee@bath.edu",
     "phone": "07789 063 939",
@@ -553,31 +553,58 @@
         "groups": [
           {
             "heading": "Graphics",
-            "items": ["Adobe Photoshop", "Adobe Illustrator"]
+            "items": [
+              "Adobe Photoshop",
+              "Adobe Illustrator"
+            ]
           },
           {
             "heading": "2D",
-            "items": ["Autodesk AutoCAD", "Autodesk Revit", "Vectorworks"]
+            "items": [
+              "Autodesk AutoCAD",
+              "Autodesk Revit",
+              "Vectorworks"
+            ]
           },
           {
             "heading": "3D",
-            "items": ["Rhinoceros", "Autodesk Revit", "Grasshopper", "SketchUp"]
+            "items": [
+              "Rhinoceros",
+              "Autodesk Revit",
+              "Grasshopper",
+              "SketchUp"
+            ]
           },
           {
             "heading": "Rendering",
-            "items": ["Enscape", "V-Ray"]
+            "items": [
+              "Enscape",
+              "V-Ray"
+            ]
           },
           {
             "heading": "Presentation",
-            "items": ["Adobe InDesign", "Microsoft Office Suite"]
+            "items": [
+              "Adobe InDesign",
+              "Microsoft Office Suite"
+            ]
           },
           {
             "heading": "Languages",
-            "items": ["English", "Cantonese", "Mandarin"]
+            "items": [
+              "English",
+              "Cantonese",
+              "Mandarin"
+            ]
           },
           {
             "heading": "Other",
-            "items": ["Hand Drawing", "Model Making", "Adobe Premiere Pro", "Social Media Marketing"]
+            "items": [
+              "Hand Drawing",
+              "Model Making",
+              "Adobe Premiere Pro",
+              "Social Media Marketing"
+            ]
           }
         ]
       }
