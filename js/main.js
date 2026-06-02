@@ -69,8 +69,8 @@
     },
 
     revealPage: function () {
-      var sel = document.querySelector('.about-page, .project-page');
-      if (sel) sel.classList.add('is-ready');
+      var el = document.querySelector('.page-main');
+      if (el) el.classList.add('is-ready');
     },
 
     revealAboutPage: function () {
@@ -170,6 +170,8 @@
         card.appendChild(meta);
         gridEl.appendChild(card);
       });
+
+      this.whenFontsReady(function () { self.revealPage(); });
     },
 
     renderProjectPage: function () {
@@ -466,15 +468,79 @@
     }
   };
 
-  // Load data on page ready
+  // Strip cache-bust params from URL after reload
+  (function cleanReloadParams() {
+    var url = new URL(window.location.href);
+    if (!url.searchParams.has('_v') && !url.searchParams.has('_reload')) return;
+    url.searchParams.delete('_v');
+    url.searchParams.delete('_reload');
+    window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+  })();
+
+  // Static pages (Contact): reveal after fonts load
+  if (document.querySelector('.page-main') &&
+      !document.getElementById('site-title') &&
+      !document.getElementById('about-content') &&
+      !document.getElementById('project-content')) {
+    window.PortfolioApp.whenFontsReady(function () {
+      window.PortfolioApp.revealPage();
+    });
+  }
+
   window.PortfolioApp.loadData();
   setTimeout(function () {
     window.PortfolioApp.revealPage();
   }, 3000);
 
-  // --- Site update detection ---
-  (function () {
-    var POLL_INTERVAL = 60000;
+  // --- Nav prefetch and exit fade ---
+  (function setupNavTransitions() {
+    var prefetched = {};
+    var jsonPrefetched = false;
+
+    function prefetchHref(href) {
+      if (!href || prefetched[href]) return;
+      if (href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+      prefetched[href] = true;
+      var link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = href;
+      document.head.appendChild(link);
+    }
+
+    function prefetchJson() {
+      if (jsonPrefetched) return;
+      jsonPrefetched = true;
+      fetch('./data/projects.json', { cache: 'force-cache' }).catch(function () {});
+    }
+
+    function onNavIntent(link) {
+      prefetchHref(link.getAttribute('href'));
+      prefetchJson();
+    }
+
+    document.querySelectorAll('.nav__links a, .nav__mobile a, .nav__logo').forEach(function (link) {
+      link.addEventListener('mouseenter', function () { onNavIntent(link); });
+      link.addEventListener('focusin', function () { onNavIntent(link); });
+      link.addEventListener('click', function (e) {
+        var href = link.getAttribute('href');
+        if (!href || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+        if (link.target === '_blank') return;
+        if (document.body.classList.contains('edit-mode')) return;
+        var pageMain = document.querySelector('.page-main');
+        if (!pageMain) return;
+        e.preventDefault();
+        pageMain.classList.add('is-exiting');
+        setTimeout(function () {
+          window.location.href = href;
+        }, 200);
+      });
+    });
+  })();
+
+  // --- Site update detection and reload ---
+  window.SiteUpdates = (function () {
+    var POLL_INTERVAL = 15000;
+    var STORAGE_KEY = 'portfolio_site_version';
     var loadedVersion = null;
     var latestRemoteVersion = null;
     var promptVisible = false;
@@ -488,7 +554,7 @@
     }
 
     function fetchVersion() {
-      return fetch(getVersionUrl(), { cache: 'no-store' })
+      return fetch(getVersionUrl() + '?t=' + Date.now(), { cache: 'no-store' })
         .then(function (response) {
           if (!response.ok) throw new Error('version unavailable');
           return response.json();
@@ -498,7 +564,36 @@
         });
     }
 
-    function showUpdatePrompt() {
+    function performReload() {
+      var doReload = function () {
+        if (window.navigation && typeof window.navigation.reload === 'function') {
+          window.navigation.reload({ cacheMode: 'no-store' }).catch(function () {
+            var url = new URL(window.location.href);
+            url.searchParams.delete('_v');
+            url.searchParams.delete('_reload');
+            url.searchParams.set('_v', Date.now().toString());
+            window.location.replace(url.href);
+          });
+          return;
+        }
+        var url = new URL(window.location.href);
+        url.searchParams.delete('_v');
+        url.searchParams.delete('_reload');
+        url.searchParams.set('_v', Date.now().toString());
+        window.location.replace(url.href);
+      };
+
+      if ('caches' in window) {
+        caches.keys().then(function (keys) {
+          return Promise.all(keys.map(function (key) { return caches.delete(key); }));
+        }).finally(doReload);
+      } else {
+        doReload();
+      }
+    }
+
+    function showPrompt(opts) {
+      opts = opts || {};
       if (promptVisible || document.getElementById('update-modal-overlay')) return;
       promptVisible = true;
 
@@ -510,50 +605,40 @@
       modal.className = 'update-modal';
 
       var heading = document.createElement('h3');
-      heading.textContent = 'Site updated';
+      heading.textContent = opts.title || 'Site updated';
       modal.appendChild(heading);
 
       var message = document.createElement('p');
-      message.textContent = 'A new version of this site is available. Reload to see the latest content.';
+      message.textContent = opts.message || 'A new version of this site is available. Reload to see the latest content.';
       modal.appendChild(message);
 
       var actions = document.createElement('div');
       actions.className = 'update-modal__actions';
 
-      var laterBtn = document.createElement('button');
-      laterBtn.type = 'button';
-      laterBtn.textContent = 'Later';
-      laterBtn.addEventListener('click', function () {
-        dismissedVersion = latestRemoteVersion;
-        overlay.remove();
-        promptVisible = false;
-      });
+      if (opts.allowLater !== false) {
+        var laterBtn = document.createElement('button');
+        laterBtn.type = 'button';
+        laterBtn.textContent = 'Later';
+        laterBtn.addEventListener('click', function () {
+          dismissedVersion = latestRemoteVersion;
+          overlay.remove();
+          promptVisible = false;
+        });
+        actions.appendChild(laterBtn);
+      }
 
       var reloadBtn = document.createElement('button');
       reloadBtn.type = 'button';
       reloadBtn.className = 'update-modal__btn-primary';
       reloadBtn.textContent = 'Reload';
       reloadBtn.addEventListener('click', function () {
-        if ('caches' in window) {
-          caches.keys().then(function (keys) {
-            return Promise.all(keys.map(function (key) { return caches.delete(key); }));
-          }).finally(performHardReload);
-        } else {
-          performHardReload();
-        }
+        performReload();
       });
 
-      actions.appendChild(laterBtn);
       actions.appendChild(reloadBtn);
       modal.appendChild(actions);
       overlay.appendChild(modal);
       document.body.appendChild(overlay);
-    }
-
-    function performHardReload() {
-      var url = new URL(window.location.href);
-      url.searchParams.set('_reload', Date.now().toString());
-      window.location.replace(url.href);
     }
 
     function checkForUpdate() {
@@ -569,24 +654,62 @@
           if (remoteVersion !== loadedVersion) {
             latestRemoteVersion = remoteVersion;
             if (remoteVersion !== dismissedVersion) {
-              showUpdatePrompt();
+              showPrompt();
             }
           }
         })
         .catch(function () {});
     }
 
-    if (window.location.protocol === 'file:') return;
+    function notifyPublished(version) {
+      if (version) {
+        latestRemoteVersion = String(version);
+        try {
+          localStorage.setItem(STORAGE_KEY, latestRemoteVersion);
+          localStorage.removeItem(STORAGE_KEY);
+        } catch (e) {}
+      }
+      showPrompt({
+        title: 'Published successfully',
+        message: 'Reload to load the latest styles and content across this page.',
+        allowLater: true
+      });
+    }
 
-    fetchVersion()
-      .then(function (version) {
-        loadedVersion = version;
-        setInterval(checkForUpdate, POLL_INTERVAL);
-        document.addEventListener('visibilitychange', function () {
-          if (!document.hidden) checkForUpdate();
-        });
-        window.addEventListener('focus', checkForUpdate);
-      })
-      .catch(function () {});
+    if (window.location.protocol !== 'file:') {
+      fetchVersion()
+        .then(function (version) {
+          loadedVersion = version;
+          setInterval(checkForUpdate, POLL_INTERVAL);
+          document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) checkForUpdate();
+          });
+          window.addEventListener('focus', checkForUpdate);
+        })
+        .catch(function () {});
+
+      window.addEventListener('storage', function (e) {
+        if (e.key !== STORAGE_KEY || !e.newValue) return;
+        fetchVersion()
+          .then(function (remoteVersion) {
+            if (!remoteVersion || remoteVersion === loadedVersion) return;
+            latestRemoteVersion = remoteVersion;
+            if (remoteVersion !== dismissedVersion) {
+              showPrompt({
+                title: 'Site updated',
+                message: 'New changes were published. Reload to see the latest content.'
+              });
+            }
+          })
+          .catch(function () {});
+      });
+    }
+
+    return {
+      fetchVersion: fetchVersion,
+      performReload: performReload,
+      showPrompt: showPrompt,
+      notifyPublished: notifyPublished
+    };
   })();
 })();

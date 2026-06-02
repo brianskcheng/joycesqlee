@@ -42,13 +42,18 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
-@keyframes pageFadeIn {
-  from { opacity: 0; }
+@keyframes revealFallback {
   to { opacity: 1; }
 }
 
-@keyframes revealFallback {
-  to { opacity: 1; }
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
 }
 
 body {
@@ -58,7 +63,21 @@ body {
   background-color: var(--color-bg);
   line-height: 1.7;
   letter-spacing: 0.01em;
-  animation: pageFadeIn 0.45s ease both;
+}
+
+.page-main {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  animation: revealFallback 0s linear 3.5s forwards;
+}
+
+.page-main.is-ready {
+  opacity: 1;
+}
+
+.page-main.is-exiting {
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 a {
@@ -382,9 +401,6 @@ p {
 .project-page {
   margin-top: var(--nav-height);
   padding: var(--spacing-lg) 0 var(--spacing-2xl);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  animation: revealFallback 0s linear 3.5s forwards;
 }
 
 .project-page__back {
@@ -539,14 +555,6 @@ p {
 .about-page {
   margin-top: var(--nav-height);
   padding: var(--spacing-xl) 0 var(--spacing-2xl);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  animation: revealFallback 0s linear 3.5s forwards;
-}
-
-.about-page.is-ready,
-.project-page.is-ready {
-  opacity: 1;
 }
 
 .about-page__intro {

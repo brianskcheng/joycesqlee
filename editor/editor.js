@@ -2470,7 +2470,7 @@
       return new Promise(function (resolve) {
         function poll() {
           if (Date.now() - started > DEPLOY_MAX_WAIT) {
-            resolve({ timedOut: true });
+            resolve({ timedOut: true, sha: commitSha });
             return;
           }
 
@@ -2493,7 +2493,7 @@
             })
             .then(function (liveData) {
               if (self.contentFingerprint(liveData) === fingerprint) {
-                resolve({ live: true });
+                resolve({ live: true, sha: commitSha });
                 return;
               }
               self.publishDeployTimer = setTimeout(poll, DEPLOY_POLL_INTERVAL);
@@ -2565,6 +2565,15 @@
             });
           })
           .then(function (result) {
+            if (result && result.live && window.SiteUpdates) {
+              window.SiteUpdates.notifyPublished(result.sha);
+            } else if (result && result.timedOut && window.SiteUpdates) {
+              window.SiteUpdates.showPrompt({
+                title: 'Changes saved',
+                message: 'Reload when ready to pick up the latest site build.',
+                allowLater: true
+              });
+            }
             if (result && (result.live || result.timedOut) && self.active) {
               self.exitEditMode();
             }
