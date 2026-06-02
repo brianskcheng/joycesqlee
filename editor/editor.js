@@ -492,6 +492,18 @@
       this.markChanged();
     },
 
+    moveImage: function (project, index, direction) {
+      var target = index + direction;
+      if (target < 0 || target >= project.images.length) return;
+
+      var temp = project.images[index];
+      project.images[index] = project.images[target];
+      project.images[target] = temp;
+
+      this.refreshProjectPage();
+      this.markChanged();
+    },
+
     // --- Project Page Editing ---
 
     enableProjectPageEditing: function () {
@@ -623,12 +635,74 @@
       // Image controls
       var imagesContainer = container.querySelector('.project-page__images');
       if (imagesContainer) {
-        // Add edit/remove buttons to each image
+        // Add edit/remove/reorder controls to each image
         var allImageDivs = imagesContainer.querySelectorAll('.project-page__image');
         allImageDivs.forEach(function (imgDiv, idx) {
-          // Find the actual project image index by matching caption
           var captionEl = imgDiv.querySelector('.placeholder-text');
-          var imgEl = imgDiv.querySelector('img');
+
+          imgDiv.setAttribute('draggable', 'true');
+          imgDiv.setAttribute('data-image-index', idx);
+
+          imgDiv.addEventListener('dragstart', function (e) {
+            self.dragState = { fromIndex: idx };
+            imgDiv.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', idx);
+          });
+
+          imgDiv.addEventListener('dragend', function () {
+            imgDiv.classList.remove('dragging');
+            self.dragState = null;
+            imagesContainer.querySelectorAll('.project-page__image').forEach(function (el) {
+              el.classList.remove('drag-over-before', 'drag-over-after');
+            });
+          });
+
+          imgDiv.addEventListener('dragover', function (e) {
+            if (!self.dragState) return;
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+
+            var rect = imgDiv.getBoundingClientRect();
+            var midY = rect.top + rect.height / 2;
+            imagesContainer.querySelectorAll('.project-page__image').forEach(function (el) {
+              el.classList.remove('drag-over-before', 'drag-over-after');
+            });
+
+            if (e.clientY < midY) {
+              imgDiv.classList.add('drag-over-before');
+            } else {
+              imgDiv.classList.add('drag-over-after');
+            }
+          });
+
+          imgDiv.addEventListener('dragleave', function () {
+            imgDiv.classList.remove('drag-over-before', 'drag-over-after');
+          });
+
+          imgDiv.addEventListener('drop', function (e) {
+            e.preventDefault();
+            if (!self.dragState) return;
+
+            var fromIndex = self.dragState.fromIndex;
+            var rect = imgDiv.getBoundingClientRect();
+            var midY = rect.top + rect.height / 2;
+            var toIndex = e.clientY < midY ? idx : idx + 1;
+
+            if (fromIndex < toIndex) toIndex--;
+
+            if (fromIndex !== toIndex && toIndex >= 0 && toIndex < project.images.length) {
+              var image = project.images.splice(fromIndex, 1)[0];
+              project.images.splice(toIndex, 0, image);
+              self.refreshProjectPage();
+              self.markChanged();
+            }
+
+            self.dragState = null;
+            imagesContainer.querySelectorAll('.project-page__image').forEach(function (el) {
+              el.classList.remove('dragging', 'drag-over-before', 'drag-over-after');
+            });
+          });
 
           var controlsDiv = document.createElement('div');
           controlsDiv.style.display = 'flex';
@@ -638,19 +712,39 @@
           controlsDiv.style.right = '8px';
           imgDiv.style.position = 'relative';
 
+          var upImgBtn = document.createElement('button');
+          upImgBtn.className = 'edit-action-btn';
+          upImgBtn.textContent = '\u2191';
+          upImgBtn.style.marginTop = '0';
+          upImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.moveImage(project, idx, -1);
+          });
+
+          var downImgBtn = document.createElement('button');
+          downImgBtn.className = 'edit-action-btn';
+          downImgBtn.textContent = '\u2193';
+          downImgBtn.style.marginTop = '0';
+          downImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            self.moveImage(project, idx, 1);
+          });
+
           var setImgBtn = document.createElement('button');
           setImgBtn.className = 'edit-action-btn';
           setImgBtn.textContent = 'Set Image';
           setImgBtn.style.marginTop = '0';
-          setImgBtn.addEventListener('click', function () {
-            var imageIndex = self.findImageIndex(project, imgDiv);
-            if (imageIndex === -1) return;
+          setImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
             self.showImageSourceModal(
               'Set Image',
-              project.images[imageIndex].src || '',
+              project.images[idx].src || '',
               'projects/' + project.slug,
               function (src) {
-                project.images[imageIndex].src = src;
+                project.images[idx].src = src;
                 self.refreshProjectPage();
                 self.markChanged();
               }
@@ -661,14 +755,16 @@
           removeImgBtn.className = 'edit-action-btn edit-action-btn--danger';
           removeImgBtn.textContent = 'Remove';
           removeImgBtn.style.marginTop = '0';
-          removeImgBtn.addEventListener('click', function () {
-            var imageIndex = self.findImageIndex(project, imgDiv);
-            if (imageIndex === -1) return;
-            project.images.splice(imageIndex, 1);
+          removeImgBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            project.images.splice(idx, 1);
             self.refreshProjectPage();
             self.markChanged();
           });
 
+          controlsDiv.appendChild(upImgBtn);
+          controlsDiv.appendChild(downImgBtn);
           controlsDiv.appendChild(setImgBtn);
           controlsDiv.appendChild(removeImgBtn);
           imgDiv.appendChild(controlsDiv);
@@ -678,11 +774,8 @@
             captionEl.setAttribute('contenteditable', 'true');
             captionEl.setAttribute('data-editable', 'img-caption');
             captionEl.addEventListener('blur', function () {
-              var imageIndex = self.findImageIndex(project, imgDiv);
-              if (imageIndex !== -1) {
-                project.images[imageIndex].caption = captionEl.textContent.trim();
-                self.markChanged();
-              }
+              project.images[idx].caption = captionEl.textContent.trim();
+              self.markChanged();
             });
           }
         });
@@ -713,17 +806,6 @@
         });
         headerDiv.appendChild(cardMetaBtn);
       }
-    },
-
-    findImageIndex: function (project, imgDiv) {
-      var captionEl = imgDiv.querySelector('.placeholder-text');
-      var imgEl = imgDiv.querySelector('img');
-      var caption = captionEl ? captionEl.textContent.trim() : (imgEl ? imgEl.alt : '');
-
-      for (var i = 0; i < project.images.length; i++) {
-        if (project.images[i].caption === caption) return i;
-      }
-      return -1;
     },
 
     refreshProjectPage: function () {
