@@ -33,3 +33,13 @@ The built-in editor publishes changes to GitHub. For automated publishing (no to
 2. Set `PUBLISH_API_URL` in `editor/editor.js` to the worker URL (e.g. `https://joyce-portfolio-publish.<account>.workers.dev`)
 
 Without the worker, the editor falls back to a manual GitHub token stored in the browser.
+
+## Git sync (agents and developers)
+
+The live site deploys from `main` on GitHub. To avoid stale or conflicting work:
+
+- **Cursor agents** — Project rule `.cursor/rules/sync-with-origin.mdc` requires `git fetch` / pull at the start of each chat and again before any push or deploy.
+- **Manual sync** — Run `./scripts/sync-with-origin.sh` (fast-forward only; fails if you have uncommitted changes).
+- **Optional hook** — After clone, run `git config core.hooksPath .githooks` so every `git push` runs the same sync first.
+
+Cursor cannot pull from `origin` between chats automatically; the rule plus optional hook cover that gap.

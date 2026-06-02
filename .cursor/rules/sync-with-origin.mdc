@@ -1,0 +1,51 @@
+---
+description: Sync local git with origin at session start and before push/deploy
+alwaysApply: true
+---
+
+# Sync with origin before work and deployment
+
+This repo is often edited from multiple places (Brian, Joyce, Cursor agents, in-browser publish). **Always work from the latest `origin` state** so deploys and merges do not overwrite or fight remote changes.
+
+## When to sync (mandatory)
+
+1. **Start of every new chat / agent session** — Before reading files for a task or making edits, run sync (see commands below).
+2. **Again immediately before any deployment or push**, including:
+   - `git push` (especially to `main`, which triggers GitHub Pages)
+   - Opening or updating a pull request that will merge to `main`
+   - `gh workflow run` / deploy-related GitHub Actions from the CLI
+   - `npx wrangler deploy` in `publish-worker/`
+   - Any step described as publish, deploy, or release
+
+If sync fails (conflicts, dirty tree, network), **stop** and report to the user. Do not force-push unless the user explicitly asks.
+
+## How to sync
+
+Prefer the project script (same behavior as the pre-push hook):
+
+```bash
+./scripts/sync-with-origin.sh
+```
+
+Equivalent manual steps:
+
+```bash
+git fetch origin
+git pull --ff-only   # when the branch tracks origin
+```
+
+Use `git pull --ff-only origin <branch>` if there is no upstream configured.
+
+## Between chats (no background polling)
+
+Cursor agents **cannot** poll `origin` on a timer between sessions. Use:
+
+- This rule (`alwaysApply`) — sync at the start of each chat
+- **Pre-push hook** — run once after clone: `git config core.hooksPath .githooks` (see README)
+
+Do not skip sync because the working tree looked fine earlier in the same session if a push or deploy is next.
+
+## After sync
+
+- Re-check `git status` and recent `git log origin/main..HEAD` / `HEAD..origin/main` if the task involves `main` or production.
+- If the user only wanted to publish editor content, remind them the live site follows **`main` on GitHub**; local sync does not replace publishing through the editor/worker.

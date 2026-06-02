@@ -1,0 +1,5 @@
+#!/bin/sh
+# Run before every push so local main/feature branches match origin when deploying.
+set -e
+repo_root="$(git rev-parse --show-toplevel)"
+"$repo_root/scripts/sync-with-origin.sh"
