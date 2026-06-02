@@ -526,6 +526,11 @@ p {
 .about-page {
   margin-top: var(--nav-height);
   padding: var(--spacing-xl) 0 var(--spacing-2xl);
+  opacity: 0;
+}
+
+.about-page.is-ready {
+  opacity: 1;
 }
 
 .about-page__intro {

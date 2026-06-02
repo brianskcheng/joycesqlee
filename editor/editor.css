@@ -35,7 +35,8 @@ body.edit-mode .editor-toolbar {
 }
 
 body.edit-mode .hero,
-body.edit-mode .project-page {
+body.edit-mode .project-page,
+body.edit-mode .about-page {
   margin-top: calc(var(--nav-height) + 48px);
 }
 

@@ -106,6 +106,7 @@
 
       // Render project cards
       gridEl.innerHTML = '';
+      var self = this;
       projects.forEach(function (project) {
         var card = document.createElement('a');
         card.href = 'project.html?slug=' + project.slug;
@@ -119,7 +120,7 @@
           img.src = project.thumbnail;
           img.alt = project.title;
           img.loading = 'lazy';
-          this.applyFramingStyle(img, project.thumbnailFraming);
+          self.applyFramingStyle(img, project.thumbnailFraming);
           imgDiv.appendChild(img);
         } else {
           var placeholder = document.createElement('span');
@@ -306,6 +307,9 @@
       });
 
       container.innerHTML = html;
+
+      var aboutPage = document.querySelector('.about-page');
+      if (aboutPage) aboutPage.classList.add('is-ready');
     },
 
     buildFramingStyleAttr: function (framing) {
