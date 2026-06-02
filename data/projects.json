@@ -8,40 +8,14 @@
     {
       "slug": "mosaics-of-urban-giardino",
       "title": "Mosaics of Urban Giardino",
-      "type": "Transforming an abandoned courthouse into a self-sufficient agroforestry housing community in Siracusa, Sicily.",
+      "type": "",
       "cardMeta": "6th Year Project · 2026 · Siracusa, Sicily",
       "thumbnail": "projects/mosaics-of-urban-giardino/plan-oblique-landscape-cropped-mpx3zdx9.png",
       "descriptions": [
-        "<div>Amidst Siracusa’s climate crisis and petrochemical legacy, its urban fabric has lost its productive soul. The fertile giardini that one wove centuries of cultivation have been displaced, leaving a biome fractured.</div><div><br></div><div>The Orchard Living Lab proposes to restore a harmony between human settlement and productive nature, the condition that Siracusa’s agricultural history once embodied. Reinterpreting traditional Sicilian agriculture and Mediterranean food practices, the scheme draws from the layered planting of coltura promiscua, the terraced earthworks of terrazamenti and the water wisdom of cisterne, returning the giardino Mediterraneo to the heart of the urban block. The citrus tree stands at its centre not as an ornament, but as structural anchor, seasonal clock and ecological engine of the whole.&nbsp;</div><div><br></div><div>The proposal does not simply house a giardino, it becomes one. The Orchard Living Lab dissolves into a living biome, animated by continuous cycles of growth, exhcnage and regeneration, in which every element feeds the next. Its inhabitants, human and non-human alike are not passive occupants but active stewards: tending, cultivating and sustaining a landscape that sustains them in return, re-establishing self-sufficiency through the reciprocal relationship between people, place and production.</div><div><br></div><div>This is not a building with an orchard. It is an orchard that has learned to be a building.&nbsp;</div>"
+        ""
       ],
-      "meta": [
-        {
-          "label": "Unit",
-          "value": "6th Year Design Studio 6.2"
-        },
-        {
-          "label": "Date",
-          "value": "Feb - May 2026"
-        },
-        {
-          "label": "Location",
-          "value": "Siracusa, Sicily"
-        },
-        {
-          "label": "Tutor",
-          "value": "Jayne Barlow"
-        }
-      ],
-      "images": [
-        {
-          "src": "projects/mosaics-of-urban-giardino/plan-oblique-overview-mpx4dvv0.png",
-          "caption": "New Image",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain",
-          "focal": "50% 50%"
-        }
-      ],
+      "meta": [],
+      "images": [],
       "relatedProjects": [],
       "thumbnailFraming": {
         "focal": "50% 0%",
@@ -88,14 +62,33 @@
           "layout": "hero"
         },
         {
-          "src": "projects/syraka/render-quarry-retention.jpg",
-          "caption": "Visualisation of a reactivated water retention quarry (Rhino, Enscape, Photoshop)",
-          "layout": "full"
+          "src": "projects/syraka/principle-parti-cropped-mpx50vrz.png",
+          "caption": "Masterplan Principles",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
-          "src": "projects/syraka/masterplan-loop.png",
-          "caption": "Plan of the Loop, envisioning Syraka by 2075 (AutoCAD, Photoshop, Procreate)",
+          "src": "projects/syraka/masterplan-final-before-mpx55yjl.png",
+          "caption": "Existing Morphology",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/syraka/masterplan-final-review-mpx55hwd.png",
+          "caption": "Existing Morphology",
+          "layout": "half",
+          "aspectRatio": "original",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/syraka/render-quarry-retention.jpg",
+          "caption": "Visualisation of a reactivated water retention quarry (Rhino, Enscape, Photoshop)",
           "layout": "full",
+          "aspectRatio": "original",
           "fit": "contain",
           "focal": "50% 50%"
         },
