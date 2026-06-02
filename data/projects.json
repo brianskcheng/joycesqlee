@@ -458,24 +458,6 @@
         ]
       },
       {
-        "title": "Publication Experience",
-        "type": "experience",
-        "items": [
-          {
-            "date": "2020 – 2021",
-            "role": "Publication Officer",
-            "org": "Hong Kong Public Affairs and Social Service Society (HKPASS), University of Bath",
-            "desc": "Promoted events and flagship activities through social media marketing; facilitated networking between Hong Kong students in the United Kingdom."
-          },
-          {
-            "date": "2020",
-            "role": "Part-Time Media and Video Editor",
-            "org": "HK Romance Dating",
-            "desc": "Produced media and video content for the organisation."
-          }
-        ]
-      },
-      {
         "title": "Education",
         "type": "experience",
         "items": [
@@ -490,6 +472,24 @@
             "role": "BSc (Hons) Architecture — First Class Honours",
             "org": "University of Bath",
             "desc": "Lucy's Room (4th Year Project) — Awarded the Prize for Environmental Design and Wellbeing sponsored by D-NA."
+          }
+        ]
+      },
+      {
+        "title": "Publication Experience",
+        "type": "experience",
+        "items": [
+          {
+            "date": "2020 – 2021",
+            "role": "Publication Officer",
+            "org": "Hong Kong Public Affairs and Social Service Society (HKPASS), University of Bath",
+            "desc": "Promoted events and flagship activities through social media marketing; facilitated networking between Hong Kong students in the United Kingdom."
+          },
+          {
+            "date": "2020",
+            "role": "Part-Time Media and Video Editor",
+            "org": "HK Romance Dating",
+            "desc": "Produced media and video content for the organisation."
           }
         ]
       },
