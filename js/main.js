@@ -70,7 +70,8 @@
 
     revealPage: function () {
       var el = document.querySelector('.page-main');
-      if (el) el.classList.add('is-ready');
+      if (!el || el.classList.contains('is-ready')) return;
+      el.classList.add('is-ready');
     },
 
     revealAboutPage: function () {
@@ -527,12 +528,12 @@
         if (link.target === '_blank') return;
         if (document.body.classList.contains('edit-mode')) return;
         var pageMain = document.querySelector('.page-main');
-        if (!pageMain) return;
+        if (!pageMain || pageMain.classList.contains('is-exiting')) return;
         e.preventDefault();
         pageMain.classList.add('is-exiting');
         setTimeout(function () {
-          window.location.href = href;
-        }, 200);
+          window.location.assign(href);
+        }, 180);
       });
     });
   })();
