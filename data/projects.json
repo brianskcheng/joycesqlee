@@ -129,17 +129,31 @@
         {
           "src": "projects/mycocycle-studio/overall-site-red-cropped-mpx288iv.png",
           "caption": "Aerial Visualisation (Rhino, Enscape, Photoshop)",
-          "layout": "full"
+          "layout": "full",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/mycocycle-studio/render-exterior.jpg",
           "caption": "Renders showing tree structure — roots, trunk, canopy",
-          "layout": "half"
+          "layout": "half",
+          "aspectRatio": "16/9",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/mycocycle-studio/water-mpx2hdvq.png",
           "caption": "The tree columns are structural and systematic devices, devices that capture sunlight and water",
-          "layout": "full"
+          "layout": "full",
+          "aspectRatio": "16/9",
+          "focal": "50% 0%"
+        },
+        {
+          "src": "projects/mycocycle-studio/massing-models-annotated-mpx3hrbk.png",
+          "caption": "A 1:500 wood and cork massing model, which captures the site’s 6m level change. They show how the building form evolved from a rectilinear form",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/mycocycle-studio/short-section.jpg",
@@ -147,14 +161,30 @@
           "layout": "full"
         },
         {
-          "src": "projects/mycocycle-studio/model-tree-column.png",
+          "src": "projects/mycocycle-studio/convex-iso-cropped-mpx3oija.png",
           "caption": "Tree column and facade 1:50 model",
           "layout": "half",
           "aspectRatio": "original",
           "focal": "50% 50%"
         },
         {
-          "src": "projects/mycocycle-studio/model-discovery-roots.png",
+          "src": "projects/mycocycle-studio/canvex-facade-cropped-mpx3nl79.png",
+          "caption": "Curvature of the timber battens adds a secondary layer of “trees” that complements the internal tree columns. Each arch incrementally steps upward, echoing the levels of the existing topography.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mycocycle-studio/e2697d77-78e0-429d-a375-bad3cbbeef38-mpx3l81s.png",
+          "caption": "New Image",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mycocycle-studio/20250920-perspective-cropped-mpx3phnw.png",
           "caption": "Discovery roots 1:20 model",
           "layout": "half",
           "aspectRatio": "original",
@@ -167,6 +197,11 @@
           "fit": "contain",
           "focal": "50% 50%",
           "aspectRatio": "original"
+        },
+        {
+          "src": "projects/mycocycle-studio/p002-undercroft-cropped-mpx3bilr.png",
+          "caption": "The undercroft space features the discvoery roots and sculptural furniture. The flooring combines stone paving and gravel, while a rendered ceiling with LEDs creates a cave-like atmosphere that remains softly illuminated. ",
+          "layout": "full"
         },
         {
           "src": "projects/mycocycle-studio/overall-journey-01-mpx35aw3.png",
