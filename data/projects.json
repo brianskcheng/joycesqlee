@@ -427,10 +427,11 @@
   "about": {
     "name": "Joyce Lee",
     "title": "Part II Architectural Assistant",
-    "bio": "Part II architectural assistant and MArch candidate at the University of Bath (graduating summer 2026), with 2.5 years of practice experience across Wilkinson Eyre, LWK + Partners and CaSA Architects.\n\nI work across the full design arc — concept research, iterative development, 3D modelling, rendering and presentation — with a focus on turning complex information into clear, review-ready drawings and narratives. I collaborate easily across multidisciplinary teams, pick up new tools fast, and deliver to tight deadlines.",
+    "bio": "MArch candidate at the University of Bath, graduating summer 2026. I have 6 months of undergraduate placement experience at Wilkinson Eyre and CaSA Architects, and 1.5 years of Part 1 experience at LWK + Partners. My skills include early concept research, iterative development, visual delivery (3D modelling, rendering, presentation), and distilling complex information into clear drawings and narratives.",
     "photo": "portfolio/portfolio-main.png",
     "email": "joyce.y.s.lee@bath.edu",
     "phone": "07789 063 939",
+    "linkedin": "linkedin.com/in/syjoycelee2001",
     "sections": [
       {
         "title": "Work Experience",
@@ -440,19 +441,37 @@
             "date": "Sep 2023 – Jan 2025",
             "role": "Part 1 Architectural Assistant",
             "org": "LWK + Partners, Hong Kong",
-            "desc": "Contributed to multiple projects including an elderly home, children care centre, universities and hospitals. Key projects included the Polytechnic University South West Campus (RIBA Stages 0-3) and Po Leung Kuk Service for the Elderly (RIBA Stages 3-4). Led the development of an internal Revit package and delivered BIM training to the project team."
+            "desc": "Contributed to a range of building types including waterfront development, elderly homes, children's care centres, universities and hospitals across RIBA Stages 0-4, coordinating with clients and consultants. Polytechnic University South West Campus (RIBA Stages 0-3): produced drawings, diagrams, renders and presentations. Po Leung Kuk Service for the Elderly (RIBA Stages 3-4): led detailed design and statutory submissions, including the team's first full technical package in Revit. BIM Coordination: developed a Revit package to streamline technical design and GBP submissions; hosted an in-house seminar on BIM workflows."
           },
           {
             "date": "Apr – Sep 2022",
             "role": "Junior Architectural Assistant",
             "org": "CaSA Architects, Bath",
-            "desc": "Worked primarily on RIBA Stages 1-3 projects involving home extensions, refurbishing existing house fabric and form for residential projects of different scales."
+            "desc": "Worked across RIBA Stages 1-3 on residential projects of varying scales, including home extensions and refurbishment of existing house fabric and form."
           },
           {
             "date": "Apr – Sep 2021",
             "role": "Architectural Assistant",
             "org": "Wilkinson Eyre, Hong Kong",
-            "desc": "Assisted on the Dongguan Taiping Waterway Bridge competition submission and the University of Hong Kong Business School interiors (RIBA Stage 3). Involved in digital modelling, rendering, and coordinating with material suppliers."
+            "desc": "Dongguan Taiping Waterway Bridge: assisted in creating digital models, diagrams and drawings for the competition submission. University of Hong Kong Business School: part of the interiors team for RIBA Stage 3; involved in digital modelling, rendering, video editing, report presentation and coordinating with material suppliers."
+          }
+        ]
+      },
+      {
+        "title": "Publication Experience",
+        "type": "experience",
+        "items": [
+          {
+            "date": "2020 – 2021",
+            "role": "Publication Officer",
+            "org": "Hong Kong Public Affairs and Social Service Society (HKPASS), University of Bath",
+            "desc": "Promoted events and flagship activities through social media marketing; facilitated networking between Hong Kong students in the United Kingdom."
+          },
+          {
+            "date": "2020",
+            "role": "Part-Time Media and Video Editor",
+            "org": "HK Romance Dating",
+            "desc": "Produced media and video content for the organisation."
           }
         ]
       },
@@ -464,7 +483,7 @@
             "date": "2024 – 2026",
             "role": "MArch (Hons) Architecture",
             "org": "University of Bath",
-            "desc": "Syraka (6th Year Group Project) — city-scale masterplan for Siracusa, Italy. MycoCycle Studio (5th Year Project) — mycelium brick workshop, achieved 78."
+            "desc": "Mosaics of Urban Giardino (6th Year Project). Syraka (6th Year Group Project). MycoCycle Studio (5th Year Project) — achieved 78."
           },
           {
             "date": "2019 – 2023",
@@ -475,52 +494,32 @@
         ]
       },
       {
-        "title": "Skills",
-        "type": "skills",
-        "groups": [
+        "title": "Certifications and Awards",
+        "type": "experience",
+        "items": [
           {
-            "heading": "Graphics",
-            "items": [
-              "Adobe Photoshop",
-              "Adobe Illustrator",
-              "Adobe InDesign"
-            ]
+            "date": "2025 – 2026",
+            "role": "Certified Passivhaus Designer Course",
+            "org": "In progress",
+            "desc": "Currently enrolled; expected certification by June 2026."
           },
           {
-            "heading": "Digital Modelling",
-            "items": [
-              "Rhinoceros",
-              "Autodesk AutoCAD",
-              "Autodesk Revit",
-              "Vectorworks",
-              "Grasshopper",
-              "SketchUp"
-            ]
-          },
+            "date": "2023",
+            "role": "Prize for Environmental Design and Wellbeing",
+            "org": "Sponsored by D-NA",
+            "desc": "Awarded for Lucy's Room (4th Year Project)."
+          }
+        ]
+      },
+      {
+        "title": "Research Project Experience",
+        "type": "experience",
+        "items": [
           {
-            "heading": "Rendering",
-            "items": [
-              "Enscape",
-              "V-Ray"
-            ]
-          },
-          {
-            "heading": "Languages",
-            "items": [
-              "English",
-              "Cantonese",
-              "Mandarin"
-            ]
-          },
-          {
-            "heading": "Other",
-            "items": [
-              "Hand Drawing",
-              "Model Making",
-              "Video Editing",
-              "Social Media Marketing",
-              "Microsoft Office Suite"
-            ]
+            "date": "2025 – 2026",
+            "role": "The Paradox of Hyperspace",
+            "org": "University of Bath",
+            "desc": "Evaluating the civic potential of Hong Kong's shopping malls. A comparative case study analysis identifying spatial and managerial patterns in malls."
           }
         ]
       },
@@ -528,6 +527,12 @@
         "title": "Other Experience",
         "type": "experience",
         "items": [
+          {
+            "date": "2025 – 2026",
+            "role": "First Year Critic",
+            "org": "University of Bath",
+            "desc": "Critiqued first year architecture student work."
+          },
           {
             "date": "2021 – 2022",
             "role": "Secretary",
@@ -539,12 +544,40 @@
             "role": "Peer Mentor",
             "org": "University of Bath",
             "desc": "Supported first year architecture students by introducing the course and providing guidance on university life."
+          }
+        ]
+      },
+      {
+        "title": "Skills",
+        "type": "skills",
+        "groups": [
+          {
+            "heading": "Graphics",
+            "items": ["Adobe Photoshop", "Adobe Illustrator"]
           },
           {
-            "date": "2020 – 2021",
-            "role": "Publication Officer",
-            "org": "Hong Kong Public Affairs and Social Service Society (HKPASS), University of Bath",
-            "desc": "Promoted events and flagship activities by social media marketing, facilitated networking between Hong Kong students in the United Kingdom."
+            "heading": "2D",
+            "items": ["Autodesk AutoCAD", "Autodesk Revit", "Vectorworks"]
+          },
+          {
+            "heading": "3D",
+            "items": ["Rhinoceros", "Autodesk Revit", "Grasshopper", "SketchUp"]
+          },
+          {
+            "heading": "Rendering",
+            "items": ["Enscape", "V-Ray"]
+          },
+          {
+            "heading": "Presentation",
+            "items": ["Adobe InDesign", "Microsoft Office Suite"]
+          },
+          {
+            "heading": "Languages",
+            "items": ["English", "Cantonese", "Mandarin"]
+          },
+          {
+            "heading": "Other",
+            "items": ["Hand Drawing", "Model Making", "Adobe Premiere Pro", "Social Media Marketing"]
           }
         ]
       }

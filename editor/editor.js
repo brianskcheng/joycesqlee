@@ -784,6 +784,18 @@
         });
       }
 
+      var linkedinEl = document.getElementById('about-linkedin');
+      if (linkedinEl) {
+        linkedinEl.setAttribute('contenteditable', 'true');
+        linkedinEl.setAttribute('data-editable', 'about-linkedin');
+        linkedinEl.addEventListener('blur', function () {
+          var val = linkedinEl.textContent.trim();
+          self.data.about.linkedin = val;
+          linkedinEl.href = 'https://' + val.replace(/^https?:\/\//, '');
+          self.markChanged();
+        });
+      }
+
       // Photo control
       var photoEl = document.getElementById('about-photo');
       if (photoEl) {
