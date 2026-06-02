@@ -9,6 +9,7 @@
   var LIVE_SITE_URL = 'https://joycesqlee.com';
   var DEPLOY_POLL_INTERVAL = 4000;
   var DEPLOY_MAX_WAIT = 300000;
+  var EDIT_PASSWORD = 'admin';
 
   var Editor = {
     active: false,
@@ -23,11 +24,11 @@
     init: function () {
       var self = this;
 
-      // Listen for secret keyboard shortcut: Ctrl+Shift+E to reveal editor
+      // Listen for secret keyboard shortcut: Ctrl+Shift+E to enter edit mode (password gated)
       document.addEventListener('keydown', function (e) {
         if (e.ctrlKey && e.shiftKey && e.key === 'E') {
           e.preventDefault();
-          self.revealEditButton();
+          self.promptForEditPassword();
         }
       });
 
@@ -223,6 +224,92 @@
       if (toggleBtn) {
         toggleBtn.style.display = 'inline-block';
       }
+    },
+
+    promptForEditPassword: function () {
+      if (this.active) return;
+
+      var self = this;
+      var existing = document.getElementById('editor-modal-overlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-modal-overlay';
+      overlay.className = 'editor-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Edit Mode';
+      modal.appendChild(heading);
+
+      var instructions = document.createElement('p');
+      instructions.textContent = 'Enter the password to edit this site.';
+      instructions.style.marginBottom = '20px';
+      instructions.style.color = '#666';
+      instructions.style.fontSize = '14px';
+      modal.appendChild(instructions);
+
+      var fieldDiv = document.createElement('div');
+      fieldDiv.className = 'editor-modal__field';
+
+      var label = document.createElement('label');
+      label.textContent = 'Password';
+      fieldDiv.appendChild(label);
+
+      var input = document.createElement('input');
+      input.type = 'password';
+      input.placeholder = 'Password';
+      input.autocomplete = 'off';
+      fieldDiv.appendChild(input);
+      modal.appendChild(fieldDiv);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      var unlockBtn = document.createElement('button');
+      unlockBtn.textContent = 'Unlock';
+      unlockBtn.className = 'modal-btn-primary';
+
+      function tryUnlock() {
+        if (input.value === EDIT_PASSWORD) {
+          overlay.remove();
+          self.revealEditButton();
+          self.enterEditMode();
+          self.showToast('Edit mode enabled');
+        } else {
+          self.showToast('Incorrect password', true);
+          input.value = '';
+          input.focus();
+        }
+      }
+
+      unlockBtn.addEventListener('click', tryUnlock);
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          tryUnlock();
+        }
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(unlockBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) overlay.remove();
+      });
+
+      setTimeout(function () { input.focus(); }, 50);
     },
 
     // --- Core Controls ---
@@ -623,12 +710,13 @@
       // Image controls
       var imagesContainer = container.querySelector('.project-page__images');
       if (imagesContainer) {
-        // Add edit/remove buttons to each image
-        var allImageDivs = imagesContainer.querySelectorAll('.project-page__image');
-        allImageDivs.forEach(function (imgDiv, idx) {
-          // Find the actual project image index by matching caption
-          var captionEl = imgDiv.querySelector('.placeholder-text');
-          var imgEl = imgDiv.querySelector('img');
+        var allFigures = imagesContainer.querySelectorAll('.project-page__figure');
+        allFigures.forEach(function (figureEl) {
+          var imageIndex = parseInt(figureEl.getAttribute('data-image-index'), 10);
+          if (isNaN(imageIndex) || !project.images[imageIndex]) return;
+
+          var imgDiv = figureEl.querySelector('.project-page__image');
+          if (!imgDiv) return;
 
           var controlsDiv = document.createElement('div');
           controlsDiv.style.display = 'flex';
@@ -643,8 +731,6 @@
           setImgBtn.textContent = 'Set Image';
           setImgBtn.style.marginTop = '0';
           setImgBtn.addEventListener('click', function () {
-            var imageIndex = self.findImageIndex(project, imgDiv);
-            if (imageIndex === -1) return;
             self.showImageSourceModal(
               'Set Image',
               project.images[imageIndex].src || '',
@@ -657,32 +743,41 @@
             );
           });
 
+          var framingBtn = document.createElement('button');
+          framingBtn.className = 'edit-action-btn';
+          framingBtn.textContent = 'Crop / Fit';
+          framingBtn.style.marginTop = '0';
+          framingBtn.addEventListener('click', function () {
+            self.showFramingModal(project, imageIndex);
+          });
+
           var removeImgBtn = document.createElement('button');
           removeImgBtn.className = 'edit-action-btn edit-action-btn--danger';
           removeImgBtn.textContent = 'Remove';
           removeImgBtn.style.marginTop = '0';
           removeImgBtn.addEventListener('click', function () {
-            var imageIndex = self.findImageIndex(project, imgDiv);
-            if (imageIndex === -1) return;
             project.images.splice(imageIndex, 1);
             self.refreshProjectPage();
             self.markChanged();
           });
 
           controlsDiv.appendChild(setImgBtn);
+          controlsDiv.appendChild(framingBtn);
           controlsDiv.appendChild(removeImgBtn);
           imgDiv.appendChild(controlsDiv);
 
-          // Make caption editable
+          var captionEl = figureEl.querySelector('.project-page__caption');
           if (captionEl) {
             captionEl.setAttribute('contenteditable', 'true');
             captionEl.setAttribute('data-editable', 'img-caption');
             captionEl.addEventListener('blur', function () {
-              var imageIndex = self.findImageIndex(project, imgDiv);
-              if (imageIndex !== -1) {
-                project.images[imageIndex].caption = captionEl.textContent.trim();
-                self.markChanged();
+              var caption = captionEl.textContent.trim();
+              project.images[imageIndex].caption = caption;
+              var imgEl = imgDiv.querySelector('img');
+              if (imgEl) {
+                imgEl.alt = caption;
               }
+              self.markChanged();
             });
           }
         });
@@ -716,14 +811,151 @@
     },
 
     findImageIndex: function (project, imgDiv) {
-      var captionEl = imgDiv.querySelector('.placeholder-text');
-      var imgEl = imgDiv.querySelector('img');
-      var caption = captionEl ? captionEl.textContent.trim() : (imgEl ? imgEl.alt : '');
-
-      for (var i = 0; i < project.images.length; i++) {
-        if (project.images[i].caption === caption) return i;
+      var figure = imgDiv.closest('.project-page__figure');
+      if (figure) {
+        var idx = parseInt(figure.getAttribute('data-image-index'), 10);
+        if (!isNaN(idx) && project.images[idx]) return idx;
       }
       return -1;
+    },
+
+    showFramingModal: function (project, imageIndex) {
+      var self = this;
+      var img = project.images[imageIndex];
+      if (!img) return;
+
+      var existing = document.getElementById('editor-modal-overlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-modal-overlay';
+      overlay.className = 'editor-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Crop / Fit';
+      modal.appendChild(heading);
+
+      var aspectField = document.createElement('div');
+      aspectField.className = 'editor-modal__field';
+      var aspectLabel = document.createElement('label');
+      aspectLabel.textContent = 'Aspect ratio';
+      aspectField.appendChild(aspectLabel);
+      var aspectSelect = document.createElement('select');
+      [
+        { value: '', label: 'Default (by layout)' },
+        { value: '16/9', label: '16:9 (wide)' },
+        { value: '4/3', label: '4:3' },
+        { value: '1/1', label: '1:1 (square)' },
+        { value: 'original', label: 'Original (natural height)' }
+      ].forEach(function (opt) {
+        var option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.label;
+        if ((img.aspectRatio || '') === opt.value) option.selected = true;
+        aspectSelect.appendChild(option);
+      });
+      aspectField.appendChild(aspectSelect);
+      modal.appendChild(aspectField);
+
+      var fitField = document.createElement('div');
+      fitField.className = 'editor-modal__field';
+      var fitLabel = document.createElement('label');
+      fitLabel.textContent = 'Fit';
+      fitField.appendChild(fitLabel);
+      var fitSelect = document.createElement('select');
+      [
+        { value: '', label: 'Default (cover / contain for original)' },
+        { value: 'cover', label: 'Cover (fill frame, may crop)' },
+        { value: 'contain', label: 'Contain (show full image)' }
+      ].forEach(function (opt) {
+        var option = document.createElement('option');
+        option.value = opt.value;
+        option.textContent = opt.label;
+        if ((img.fit || '') === opt.value) option.selected = true;
+        fitSelect.appendChild(option);
+      });
+      fitField.appendChild(fitSelect);
+      modal.appendChild(fitField);
+
+      var focalField = document.createElement('div');
+      focalField.className = 'editor-modal__field';
+      var focalLabel = document.createElement('label');
+      focalLabel.textContent = 'Focal point';
+      focalField.appendChild(focalLabel);
+
+      var focalPositions = [
+        { value: '0% 0%', label: 'Top left' },
+        { value: '50% 0%', label: 'Top center' },
+        { value: '100% 0%', label: 'Top right' },
+        { value: '0% 50%', label: 'Center left' },
+        { value: '50% 50%', label: 'Center' },
+        { value: '100% 50%', label: 'Center right' },
+        { value: '0% 100%', label: 'Bottom left' },
+        { value: '50% 100%', label: 'Bottom center' },
+        { value: '100% 100%', label: 'Bottom right' }
+      ];
+      var currentFocal = img.focal || '50% 50%';
+      var focalGrid = document.createElement('div');
+      focalGrid.className = 'editor-focal-grid';
+      var selectedFocal = currentFocal;
+
+      focalPositions.forEach(function (pos) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'editor-focal-grid__cell';
+        btn.title = pos.label;
+        btn.setAttribute('data-focal', pos.value);
+        if (pos.value === currentFocal) btn.classList.add('active');
+        btn.addEventListener('click', function () {
+          selectedFocal = pos.value;
+          focalGrid.querySelectorAll('.editor-focal-grid__cell').forEach(function (c) {
+            c.classList.remove('active');
+          });
+          btn.classList.add('active');
+        });
+        focalGrid.appendChild(btn);
+      });
+      focalField.appendChild(focalGrid);
+      modal.appendChild(focalField);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      var saveBtn = document.createElement('button');
+      saveBtn.textContent = 'Save';
+      saveBtn.className = 'modal-btn-primary';
+      saveBtn.addEventListener('click', function () {
+        var aspectVal = aspectSelect.value;
+        var fitVal = fitSelect.value;
+        if (aspectVal) img.aspectRatio = aspectVal;
+        else delete img.aspectRatio;
+        if (fitVal) img.fit = fitVal;
+        else delete img.fit;
+        img.focal = selectedFocal;
+        overlay.remove();
+        self.refreshProjectPage();
+        self.markChanged();
+        self.showToast('Framing updated');
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(saveBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) overlay.remove();
+      });
     },
 
     refreshProjectPage: function () {
@@ -1231,6 +1463,12 @@
 
     uploadImage: function (file, destDir, onDone) {
       var self = this;
+
+      if (this.usesPublishApi()) {
+        this.uploadImageViaWorker(file, destDir, onDone);
+        return;
+      }
+
       var token = this.getToken();
 
       if (!token) {
@@ -1276,6 +1514,41 @@
             }
             return response.json();
           })
+          .then(function () {
+            self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
+            self.showToast('Image uploaded');
+            if (onDone) onDone(null, path);
+          })
+          .catch(function (uploadErr) {
+            self.showToast('Upload failed: ' + uploadErr.message + '. Check your GitHub token has Contents write access.', true);
+            if (onDone) onDone(uploadErr);
+          });
+      });
+    },
+
+    uploadImageViaWorker: function (file, destDir, onDone) {
+      var self = this;
+      this.showToast('Uploading image...');
+
+      this.prepareImageFile(file, function (err, b64, mime, suggestedName) {
+        if (err) {
+          self.showToast(err.message, true);
+          if (onDone) onDone(err);
+          return;
+        }
+
+        var filename = self.sanitizeFilename(suggestedName || file.name);
+        var path = destDir.replace(/\/$/, '') + '/' + filename;
+
+        self.apiRequest('/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            path: path,
+            content: b64,
+            message: 'Upload image: ' + filename
+          })
+        })
           .then(function () {
             self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
             self.showToast('Image uploaded');
@@ -1923,6 +2196,9 @@
             return self.waitForLiveDeploy(fingerprint, commitSha);
           })
           .then(function (result) {
+            if (result && (result.live || result.timedOut) && self.active) {
+              self.exitEditMode();
+            }
             if (onSuccess && (!result || result.live || result.timedOut)) {
               onSuccess();
             }

@@ -418,6 +418,34 @@ body.edit-mode .desc-edit-controls {
   opacity: 0.8;
 }
 
+/* --- Focal point picker --- */
+.editor-focal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  max-width: 120px;
+  margin-top: 8px;
+}
+
+.editor-focal-grid__cell {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-alt);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.editor-focal-grid__cell:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.editor-focal-grid__cell.active {
+  background: var(--color-text);
+  border-color: var(--color-text);
+}
+
 /* --- Toast Notification --- */
 .editor-toast {
   position: fixed;

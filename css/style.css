@@ -434,6 +434,10 @@ p {
   margin-bottom: var(--spacing-xl);
 }
 
+.project-page__figure {
+  margin: 0;
+}
+
 .project-page__image {
   width: 100%;
   aspect-ratio: 16 / 9;
@@ -463,6 +467,15 @@ p {
   width: 100%;
   height: auto;
   object-fit: contain;
+}
+
+.project-page__image.aspect-original {
+  aspect-ratio: auto;
+}
+
+.project-page__image.aspect-original img {
+  width: 100%;
+  height: auto;
 }
 
 .project-page__image-row {

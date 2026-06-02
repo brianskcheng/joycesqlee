@@ -19,7 +19,11 @@ Personal portfolio website for Joyce Lee, showcasing selected works.
 
 Reveal edit mode with `Ctrl+Shift+E` or `?admin` in the URL. In edit mode you can change text inline and publish updates to `data/projects.json` via GitHub.
 
-**Images:** For project images, thumbnails, and the About photo, use **Upload from device** in the editor modals (alternative to pasting a URL or repo path). Files are committed into the repo under `projects/<slug>/` or `portfolio/` using your GitHub token; then **Publish** saves the JSON. Large images are resized in the browser before upload. The live site may take about a minute to show a newly uploaded file after GitHub Pages redeploys.
+**Images:** For project images, thumbnails, and the About photo, use **Upload from device** in the editor modals (alternative to pasting a URL or repo path). When the publish worker is configured, uploads go through the worker (no browser token needed). Otherwise files are committed via the GitHub API using your stored token. Large images are resized in the browser before upload. The live site may take about a minute to show a newly uploaded file after GitHub Pages redeploys.
+
+**Captions:** Each project image can have a caption shown below the image on the project page. Click the caption text in edit mode to change it inline.
+
+**Crop / Fit:** Use the **Crop / Fit** button on each image in edit mode to set aspect ratio (16:9, 4:3, 1:1, or original), fit (cover/contain), and focal point. These are display settings stored in the project data, not changes to the image file.
 
 ## Setup
 
@@ -31,6 +35,8 @@ The built-in editor publishes changes to GitHub. For automated publishing (no to
 
 1. Deploy the Cloudflare Worker in `publish-worker/` (`npx wrangler deploy`, then `npx wrangler secret put GITHUB_TOKEN`)
 2. Set `PUBLISH_API_URL` in `editor/editor.js` to the worker URL (e.g. `https://joyce-portfolio-publish.<account>.workers.dev`)
+
+The worker handles JSON publish (`/publish`) and image uploads (`/upload`) using a server-side GitHub token.
 
 Without the worker, the editor falls back to a manual GitHub token stored in the browser.
 

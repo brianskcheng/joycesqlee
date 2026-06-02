@@ -197,12 +197,12 @@
         var img = project.images[i];
         if (img.layout === 'half' && i + 1 < project.images.length && project.images[i + 1].layout === 'half') {
           html += '<div class="project-page__image-row">';
-          html += this.buildImageHtml(img, true);
-          html += this.buildImageHtml(project.images[i + 1], true);
+          html += this.buildImageHtml(img, true, i);
+          html += this.buildImageHtml(project.images[i + 1], true, i + 1);
           html += '</div>';
           i += 2;
         } else {
-          html += this.buildImageHtml(img, false);
+          html += this.buildImageHtml(img, false, i);
           i++;
         }
       }
@@ -309,17 +309,58 @@
       container.innerHTML = html;
     },
 
-    buildImageHtml: function (img, isHalf) {
+    getImageFramingStyles: function (img, isHalf) {
+      var boxStyle = '';
+      var imgStyle = '';
+      var aspectRatio = img.aspectRatio;
+
+      if (!aspectRatio) {
+        if (img.layout === 'hero') {
+          aspectRatio = 'original';
+        } else if (isHalf || img.layout === 'half') {
+          aspectRatio = '4/3';
+        } else {
+          aspectRatio = '16/9';
+        }
+      }
+
+      if (aspectRatio === 'original') {
+        boxStyle = 'aspect-ratio:auto;';
+      } else {
+        boxStyle = 'aspect-ratio:' + aspectRatio.replace('/', ' / ') + ';';
+      }
+
+      var fit = img.fit || (aspectRatio === 'original' ? 'contain' : 'cover');
+      imgStyle = 'object-fit:' + fit + ';';
+      if (img.focal) {
+        imgStyle += 'object-position:' + img.focal + ';';
+      }
+
+      return { boxStyle: boxStyle, imgStyle: imgStyle, aspectRatio: aspectRatio };
+    },
+
+    buildImageHtml: function (img, isHalf, imageIndex) {
       var cls = 'project-page__image';
       if (img.layout === 'hero') cls += ' hero';
       else if (isHalf) cls += ' half';
-      var html = '<div class="' + cls + '">';
+
+      var framing = this.getImageFramingStyles(img, isHalf);
+      if (framing.aspectRatio === 'original') cls += ' aspect-original';
+
+      var html = '<figure class="project-page__figure" data-image-index="' + imageIndex + '">';
+      html += '<div class="' + cls + '" style="' + framing.boxStyle + '">';
       if (img.src) {
-        html += '<img src="' + this.escapeHtml(img.src) + '" alt="' + this.escapeHtml(img.caption) + '" loading="lazy">';
+        html += '<img src="' + this.escapeHtml(img.src) + '" alt="' + this.escapeHtml(img.caption) + '" loading="lazy" style="' + framing.imgStyle + '">';
       } else {
         html += '<span class="placeholder-text">' + this.escapeHtml(img.caption) + '</span>';
       }
       html += '</div>';
+      if (img.caption) {
+        html += '<figcaption class="project-page__caption">' + this.escapeHtml(img.caption) + '</figcaption>';
+      } else {
+        html += '<figcaption class="project-page__caption project-page__caption--empty"></figcaption>';
+      }
+      html += '</figure>';
       return html;
     },
 
