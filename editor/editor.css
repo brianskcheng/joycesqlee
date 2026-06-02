@@ -27,6 +27,33 @@
   border-color: var(--color-text);
 }
 
+.edit-toggle-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.edit-toggle-btn:disabled:hover {
+  color: var(--color-text-secondary);
+  border-color: var(--color-border);
+}
+
+body.editor-publishing [contenteditable="true"],
+body.editor-publishing [data-editable],
+body.editor-publishing .edit-action-btn,
+body.editor-publishing .card-edit-controls,
+body.editor-publishing .meta-edit-controls,
+body.editor-publishing .image-edit-controls,
+body.editor-publishing .desc-edit-controls,
+body.editor-publishing .project-card[draggable="true"] {
+  pointer-events: none;
+  user-select: none;
+  cursor: default;
+}
+
+body.editor-publishing .project-card[draggable="true"] {
+  cursor: default;
+}
+
 /* --- Editor Toolbar --- */
 .editor-toolbar {
   display: none;

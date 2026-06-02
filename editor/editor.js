@@ -18,6 +18,7 @@
     toastTimer: null,
     uploadPreviews: {},
     publishDeployTimer: null,
+    isPublishing: false,
 
     init: function () {
       var self = this;
@@ -54,21 +55,33 @@
           });
       }
 
-      // Warn before leaving with unsaved changes
+      // Warn before leaving during publish or with unsaved changes
       window.addEventListener('beforeunload', function (e) {
+        if (self.isPublishing) {
+          e.preventDefault();
+          e.returnValue = '';
+          return '';
+        }
         if (self.hasUnsavedChanges) {
           e.preventDefault();
           e.returnValue = '';
         }
       });
 
-      // Intercept link clicks when there are unsaved changes
+      // Block navigation while publishing or when there are unsaved changes
       document.addEventListener('click', function (e) {
-        if (!self.hasUnsavedChanges) return;
         var link = e.target.closest('a[href]');
         if (!link) return;
         var href = link.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('javascript')) return;
+        if (!href || href.startsWith('#') || href.startsWith('javascript') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+
+        if (self.isPublishing) {
+          e.preventDefault();
+          self.showPublishingWarning();
+          return;
+        }
+
+        if (!self.hasUnsavedChanges) return;
 
         e.preventDefault();
         self.showUnsavedWarning(href);
@@ -86,6 +99,7 @@
     },
 
     markChanged: function () {
+      if (this.isPublishing) return;
       this.hasUnsavedChanges = true;
       var statusEl = document.getElementById('editor-status');
       if (statusEl) statusEl.textContent = 'Unsaved Changes';
@@ -168,6 +182,42 @@
       });
     },
 
+    showPublishingWarning: function () {
+      var existing = document.getElementById('editor-modal-overlay');
+      if (existing) existing.remove();
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-modal-overlay';
+      overlay.className = 'editor-modal-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Publishing in progress';
+      modal.appendChild(heading);
+
+      var msg = document.createElement('p');
+      msg.textContent = 'Your changes are being deployed. Please stay on this page until publishing finishes.';
+      msg.style.marginBottom = '24px';
+      modal.appendChild(msg);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      var okBtn = document.createElement('button');
+      okBtn.className = 'modal-btn-primary';
+      okBtn.textContent = 'OK';
+      okBtn.addEventListener('click', function () {
+        overlay.remove();
+      });
+
+      actions.appendChild(okBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+    },
+
     revealEditButton: function () {
       var toggleBtn = document.getElementById('edit-toggle');
       if (toggleBtn) {
@@ -210,6 +260,11 @@
     },
 
     toggleEditMode: function () {
+      if (this.isPublishing) {
+        this.showPublishingWarning();
+        return;
+      }
+
       // If exiting edit mode with unsaved changes, warn
       if (this.active && this.hasUnsavedChanges) {
         this.showUnsavedWarning(null);
@@ -958,6 +1013,10 @@
     // --- Modals ---
 
     showAddProjectModal: function () {
+      if (this.isPublishing) {
+        this.showPublishingWarning();
+        return;
+      }
       var self = this;
       this.showModal('Add New Project', [
         { name: 'title', label: 'Project Title', type: 'text', value: '', required: true },
@@ -1408,6 +1467,11 @@
     },
 
     showModal: function (title, fields, onSubmit) {
+      if (this.isPublishing) {
+        this.showPublishingWarning();
+        return;
+      }
+
       // Remove existing modal if any
       var existing = document.getElementById('editor-modal-overlay');
       if (existing) existing.remove();
@@ -1524,6 +1588,11 @@
     // --- Publish Menu ---
 
     showPublishMenu: function () {
+      if (this.isPublishing) {
+        this.showPublishingWarning();
+        return;
+      }
+
       var self = this;
       var existing = document.getElementById('editor-modal-overlay');
       if (existing) existing.remove();
@@ -1614,6 +1683,29 @@
       var btn = document.getElementById('btn-publish');
       if (btn) {
         btn.disabled = disabled;
+      }
+    },
+
+    setEditorControlsDisabled: function (disabled) {
+      var ids = ['btn-publish', 'btn-add-project', 'btn-suggest', 'edit-toggle'];
+      var i;
+      for (i = 0; i < ids.length; i++) {
+        var el = document.getElementById(ids[i]);
+        if (el) el.disabled = disabled;
+      }
+    },
+
+    setPublishing: function (active) {
+      this.isPublishing = !!active;
+      document.body.classList.toggle('editor-publishing', this.isPublishing);
+      this.setEditorControlsDisabled(this.isPublishing);
+
+      if (this.isPublishing) {
+        var modal = document.getElementById('editor-modal-overlay');
+        if (modal) modal.remove();
+        if (this.suggestMode) {
+          this.endSuggestMode();
+        }
       }
     },
 
@@ -1711,7 +1803,7 @@
       var started = Date.now();
 
       this.ensureDeployBar();
-      this.disablePublish(true);
+      this.setPublishing(true);
       this.setPublishStatus('Building site...', 'working');
       this.showToast('Changes saved — waiting for the live site to update', false, 0);
 
@@ -1753,7 +1845,7 @@
 
         poll();
       }).then(function (result) {
-        self.disablePublish(false);
+        self.setPublishing(false);
         self.hideDeployBar();
         if (self.publishDeployTimer) {
           clearTimeout(self.publishDeployTimer);
@@ -1783,7 +1875,7 @@
 
       this.ensureAuth(function () {
         self.setPublishStatus('Saving changes...', 'working');
-        self.disablePublish(true);
+        self.setPublishing(true);
 
         var content = btoa(unescape(encodeURIComponent(JSON.stringify(self.data, null, 2))));
         var fingerprint = self.contentFingerprint(self.data);
@@ -1813,7 +1905,7 @@
             }
           })
           .catch(function (err) {
-            self.disablePublish(false);
+            self.setPublishing(false);
             self.hideDeployBar();
             self.setPublishStatus('Edit Mode', '');
             if (err && err.authError) {
@@ -1886,6 +1978,11 @@
     // --- Revert ---
 
     showRevertModal: function () {
+      if (this.isPublishing) {
+        this.showPublishingWarning();
+        return;
+      }
+
       var self = this;
 
       this.ensureAuth(function () {
@@ -2073,6 +2170,11 @@
     suggestHandlers: null,
 
     startSuggestMode: function () {
+      if (this.isPublishing) {
+        this.showPublishingWarning();
+        return;
+      }
+
       var self = this;
       this.suggestMode = true;
       document.body.classList.add('suggest-mode');
