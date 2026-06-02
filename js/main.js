@@ -70,7 +70,8 @@
 
     revealPage: function () {
       var el = document.querySelector('.page-main');
-      if (!el || el.classList.contains('is-ready')) return;
+      if (!el) return;
+      el.classList.remove('is-exiting');
       el.classList.add('is-ready');
     },
 
@@ -535,6 +536,16 @@
           window.location.assign(href);
         }, 180);
       });
+    });
+
+    window.addEventListener('pagehide', function () {
+      var pageMain = document.querySelector('.page-main');
+      if (pageMain) pageMain.classList.remove('is-exiting');
+    });
+
+    window.addEventListener('pageshow', function (event) {
+      if (!event.persisted) return;
+      window.PortfolioApp.revealPage();
     });
   })();
 
