@@ -137,21 +137,14 @@
           "layout": "half"
         },
         {
-          "src": "projects/mycocycle-studio/tree-structure-concept.png",
-          "caption": "Hierarchy of Tree Structures diagram",
-          "layout": "half"
+          "src": "projects/mycocycle-studio/water-mpx2hdvq.png",
+          "caption": "The tree columns are structural and systematic devices, devices that capture sunlight and water",
+          "layout": "full"
         },
         {
           "src": "projects/mycocycle-studio/short-section.jpg",
           "caption": "Short Section 1:100 featuring the mushroom cafe (Rhino, Enscape, Photoshop)",
           "layout": "full"
-        },
-        {
-          "src": "projects/mycocycle-studio/model-discovery-roots.png",
-          "caption": "Discovery roots 1:20 model",
-          "layout": "half",
-          "aspectRatio": "original",
-          "focal": "50% 50%"
         },
         {
           "src": "projects/mycocycle-studio/model-tree-column.png",
@@ -161,9 +154,27 @@
           "focal": "50% 50%"
         },
         {
-          "src": "projects/mycocycle-studio/isometric-render-full.jpg",
-          "caption": "Isometric render — subterranean and forest journey (Rhino, Grasshopper, Enscape, Photoshop)",
-          "layout": "full"
+          "src": "projects/mycocycle-studio/model-discovery-roots.png",
+          "caption": "Discovery roots 1:20 model",
+          "layout": "half",
+          "aspectRatio": "original",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mycocycle-studio/overall-journey-02-mpx34rct.png",
+          "caption": "Isometric render of the lower ground floor shows the meandering path of the visitor journey. The movements mirrors the interconnected layout of rooms on ground floor, both reflecting the complex network of mycelium weaving through the soil.",
+          "layout": "full",
+          "fit": "contain",
+          "focal": "50% 50%",
+          "aspectRatio": "original"
+        },
+        {
+          "src": "projects/mycocycle-studio/overall-journey-01-mpx35aw3.png",
+          "caption": "Isometric render of the upper ground floor and first floor, the spiraling movement of the tree walk is designed to echo the way mushrooms emerge from the ground, resonating with the narrative that connects visitors’ spatial experience to the lifecycle of fungi.",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         }
       ],
       "relatedProjects": [
