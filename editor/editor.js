@@ -19,6 +19,7 @@
     hasUnsavedChanges: false,
     toastTimer: null,
     uploadPreviews: {},
+    pendingUploads: {},
     publishDeployTimer: null,
     isPublishing: false,
 
@@ -142,6 +143,8 @@
           // Restore original data and exit edit mode
           self.data = JSON.parse(self.originalData);
           window.PortfolioApp.data = self.data;
+          self.pendingUploads = {};
+          self.uploadPreviews = {};
           self.active = false;
           document.body.classList.remove('edit-mode');
           window.PortfolioApp.render();
@@ -1361,7 +1364,7 @@
         { name: 'type', label: 'Project Type / Subtitle', type: 'text', value: project.type },
         { name: 'cardMeta', label: 'Card Meta', type: 'text', value: project.cardMeta },
         { name: 'thumbnail', label: 'Thumbnail URL or path (optional)', type: 'text', value: project.thumbnail || '' },
-        { name: 'thumbnailFile', label: 'Upload thumbnail from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' }
+        { name: 'thumbnailFile', label: 'Upload thumbnail from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Staged in your edits; uploaded when you Publish.' }
       ], function (values) {
         var finish = function () {
           project.title = values.title || project.title;
@@ -1399,7 +1402,7 @@
       this.showModal('Add Image', [
         { name: 'caption', label: 'Caption / Description', type: 'text', value: '' },
         { name: 'src', label: 'Image URL or path (optional)', type: 'text', value: '' },
-        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' },
+        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Staged in your edits; uploaded when you Publish.' },
         { name: 'layout', label: 'Layout', type: 'select', value: 'full', options: [
           { value: 'full', label: 'Full Width' },
           { value: 'half', label: 'Half Width' }
@@ -1430,7 +1433,7 @@
       var self = this;
       this.showModal(title, [
         { name: 'src', label: 'Image URL or path (optional)', type: 'text', value: currentSrc || '' },
-        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Uploaded immediately; may take ~1 min to appear on the live site.' }
+        { name: 'file', label: 'Upload from device', type: 'file', hint: 'JPEG, PNG, GIF, WebP. Staged in your edits; uploaded when you Publish.' }
       ], function (values) {
         if (values.file) {
           self.uploadImage(values.file, destDir, function (err, path) {
@@ -1830,22 +1833,6 @@
         return;
       }
 
-      if (this.usesPublishApi()) {
-        this.uploadImageViaWorker(file, destDir, onDone);
-        return;
-      }
-
-      var token = this.getToken();
-
-      if (!token) {
-        this.promptForToken(function () {
-          self.uploadImage(file, destDir, onDone);
-        });
-        return;
-      }
-
-      this.showToast('Uploading image...');
-
       this.prepareImageFile(file, function (err, b64, mime, suggestedName) {
         if (err) {
           self.showToast(err.message, true);
@@ -1855,75 +1842,86 @@
 
         var filename = self.sanitizeFilename(suggestedName || file.name);
         var path = destDir.replace(/\/$/, '') + '/' + filename;
-        var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + path;
 
-        fetch(apiUrl, {
-          method: 'PUT',
-          headers: {
-            'Authorization': 'Bearer ' + token,
-            'Accept': 'application/vnd.github.v3+json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            message: 'Upload image: ' + filename,
-            content: b64
-          })
-        })
-          .then(function (response) {
-            if (!response.ok) {
-              return response.json().then(function (data) {
-                var msg = (data && data.message) ? data.message : ('HTTP ' + response.status);
-                throw new Error(msg);
-              }).catch(function () {
-                throw new Error('Upload failed (HTTP ' + response.status + ')');
-              });
-            }
-            return response.json();
-          })
-          .then(function () {
-            self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
-            self.showToast('Image uploaded');
-            if (onDone) onDone(null, path);
-          })
-          .catch(function (uploadErr) {
-            self.showToast('Upload failed: ' + uploadErr.message + '. Check your GitHub token has Contents write access.', true);
-            if (onDone) onDone(uploadErr);
-          });
+        self.pendingUploads[path] = {
+          content: b64,
+          mime: mime,
+          message: 'Upload image: ' + filename
+        };
+        self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
+        self.markChanged();
+        self.showToast('Image staged — will upload when you Publish');
+        if (onDone) onDone(null, path);
       });
     },
 
-    uploadImageViaWorker: function (file, destDir, onDone) {
+    commitImageFile: function (path, b64, mime, message) {
       var self = this;
-      this.showToast('Uploading image...');
 
-      this.prepareImageFile(file, function (err, b64, mime, suggestedName) {
-        if (err) {
-          self.showToast(err.message, true);
-          if (onDone) onDone(err);
-          return;
-        }
-
-        var filename = self.sanitizeFilename(suggestedName || file.name);
-        var path = destDir.replace(/\/$/, '') + '/' + filename;
-
-        self.apiRequest('/upload', {
+      if (this.usesPublishApi()) {
+        return this.apiRequest('/upload', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             path: path,
             content: b64,
-            message: 'Upload image: ' + filename
+            message: message
           })
+        });
+      }
+
+      var token = this.getToken();
+      if (!token) {
+        return Promise.reject(new Error('GitHub token required to publish images'));
+      }
+
+      var apiUrl = 'https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + path;
+
+      return fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Accept': 'application/vnd.github.v3+json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          message: message,
+          content: b64
         })
-          .then(function () {
-            self.uploadPreviews[path] = 'data:' + mime + ';base64,' + b64;
-            self.showToast('Image uploaded');
-            if (onDone) onDone(null, path);
-          })
-          .catch(function (uploadErr) {
-            self.showToast('Upload failed: ' + uploadErr.message, true);
-            if (onDone) onDone(uploadErr);
-          });
+      })
+        .then(function (response) {
+          if (self.isAuthError(response.status)) {
+            throw { authError: true, status: response.status };
+          }
+          if (!response.ok) {
+            return response.json().then(function (data) {
+              var msg = (data && data.message) ? data.message : ('HTTP ' + response.status);
+              throw new Error(msg);
+            }).catch(function () {
+              throw new Error('Upload failed (HTTP ' + response.status + ')');
+            });
+          }
+          return response.json();
+        });
+    },
+
+    flushPendingUploads: function () {
+      var self = this;
+      var paths = Object.keys(this.pendingUploads);
+      if (!paths.length) {
+        return Promise.resolve();
+      }
+
+      var chain = Promise.resolve();
+      paths.forEach(function (path) {
+        chain = chain.then(function () {
+          var entry = self.pendingUploads[path];
+          return self.commitImageFile(path, entry.content, entry.mime, entry.message);
+        });
+      });
+
+      return chain.then(function () {
+        self.pendingUploads = {};
       });
     },
 
@@ -2536,30 +2534,35 @@
       var self = this;
 
       this.ensureAuth(function () {
-        self.setPublishStatus('Saving changes...', 'working');
+        self.setPublishStatus('Uploading images...', 'working');
         self.setPublishing(true);
 
-        var content = btoa(unescape(encodeURIComponent(JSON.stringify(self.data, null, 2))));
-        var fingerprint = self.contentFingerprint(self.data);
+        self.flushPendingUploads()
+          .then(function () {
+            self.setPublishStatus('Saving changes...', 'working');
 
-        var publishPromise;
-        if (self.usesPublishApi()) {
-          publishPromise = self.apiRequest('/publish', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content: content })
-          });
-        } else {
-          publishPromise = self.publishViaGitHub(content);
-        }
+            var content = btoa(unescape(encodeURIComponent(JSON.stringify(self.data, null, 2))));
+            var fingerprint = self.contentFingerprint(self.data);
 
-        publishPromise
-          .then(function (result) {
-            localStorage.removeItem('portfolio_draft');
-            self.hasUnsavedChanges = false;
-            self.originalData = JSON.stringify(self.data);
-            var commitSha = result && result.sha ? result.sha : null;
-            return self.waitForLiveDeploy(fingerprint, commitSha);
+            var publishPromise;
+            if (self.usesPublishApi()) {
+              publishPromise = self.apiRequest('/publish', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ content: content })
+              });
+            } else {
+              publishPromise = self.publishViaGitHub(content);
+            }
+
+            return publishPromise.then(function (result) {
+              localStorage.removeItem('portfolio_draft');
+              self.hasUnsavedChanges = false;
+              self.originalData = JSON.stringify(self.data);
+              self.uploadPreviews = {};
+              var commitSha = result && result.sha ? result.sha : null;
+              return self.waitForLiveDeploy(fingerprint, commitSha);
+            });
           })
           .then(function (result) {
             if (result && (result.live || result.timedOut) && self.active) {

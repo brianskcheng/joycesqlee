@@ -316,7 +316,14 @@
 
       container.innerHTML = html;
 
-      this.revealAboutPage();
+      var photoImg = container.querySelector('#about-photo img');
+      if (photoImg && !photoImg.complete) {
+        var self2 = this;
+        photoImg.addEventListener('load', function () { self2.revealAboutPage(); });
+        photoImg.addEventListener('error', function () { self2.revealAboutPage(); });
+      } else {
+        this.revealAboutPage();
+      }
     },
 
     buildFramingStyleAttr: function (framing) {

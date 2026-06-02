@@ -527,6 +527,7 @@ p {
   margin-top: var(--nav-height);
   padding: var(--spacing-xl) 0 var(--spacing-2xl);
   opacity: 0;
+  transition: opacity 0.35s ease;
 }
 
 .about-page.is-ready {
