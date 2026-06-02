@@ -755,7 +755,7 @@
         self.data.about.title = val;
         self.markChanged();
       });
-      this.makeEditable('about-bio', function (val) {
+      this.makeEditableMultiline('about-bio', function (val) {
         self.data.about.bio = val;
         self.markChanged();
       });
@@ -1007,6 +1007,17 @@
       el.setAttribute('data-editable', elementId);
       el.addEventListener('blur', function () {
         onUpdate(el.textContent.trim());
+      });
+    },
+
+    makeEditableMultiline: function (elementId, onUpdate) {
+      var el = document.getElementById(elementId);
+      if (!el) return;
+      el.setAttribute('contenteditable', 'true');
+      el.setAttribute('data-editable', elementId);
+      el.addEventListener('blur', function () {
+        var value = window.PortfolioApp.readBioFromElement(el);
+        onUpdate(value);
       });
     },
 

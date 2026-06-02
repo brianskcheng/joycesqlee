@@ -261,7 +261,7 @@
       html += '<div class="about-page__bio">';
       html += '<h1 id="about-name">' + this.escapeHtml(about.name) + '</h1>';
       html += '<span class="label" id="about-title">' + this.escapeHtml(about.title) + '</span>';
-      html += '<p id="about-bio">' + this.escapeHtml(about.bio) + '</p>';
+      html += '<div id="about-bio" class="about-page__bio-text">' + this.formatBioHtml(about.bio) + '</div>';
       html += '<div class="about-page__contact">';
       html += '<a href="mailto:' + this.escapeHtml(about.email) + '" id="about-email">' + this.escapeHtml(about.email) + '</a>';
       html += '<a href="tel:' + this.escapeHtml(about.phone.replace(/\s/g, '')) + '" id="about-phone">' + this.escapeHtml(about.phone) + '</a>';
@@ -324,6 +324,44 @@
       var div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;
+    },
+
+    splitBioParagraphs: function (bio) {
+      if (!bio) return [];
+      var parts = bio.split(/\n\n+/).map(function (p) { return p.trim(); }).filter(Boolean);
+      if (parts.length <= 1 && bio.indexOf('\n') !== -1) {
+        parts = bio.split(/\n/).map(function (p) { return p.trim(); }).filter(Boolean);
+      }
+      return parts;
+    },
+
+    formatBioHtml: function (bio) {
+      var parts = this.splitBioParagraphs(bio);
+      if (!parts.length) return '<p></p>';
+      var self = this;
+      return parts.map(function (part) {
+        return '<p>' + self.escapeHtml(part) + '</p>';
+      }).join('');
+    },
+
+    readBioFromElement: function (el) {
+      if (!el) return '';
+      var parts = [];
+      var i;
+      for (i = 0; i < el.childNodes.length; i++) {
+        var node = el.childNodes[i];
+        if (node.nodeType === 1 && (node.nodeName === 'P' || node.nodeName === 'DIV')) {
+          var text = node.textContent.trim();
+          if (text) parts.push(text);
+        } else if (node.nodeType === 3) {
+          text = node.textContent.trim();
+          if (text) parts.push(text);
+        }
+      }
+      if (parts.length) return parts.join('\n\n');
+      var inner = el.innerText.trim();
+      if (!inner) return '';
+      return inner.split(/\n\n+/).map(function (s) { return s.trim(); }).filter(Boolean).join('\n\n');
     }
   };
 
