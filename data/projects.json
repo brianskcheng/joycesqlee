@@ -103,11 +103,12 @@
           "layout": "half"
         },
         {
-          "src": "projects/syraka/section-city-systems.png",
-          "caption": "Section of city-wide energy, water and waste systems (Photoshop on handdrawing)",
+          "src": "projects/syraka/syraka-toolkit-mpx5oee7.png",
+          "caption": "Section of city-wide energy, water and waste systems",
           "layout": "full",
           "focal": "50% 50%",
-          "fit": "contain"
+          "fit": "contain",
+          "aspectRatio": "original"
         }
       ],
       "relatedProjects": [
