@@ -62,7 +62,15 @@
           self.data = data;
           self.render();
           return data;
+        })
+        .catch(function () {
+          self.revealAboutPage();
         });
+    },
+
+    revealAboutPage: function () {
+      var aboutPage = document.querySelector('.about-page');
+      if (aboutPage) aboutPage.classList.add('is-ready');
     },
 
     render: function () {
@@ -308,8 +316,7 @@
 
       container.innerHTML = html;
 
-      var aboutPage = document.querySelector('.about-page');
-      if (aboutPage) aboutPage.classList.add('is-ready');
+      this.revealAboutPage();
     },
 
     buildFramingStyleAttr: function (framing) {
@@ -428,6 +435,9 @@
 
   // Load data on page ready
   window.PortfolioApp.loadData();
+  setTimeout(function () {
+    window.PortfolioApp.revealAboutPage();
+  }, 3000);
 
   // --- Site update detection ---
   (function () {
