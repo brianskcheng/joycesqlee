@@ -86,21 +86,83 @@
         },
         {
           "src": "projects/syraka/render-quarry-retention.jpg",
-          "caption": "Visualisation of a reactivated water retention quarry (Rhino, Enscape, Photoshop)",
+          "caption": "To diversify the city's water supply to eliminate drought vulnerability, one of the key strategies is rainwater capture and retention. Reviving abandoned quarries plays a role in adapting to seasonal rainfall, they capture rain, runoff and infiltration during the wet months.",
           "layout": "full",
           "aspectRatio": "original",
           "fit": "contain",
           "focal": "50% 50%"
         },
         {
+          "src": "projects/syraka/latomie-d-acqua-01-mpx6oyop.png",
+          "caption": "Beyond water management, each of the eight quarries are dedicated to a specific agricultural use, fostering research, education, and community participation. Around this agricultural framework, we have designed community zones for art and culture, civic gathering, and recreation—returning the quarries to the people.",
+          "layout": "full"
+        },
+        {
+          "src": "projects/syraka/latomie-d-acqua-02-mpx6pvg2.png",
+          "caption": "The three quarries in the arts and culture zone are designed in detail and are connected by a botanical garden ",
+          "layout": "full"
+        },
+        {
+          "src": "projects/syraka/performance-theatre-mpx6rnta.png",
+          "caption": "The proposed theatre reactivates Latomia della intagliatell, offering a contemporary counterpart to the Greek and Roman theatres of the Neapolis archaeological park.",
+          "layout": "full",
+          "focal": "50% 100%",
+          "aspectRatio": "1/1"
+        },
+        {
           "src": "projects/syraka/kit-of-parts-walkway.png",
-          "caption": "'Coltura Promiscua' Kit of Parts",
+          "caption": "Urban tool kit inspired by the indigenous agricultural technique coltura promiscua.",
           "layout": "half"
         },
         {
-          "src": "projects/syraka/lido-seating-mpvu9tr7.png",
-          "caption": "Hand drawing (Procreate)",
+          "src": "projects/syraka/porto-piccolo-ruins-mpx6ucva.png",
+          "caption": "The forgotten ruins will be improved by removing overgrowth, providing information and allowing closer public access via boardwalks.",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/syraka/market-1-cropped-mpx70n6n.png",
+          "caption": "Easy-assembly market stalls built from the urban tool kit of timber parts",
+          "layout": "half",
+          "fit": "cover",
+          "focal": "50% 50%",
+          "aspectRatio": "original"
+        },
+        {
+          "src": "projects/syraka/market-mpx7382m.png",
+          "caption": "Piazza Adda Carpark transformed into a vibrant food market, surrounding residential buildings retrofitted with an exoskeleton timber structure ",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/syraka/activities-cropped-mpx75kze.png",
+          "caption": "Using the ‘Coltura Promiscua’ Kit of Parts to enhance the new city park, supporting a range of activities around the Lido, including sports and allotments.",
           "layout": "half"
+        },
+        {
+          "src": "projects/syraka/lido-seating-mpx768ch.png",
+          "caption": "The lido provides a large public space for people to interact with water whilst also coming together and socialising. ",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/syraka/carbon-capturing-cropped-mpx78809.png",
+          "caption": "Using the ‘Coltura Promiscua’ Kit of parts to create floating boardwalks so that people can observe the sea grass intervention which aims to feed marine life and sequester carbon",
+          "layout": "half"
+        },
+        {
+          "src": "projects/syraka/marine-research-mpx78y45.png",
+          "caption": "The seagrass nursery strengthens Siracusa’s wider blue belt by enhancing marine biodiversity and improving water quality, acting as a natural carbon sink. This further links ecological resilience and cultivation practices within the city’s broader vision of sustainable marine stewardship.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/syraka/syraka-toolkit-mpx5oee7.png",
