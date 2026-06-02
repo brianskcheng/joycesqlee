@@ -36,8 +36,38 @@
       ],
       "images": [
         {
+          "src": "projects/mosaics-of-urban-giardino/motifs-cropped-mpx9pajd.png",
+          "caption": "Giardino Mediterraneo - a single citrus tree protected by a circular dry stone wall: a device as much as climatic and spatial.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/motifs2-cropped-mpx9q2a5.png",
+          "caption": "Coltura promiscua - interplanting fruit trees with vines, cereals, legumes and understorey herbs.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/the-lemon-gang-cropped-mpx9dw7b.jpg",
+          "caption": "Citrus came to Sicily with the Arabs in the 9th century. The Siracusa lemon accounts for a third of Italy's total lemon output, which is prized for its yield and quality. The simultaneity of flower and fruit on the same branch made it a symbol of the orchard at its most abundant. ",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/giadino-mpx9f6g8.png",
+          "caption": "A single citrus tree planted at the centre of the Living Lab recreates the Giardino Mediterraneo, integrated with stone amphitheatre seating, performs as the social anchor of the scheme",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%"
+        },
+        {
           "src": "projects/mosaics-of-urban-giardino/plan-oblique-overview-mpx7imm3.png",
-          "caption": "Planting spaces are organized as a series of interlocking “negative” mosaics, carved from the mass of the site and aligned along the primary axis, opening to the south to receive sunlight.",
+          "caption": "Developing from the giardino Mediterraneo, planting spaces are organized as a series of interlocking “negative” mosaics, carved from the mass of the site and aligned along the primary axis, opening to the south to receive sunlight.",
           "layout": "full",
           "aspectRatio": "original",
           "fit": "contain",
@@ -66,6 +96,14 @@
           "layout": "half"
         },
         {
+          "src": "projects/mosaics-of-urban-giardino/spatial-strategy5-cropped-mpx9944w.png",
+          "caption": "Lower ground floor plan and upper ground floor plan",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
           "src": "projects/mosaics-of-urban-giardino/gateway-cropped-mpx84bxb.png",
           "caption": "Main gateway to the building, the orangerie is visually connected to the pavement.",
           "layout": "half"
@@ -74,6 +112,14 @@
           "src": "projects/mosaics-of-urban-giardino/winter-garden-mpx858ek.png",
           "caption": "The orangerie, a winter garden testing what Siracusa might grow next, such as tropical species introduced as the climate warms",
           "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/section-aa-mpx9319c.png",
+          "caption": "The long section traces a continuous journey from arrival to inhabitation, cutting through the entrance foyer, the orangerie and into the productive agroforestry grounds before descending into the giardino mediterraneo. ",
+          "layout": "full",
           "aspectRatio": "original",
           "fit": "contain",
           "focal": "50% 50%"
