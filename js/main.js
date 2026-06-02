@@ -277,6 +277,8 @@
       container.innerHTML = html;
       this.whenFontsReady(function () { self.revealPage(); });
     },
+
+    renderAboutPage: function () {
       var container = document.getElementById('about-content');
       if (!container || !this.data.about) return;
 
