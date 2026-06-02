@@ -10,6 +10,7 @@
   var DEPLOY_POLL_INTERVAL = 4000;
   var DEPLOY_MAX_WAIT = 300000;
   var EDIT_PASSWORD = 'admin';
+  var EDIT_AUTH_STORAGE_KEY = 'portfolio_editor_auth';
 
   var Editor = {
     active: false,
@@ -32,9 +33,9 @@
         }
       });
 
-      // Also allow ?admin URL parameter to reveal editor
+      // Also allow ?admin URL parameter to open edit password prompt
       if (window.location.search.indexOf('admin') !== -1) {
-        this.revealEditButton();
+        this.promptForEditPassword();
       }
 
       // Hidden setup: ?setup_token=ghp_xxx stores the token (one-time by developer)
@@ -143,11 +144,6 @@
           window.PortfolioApp.data = self.data;
           self.active = false;
           document.body.classList.remove('edit-mode');
-          var toggleBtn = document.getElementById('edit-toggle');
-          if (toggleBtn) {
-            toggleBtn.classList.remove('active');
-            toggleBtn.textContent = 'Edit';
-          }
           window.PortfolioApp.render();
         }
       });
@@ -219,15 +215,17 @@
       document.body.appendChild(overlay);
     },
 
-    revealEditButton: function () {
-      var toggleBtn = document.getElementById('edit-toggle');
-      if (toggleBtn) {
-        toggleBtn.style.display = 'inline-block';
-      }
-    },
-
     promptForEditPassword: function () {
-      if (this.active) return;
+      if (this.active) {
+        this.toggleEditMode();
+        return;
+      }
+
+      if (this.isEditAuthorized()) {
+        this.enterEditMode();
+        this.showToast('Edit mode enabled');
+        return;
+      }
 
       var self = this;
       var existing = document.getElementById('editor-modal-overlay');
@@ -281,7 +279,7 @@
       function tryUnlock() {
         if (input.value === EDIT_PASSWORD) {
           overlay.remove();
-          self.revealEditButton();
+          self.saveEditAuth();
           self.enterEditMode();
           self.showToast('Edit mode enabled');
         } else {
@@ -312,19 +310,24 @@
       setTimeout(function () { input.focus(); }, 50);
     },
 
+    isEditAuthorized: function () {
+      return localStorage.getItem(EDIT_AUTH_STORAGE_KEY) === '1';
+    },
+
+    saveEditAuth: function () {
+      localStorage.setItem(EDIT_AUTH_STORAGE_KEY, '1');
+    },
+
+    clearEditAuth: function () {
+      localStorage.removeItem(EDIT_AUTH_STORAGE_KEY);
+    },
+
     // --- Core Controls ---
 
     bindControls: function () {
       var self = this;
-      var toggleBtn = document.getElementById('edit-toggle');
       var publishBtn = document.getElementById('btn-publish');
       var addProjectBtn = document.getElementById('btn-add-project');
-
-      if (toggleBtn) {
-        toggleBtn.addEventListener('click', function () {
-          self.toggleEditMode();
-        });
-      }
 
       if (publishBtn) {
         publishBtn.addEventListener('click', function () {
@@ -368,26 +371,12 @@
     enterEditMode: function () {
       this.active = true;
       document.body.classList.add('edit-mode');
-
-      var toggleBtn = document.getElementById('edit-toggle');
-      if (toggleBtn) {
-        toggleBtn.classList.add('active');
-        toggleBtn.textContent = 'Exit Edit';
-      }
-
       this.enableEditing();
     },
 
     exitEditMode: function () {
       this.active = false;
       document.body.classList.remove('edit-mode');
-
-      var toggleBtn = document.getElementById('edit-toggle');
-      if (toggleBtn) {
-        toggleBtn.classList.remove('active');
-        toggleBtn.textContent = 'Edit';
-      }
-
       this.disableEditing();
     },
 
@@ -525,6 +514,21 @@
           self.showEditProjectModal(index);
         });
 
+        var thumbFramingBtn = document.createElement('button');
+        thumbFramingBtn.textContent = 'Crop / Fit';
+        thumbFramingBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var project = self.data.projects[index];
+          if (!project.thumbnailFraming) project.thumbnailFraming = {};
+          self.showFramingModal(project.thumbnailFraming, function () {
+            window.PortfolioApp.data = self.data;
+            window.PortfolioApp.render();
+            self.enableEditing();
+            self.markChanged();
+          }, { hideAspect: true });
+        });
+
         var upBtn = document.createElement('button');
         upBtn.textContent = '\u2191';
         upBtn.addEventListener('click', function (e) {
@@ -557,6 +561,7 @@
         });
 
         controls.appendChild(editBtn);
+        controls.appendChild(thumbFramingBtn);
         controls.appendChild(upBtn);
         controls.appendChild(downBtn);
         controls.appendChild(deleteBtn);
@@ -748,7 +753,10 @@
           framingBtn.textContent = 'Crop / Fit';
           framingBtn.style.marginTop = '0';
           framingBtn.addEventListener('click', function () {
-            self.showFramingModal(project, imageIndex);
+            self.showFramingModal(project.images[imageIndex], function () {
+              self.refreshProjectPage();
+              self.markChanged();
+            }, {});
           });
 
           var removeImgBtn = document.createElement('button');
@@ -819,9 +827,10 @@
       return -1;
     },
 
-    showFramingModal: function (project, imageIndex) {
+    showFramingModal: function (framingObj, onApply, opts) {
       var self = this;
-      var img = project.images[imageIndex];
+      opts = opts || {};
+      var img = framingObj;
       if (!img) return;
 
       var existing = document.getElementById('editor-modal-overlay');
@@ -838,27 +847,31 @@
       heading.textContent = 'Crop / Fit';
       modal.appendChild(heading);
 
-      var aspectField = document.createElement('div');
-      aspectField.className = 'editor-modal__field';
-      var aspectLabel = document.createElement('label');
-      aspectLabel.textContent = 'Aspect ratio';
-      aspectField.appendChild(aspectLabel);
-      var aspectSelect = document.createElement('select');
-      [
-        { value: '', label: 'Default (by layout)' },
-        { value: '16/9', label: '16:9 (wide)' },
-        { value: '4/3', label: '4:3' },
-        { value: '1/1', label: '1:1 (square)' },
-        { value: 'original', label: 'Original (natural height)' }
-      ].forEach(function (opt) {
-        var option = document.createElement('option');
-        option.value = opt.value;
-        option.textContent = opt.label;
-        if ((img.aspectRatio || '') === opt.value) option.selected = true;
-        aspectSelect.appendChild(option);
-      });
-      aspectField.appendChild(aspectSelect);
-      modal.appendChild(aspectField);
+      var aspectSelectEl = null;
+
+      if (!opts.hideAspect) {
+        var aspectField = document.createElement('div');
+        aspectField.className = 'editor-modal__field';
+        var aspectLabel = document.createElement('label');
+        aspectLabel.textContent = 'Aspect ratio';
+        aspectField.appendChild(aspectLabel);
+        aspectSelectEl = document.createElement('select');
+        [
+          { value: '', label: 'Default (by layout)' },
+          { value: '16/9', label: '16:9 (wide)' },
+          { value: '4/3', label: '4:3' },
+          { value: '1/1', label: '1:1 (square)' },
+          { value: 'original', label: 'Original (natural height)' }
+        ].forEach(function (opt) {
+          var option = document.createElement('option');
+          option.value = opt.value;
+          option.textContent = opt.label;
+          if ((img.aspectRatio || '') === opt.value) option.selected = true;
+          aspectSelectEl.appendChild(option);
+        });
+        aspectField.appendChild(aspectSelectEl);
+        modal.appendChild(aspectField);
+      }
 
       var fitField = document.createElement('div');
       fitField.className = 'editor-modal__field';
@@ -867,7 +880,7 @@
       fitField.appendChild(fitLabel);
       var fitSelect = document.createElement('select');
       [
-        { value: '', label: 'Default (cover / contain for original)' },
+        { value: '', label: opts.hideAspect ? 'Default (cover)' : 'Default (cover / contain for original)' },
         { value: 'cover', label: 'Cover (fill frame, may crop)' },
         { value: 'contain', label: 'Contain (show full image)' }
       ].forEach(function (opt) {
@@ -934,16 +947,17 @@
       saveBtn.textContent = 'Save';
       saveBtn.className = 'modal-btn-primary';
       saveBtn.addEventListener('click', function () {
-        var aspectVal = aspectSelect.value;
+        if (aspectSelectEl) {
+          var aspectVal = aspectSelectEl.value;
+          if (aspectVal) img.aspectRatio = aspectVal;
+          else delete img.aspectRatio;
+        }
         var fitVal = fitSelect.value;
-        if (aspectVal) img.aspectRatio = aspectVal;
-        else delete img.aspectRatio;
         if (fitVal) img.fit = fitVal;
         else delete img.fit;
         img.focal = selectedFocal;
         overlay.remove();
-        self.refreshProjectPage();
-        self.markChanged();
+        if (onApply) onApply();
         self.showToast('Framing updated');
       });
 
@@ -1031,10 +1045,16 @@
       // Photo control
       var photoEl = document.getElementById('about-photo');
       if (photoEl) {
+        var photoControls = document.createElement('div');
+        photoControls.style.display = 'flex';
+        photoControls.style.gap = '8px';
+        photoControls.style.marginTop = '8px';
+        photoControls.style.flexWrap = 'wrap';
+
         var photoBtn = document.createElement('button');
         photoBtn.className = 'edit-action-btn';
         photoBtn.textContent = 'Set Photo';
-        photoBtn.style.marginTop = '8px';
+        photoBtn.style.marginTop = '0';
         photoBtn.addEventListener('click', function () {
           self.showImageSourceModal(
             'Set Photo',
@@ -1047,7 +1067,22 @@
             }
           );
         });
-        photoEl.appendChild(photoBtn);
+
+        var photoFramingBtn = document.createElement('button');
+        photoFramingBtn.className = 'edit-action-btn';
+        photoFramingBtn.textContent = 'Crop / Fit';
+        photoFramingBtn.style.marginTop = '0';
+        photoFramingBtn.addEventListener('click', function () {
+          if (!self.data.about.photoFraming) self.data.about.photoFraming = {};
+          self.showFramingModal(self.data.about.photoFraming, function () {
+            self.refreshAboutPage();
+            self.markChanged();
+          }, { hideAspect: true });
+        });
+
+        photoControls.appendChild(photoBtn);
+        photoControls.appendChild(photoFramingBtn);
+        photoEl.appendChild(photoControls);
       }
 
       // Section titles and content
@@ -1402,6 +1437,318 @@
       });
     },
 
+    showCropModal: function (file, onResult) {
+      var self = this;
+      var existing = document.getElementById('editor-crop-overlay');
+      if (existing) existing.remove();
+
+      var objectUrl = URL.createObjectURL(file);
+      var image = new Image();
+      var aspectLock = null;
+      var crop = { x: 0, y: 0, w: 1, h: 1 };
+      var displayW = 0;
+      var displayH = 0;
+      var natW = 0;
+      var natH = 0;
+      var dragState = null;
+
+      var overlay = document.createElement('div');
+      overlay.id = 'editor-crop-overlay';
+      overlay.className = 'editor-crop-overlay open';
+
+      var modal = document.createElement('div');
+      modal.className = 'editor-crop-modal';
+
+      var heading = document.createElement('h3');
+      heading.textContent = 'Crop Image';
+      modal.appendChild(heading);
+
+      var presets = document.createElement('div');
+      presets.className = 'editor-crop-presets';
+      var presetDefs = [
+        { label: 'Free', ratio: null },
+        { label: '1:1', ratio: 1 },
+        { label: '4:3', ratio: 4 / 3 },
+        { label: '16:9', ratio: 16 / 9 },
+        { label: '3:2', ratio: 3 / 2 }
+      ];
+      var presetButtons = [];
+
+      var stage = document.createElement('div');
+      stage.className = 'editor-crop-stage';
+
+      var imgEl = document.createElement('img');
+      imgEl.className = 'editor-crop-stage__img';
+      imgEl.draggable = false;
+
+      var shadeTop = document.createElement('div');
+      shadeTop.className = 'editor-crop-shade editor-crop-shade--top';
+      var shadeLeft = document.createElement('div');
+      shadeLeft.className = 'editor-crop-shade editor-crop-shade--left';
+      var shadeRight = document.createElement('div');
+      shadeRight.className = 'editor-crop-shade editor-crop-shade--right';
+      var shadeBottom = document.createElement('div');
+      shadeBottom.className = 'editor-crop-shade editor-crop-shade--bottom';
+
+      var cropBox = document.createElement('div');
+      cropBox.className = 'editor-crop-box';
+
+      ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'].forEach(function (h) {
+        var handle = document.createElement('div');
+        handle.className = 'editor-crop-handle editor-crop-handle--' + h;
+        handle.setAttribute('data-handle', h);
+        cropBox.appendChild(handle);
+      });
+
+      stage.appendChild(imgEl);
+      stage.appendChild(shadeTop);
+      stage.appendChild(shadeLeft);
+      stage.appendChild(shadeRight);
+      stage.appendChild(shadeBottom);
+      stage.appendChild(cropBox);
+      modal.appendChild(presets);
+      modal.appendChild(stage);
+
+      var actions = document.createElement('div');
+      actions.className = 'editor-modal__actions';
+
+      function clampCrop() {
+        var minSize = 0.05;
+        if (crop.w < minSize) crop.w = minSize;
+        if (crop.h < minSize) crop.h = minSize;
+        if (crop.x < 0) crop.x = 0;
+        if (crop.y < 0) crop.y = 0;
+        if (crop.x + crop.w > 1) crop.x = 1 - crop.w;
+        if (crop.y + crop.h > 1) crop.y = 1 - crop.h;
+      }
+
+      function updateCropBox() {
+        clampCrop();
+        var px = crop.x * displayW;
+        var py = crop.y * displayH;
+        var pw = crop.w * displayW;
+        var ph = crop.h * displayH;
+        cropBox.style.left = px + 'px';
+        cropBox.style.top = py + 'px';
+        cropBox.style.width = pw + 'px';
+        cropBox.style.height = ph + 'px';
+        shadeTop.style.height = py + 'px';
+        shadeLeft.style.top = py + 'px';
+        shadeLeft.style.width = px + 'px';
+        shadeLeft.style.height = ph + 'px';
+        shadeRight.style.top = py + 'px';
+        shadeRight.style.left = (px + pw) + 'px';
+        shadeRight.style.width = Math.max(0, displayW - px - pw) + 'px';
+        shadeRight.style.height = ph + 'px';
+        shadeBottom.style.top = (py + ph) + 'px';
+        shadeBottom.style.height = Math.max(0, displayH - py - ph) + 'px';
+      }
+
+      function initCropBox() {
+        if (aspectLock) {
+          var w = 0.9;
+          var h = w / aspectLock * (displayW / displayH);
+          if (h > 0.9) {
+            h = 0.9;
+            w = h * aspectLock * (displayH / displayW);
+          }
+          crop.w = w;
+          crop.h = h;
+        } else {
+          crop.w = 0.9;
+          crop.h = 0.9;
+        }
+        crop.x = (1 - crop.w) / 2;
+        crop.y = (1 - crop.h) / 2;
+        updateCropBox();
+      }
+
+      function pointerToNorm(clientX, clientY) {
+        var rect = stage.getBoundingClientRect();
+        return {
+          x: Math.max(0, Math.min(1, (clientX - rect.left) / displayW)),
+          y: Math.max(0, Math.min(1, (clientY - rect.top) / displayH))
+        };
+      }
+
+      function onPointerMove(e) {
+        if (!dragState) return;
+        e.preventDefault();
+        var pt = pointerToNorm(e.clientX, e.clientY);
+        var dx = pt.x - dragState.startPt.x;
+        var dy = pt.y - dragState.startPt.y;
+        var start = dragState.startCrop;
+
+        if (dragState.mode === 'move') {
+          crop.x = start.x + dx;
+          crop.y = start.y + dy;
+          clampCrop();
+        } else {
+          var c = { x: start.x, y: start.y, w: start.w, h: start.h };
+          var handle = dragState.handle;
+          if (handle.indexOf('e') !== -1) c.w = start.w + dx;
+          if (handle.indexOf('w') !== -1) {
+            c.x = start.x + dx;
+            c.w = start.w - dx;
+          }
+          if (handle.indexOf('s') !== -1) c.h = start.h + dy;
+          if (handle.indexOf('n') !== -1) {
+            c.y = start.y + dy;
+            c.h = start.h - dy;
+          }
+          if (c.w < 0.05) c.w = 0.05;
+          if (c.h < 0.05) c.h = 0.05;
+          if (aspectLock) {
+            if (handle === 'n' || handle === 's') {
+              c.w = c.h * aspectLock * (displayH / displayW);
+            } else {
+              c.h = c.w / aspectLock * (displayW / displayH);
+            }
+          }
+          crop.x = c.x;
+          crop.y = c.y;
+          crop.w = c.w;
+          crop.h = c.h;
+          clampCrop();
+        }
+        updateCropBox();
+      }
+
+      function onPointerUp() {
+        dragState = null;
+        document.removeEventListener('pointermove', onPointerMove);
+        document.removeEventListener('pointerup', onPointerUp);
+      }
+
+      cropBox.addEventListener('pointerdown', function (e) {
+        if (e.target !== cropBox) return;
+        e.preventDefault();
+        dragState = {
+          mode: 'move',
+          startPt: pointerToNorm(e.clientX, e.clientY),
+          startCrop: { x: crop.x, y: crop.y, w: crop.w, h: crop.h }
+        };
+        document.addEventListener('pointermove', onPointerMove);
+        document.addEventListener('pointerup', onPointerUp);
+      });
+
+      cropBox.querySelectorAll('.editor-crop-handle').forEach(function (handleEl) {
+        handleEl.addEventListener('pointerdown', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          dragState = {
+            mode: 'resize',
+            handle: handleEl.getAttribute('data-handle'),
+            startPt: pointerToNorm(e.clientX, e.clientY),
+            startCrop: { x: crop.x, y: crop.y, w: crop.w, h: crop.h }
+          };
+          document.addEventListener('pointermove', onPointerMove);
+          document.addEventListener('pointerup', onPointerUp);
+        });
+      });
+
+      presetDefs.forEach(function (def, idx) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = def.label;
+        btn.className = 'editor-crop-preset' + (idx === 0 ? ' active' : '');
+        btn.addEventListener('click', function () {
+          aspectLock = def.ratio;
+          presetButtons.forEach(function (b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          initCropBox();
+        });
+        presetButtons.push(btn);
+        presets.appendChild(btn);
+      });
+
+      function closeOverlay() {
+        URL.revokeObjectURL(objectUrl);
+        overlay.remove();
+      }
+
+      var cancelBtn = document.createElement('button');
+      cancelBtn.textContent = 'Cancel';
+      cancelBtn.addEventListener('click', function () {
+        closeOverlay();
+        if (onResult) onResult(null);
+      });
+
+      var skipBtn = document.createElement('button');
+      skipBtn.textContent = 'Use full image';
+      skipBtn.addEventListener('click', function () {
+        closeOverlay();
+        if (onResult) onResult(file);
+      });
+
+      var cropBtn = document.createElement('button');
+      cropBtn.textContent = 'Crop';
+      cropBtn.className = 'modal-btn-primary';
+      cropBtn.addEventListener('click', function () {
+        var sx = Math.round(crop.x * natW);
+        var sy = Math.round(crop.y * natH);
+        var sw = Math.max(1, Math.round(crop.w * natW));
+        var sh = Math.max(1, Math.round(crop.h * natH));
+        var canvas = document.createElement('canvas');
+        canvas.width = sw;
+        canvas.height = sh;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(image, sx, sy, sw, sh, 0, 0, sw, sh);
+        var isPng = file.type === 'image/png';
+        var mime = isPng ? 'image/png' : 'image/jpeg';
+        canvas.toBlob(function (blob) {
+          if (!blob) {
+            self.showToast('Crop failed', true);
+            return;
+          }
+          var baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+          var ext = isPng ? '.png' : '.jpg';
+          var croppedFile = new File([blob], baseName + '-cropped' + ext, { type: mime });
+          closeOverlay();
+          if (onResult) onResult(croppedFile);
+        }, mime, isPng ? undefined : 0.9);
+      });
+
+      actions.appendChild(cancelBtn);
+      actions.appendChild(skipBtn);
+      actions.appendChild(cropBtn);
+      modal.appendChild(actions);
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) {
+          closeOverlay();
+          if (onResult) onResult(null);
+        }
+      });
+
+      image.onload = function () {
+        natW = image.naturalWidth;
+        natH = image.naturalHeight;
+        var maxW = 560;
+        var maxH = 400;
+        var scale = Math.min(1, maxW / natW, maxH / natH);
+        displayW = Math.round(natW * scale);
+        displayH = Math.round(natH * scale);
+        stage.style.width = displayW + 'px';
+        stage.style.height = displayH + 'px';
+        imgEl.src = objectUrl;
+        imgEl.style.width = displayW + 'px';
+        imgEl.style.height = displayH + 'px';
+        initCropBox();
+      };
+
+      image.onerror = function () {
+        URL.revokeObjectURL(objectUrl);
+        overlay.remove();
+        self.showToast('Could not load image for cropping', true);
+        if (onResult) onResult(file);
+      };
+
+      image.src = objectUrl;
+    },
+
     sanitizeFilename: function (name) {
       var extMatch = name.match(/\.([^.]+)$/);
       var ext = extMatch ? extMatch[1].toLowerCase() : 'jpg';
@@ -1461,8 +1808,20 @@
       img.src = url;
     },
 
-    uploadImage: function (file, destDir, onDone) {
+    uploadImage: function (file, destDir, onDone, skipCrop) {
       var self = this;
+
+      if (!skipCrop && !file._cropProcessed) {
+        this.showCropModal(file, function (result) {
+          if (result === null) {
+            if (onDone) onDone(new Error('Upload cancelled'));
+            return;
+          }
+          result._cropProcessed = true;
+          self.uploadImage(result, destDir, onDone, true);
+        });
+        return;
+      }
 
       if (this.usesPublishApi()) {
         this.uploadImageViaWorker(file, destDir, onDone);
@@ -1983,7 +2342,7 @@
     },
 
     setEditorControlsDisabled: function (disabled) {
-      var ids = ['btn-publish', 'btn-add-project', 'btn-suggest', 'edit-toggle'];
+      var ids = ['btn-publish', 'btn-add-project', 'btn-suggest'];
       var i;
       for (i = 0; i < ids.length; i++) {
         var el = document.getElementById(ids[i]);

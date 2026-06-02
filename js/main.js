@@ -119,6 +119,7 @@
           img.src = project.thumbnail;
           img.alt = project.title;
           img.loading = 'lazy';
+          this.applyFramingStyle(img, project.thumbnailFraming);
           imgDiv.appendChild(img);
         } else {
           var placeholder = document.createElement('span');
@@ -227,7 +228,7 @@
             html += '<a href="project.html?slug=' + rel.slug + '" class="project-card">';
             html += '<div class="project-card__image">';
             if (rel.thumbnail) {
-              html += '<img src="' + self.escapeHtml(rel.thumbnail) + '" alt="' + self.escapeHtml(rel.title) + '" loading="lazy">';
+              html += '<img src="' + self.escapeHtml(rel.thumbnail) + '" alt="' + self.escapeHtml(rel.title) + '" loading="lazy"' + self.buildFramingStyleAttr(rel.thumbnailFraming) + '>';
             } else {
               html += '<span class="placeholder-text">Project Image</span>';
             }
@@ -251,11 +252,10 @@
       var about = this.data.about;
       var html = '';
 
-      // Intro block
       html += '<div class="about-page__intro">';
       html += '<div class="about-page__photo" id="about-photo">';
       if (about.photo) {
-        html += '<img src="' + this.escapeHtml(about.photo) + '" alt="' + this.escapeHtml(about.name) + '">';
+        html += '<img src="' + this.escapeHtml(about.photo) + '" alt="' + this.escapeHtml(about.name) + '"' + this.buildFramingStyleAttr(about.photoFraming) + '>';
       }
       html += '</div>';
       html += '<div class="about-page__bio">';
@@ -271,7 +271,6 @@
       }
       html += '</div></div></div>';
 
-      // Sections
       var self = this;
       (about.sections || []).forEach(function (section, sIdx) {
         html += '<section class="about-section" data-section-index="' + sIdx + '">';
@@ -307,6 +306,19 @@
       });
 
       container.innerHTML = html;
+    },
+
+    buildFramingStyleAttr: function (framing) {
+      if (!framing || (!framing.fit && !framing.focal)) return '';
+      var fit = framing.fit || 'cover';
+      var focal = framing.focal || '50% 50%';
+      return ' style="object-fit:' + fit + ';object-position:' + focal + ';"';
+    },
+
+    applyFramingStyle: function (imgEl, framing) {
+      if (!framing) return;
+      if (framing.fit) imgEl.style.objectFit = framing.fit;
+      if (framing.focal) imgEl.style.objectPosition = framing.focal;
     },
 
     getImageFramingStyles: function (img, isHalf) {

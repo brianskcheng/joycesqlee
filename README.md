@@ -23,7 +23,7 @@ Reveal edit mode with `Ctrl+Shift+E` or `?admin` in the URL. In edit mode you ca
 
 **Captions:** Each project image can have a caption shown below the image on the project page. Click the caption text in edit mode to change it inline.
 
-**Crop / Fit:** Use the **Crop / Fit** button on each image in edit mode to set aspect ratio (16:9, 4:3, 1:1, or original), fit (cover/contain), and focal point. These are display settings stored in the project data, not changes to the image file.
+**Crop / Fit:** After choosing a file to upload, an interactive crop tool opens (drag/resize the crop box, or pick an aspect preset). Use **Use full image** to skip cropping. Gallery images also support **Crop / Fit** in edit mode for aspect ratio, fit, and focal point. Thumbnails and the About photo support fit and focal point via **Crop / Fit** on their edit controls.
 
 ## Setup
 
