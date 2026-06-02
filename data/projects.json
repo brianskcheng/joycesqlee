@@ -36,62 +36,56 @@
       ],
       "images": [
         {
+          "src": "projects/mosaics-of-urban-giardino/plan-oblique-overview-mpx7imm3.png",
+          "caption": "Planting spaces are organized as a series of interlocking “negative” mosaics, carved from the mass of the site and aligned along the primary axis, opening to the south to receive sunlight.",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/spatial-strategy3-cropped-mpx7mvcx.png",
+          "caption": "Spatial strategy and programme traces growth, exchange, inhabitation and regeneration; massing strategy.",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/market-interface-plan-oblique-cropped-mpx7vqiv.png",
+          "caption": "The existing carpark of Piazza Adda is transformed into a market, shops and the dining hall opens up to the vibrant street frontage. ",
+          "layout": "full"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/p1010816-bnw-cropped-mpx7zabg.jpg",
+          "caption": "Existing condition of Piazza Adda",
+          "layout": "half"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/market-interface-mpx8164p.png",
+          "caption": "Proposed condition of Piazza Adda, the ground floor is shaded by a colonnade while perforated shutters provides a sound and visual barrier to enhance user privacy in the storeys above. ",
+          "layout": "half"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/gateway-cropped-mpx84bxb.png",
+          "caption": "Main gateway to the building, the orangerie is visually connected to the pavement.",
+          "layout": "half"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/winter-garden-mpx858ek.png",
+          "caption": "The orangerie, a winter garden testing what Siracusa might grow next, such as tropical species introduced as the climate warms",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
           "src": "projects/mosaics-of-urban-giardino/hero-understorey-giardino.png",
           "caption": "The understorey approaching the giardino Mediterraneo (Rhino, Enscape, Photoshop)",
           "layout": "hero"
         },
         {
-          "src": "projects/mosaics-of-urban-giardino/programme-spatial-strategy.png",
-          "caption": "Programme traces growth, exchange, inhabitation and regeneration; massing strategy (Hand drawn plans, Rhino, Photoshop)",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain"
-        },
-        {
-          "src": "projects/mosaics-of-urban-giardino/retrofitting-piazza-adda.png",
-          "caption": "Retrofitting Piazza Adda — orangerie, colonnade and market frontage (Hand drawn on Procreate; Rhino, Enscape, Photoshop)",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain"
-        },
-        {
-          "src": "projects/mosaics-of-urban-giardino/terraced-giardino-section.png",
-          "caption": "The Terraced Giardino — long section and plans (Hand drawn on paper and Procreate)",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain"
-        },
-        {
-          "src": "projects/mosaics-of-urban-giardino/growth-exchange-regeneration.png",
+          "src": "projects/mosaics-of-urban-giardino/spatial-strategy6-mpx7pufn.png",
           "caption": "Growth, Exchange, Regeneration — breathing edge, drying tower, orangerie and amphitheatre",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain"
-        },
-        {
-          "src": "projects/mosaics-of-urban-giardino/inhabiting-the-facade.png",
-          "caption": "Inhabiting the Facade — detailed elevation and section (AutoCAD, Rhino, Photoshop; hand drawn on paper)",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain"
-        },
-        {
-          "src": "projects/mosaics-of-urban-giardino/inhabiting-the-biome.png",
-          "caption": "Inhabiting the Detail and the Biome — hand drawn moments of public and private inhabitation (Procreate)",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain"
-        },
-        {
-          "src": "projects/mosaics-of-urban-giardino/the-drying-tower.png",
-          "caption": "The Drying Tower — passive stack ventilation and elevation studies (Rhino, Photoshop, hand drawing)",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain"
-        },
-        {
-          "src": "projects/mosaics-of-urban-giardino/creative-process.png",
-          "caption": "The Creative Process — concept models and structural exploration",
           "layout": "full",
           "aspectRatio": "original",
           "fit": "contain"
