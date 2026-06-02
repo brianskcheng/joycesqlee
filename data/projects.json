@@ -8,18 +8,102 @@
     {
       "slug": "mosaics-of-urban-giardino",
       "title": "Mosaics of Urban Giardino",
-      "type": "",
+      "type": "The Orchard Living Lab",
       "cardMeta": "6th Year Project · 2026 · Siracusa, Sicily",
-      "thumbnail": "projects/mosaics-of-urban-giardino/plan-oblique-landscape-cropped-mpx3zdx9.png",
+      "thumbnail": "projects/mosaics-of-urban-giardino/hero-understorey-giardino.png",
       "descriptions": [
-        ""
+        "In Sicily, the term giardino has always meant productive orchard before it translates directly to garden. Amidst Siracusa's climate crisis and petrochemical legacy, its fertile giardini that once wove centuries of cultivation have been displaced, leaving a biome fractured.",
+        "The Orchard Living Lab proposes to restore harmony between human settlement and productive nature. Reinterpreting traditional Sicilian agriculture and Mediterranean food practices, the scheme returns the giardino Mediterraneo to the heart of the urban block, with the citrus tree at its centre as the structural anchor, seasonal clock and ecological engine of the whole.",
+        "The scheme aims to become a living biome animated by cycles of growth, exchange and regeneration, in which every element feeds the next. Its inhabitants, human and non-human alike, are active stewards in sustaining a landscape that sustains them in return, through the reciprocal relationship between people, place and production."
       ],
-      "meta": [],
-      "images": [],
-      "relatedProjects": [],
+      "meta": [
+        {
+          "label": "Unit",
+          "value": "6th Year Design Studio 6.2"
+        },
+        {
+          "label": "Date",
+          "value": "Feb – May 2026"
+        },
+        {
+          "label": "Location",
+          "value": "Siracusa, Sicily"
+        },
+        {
+          "label": "Tutor",
+          "value": "Jayne Barlow"
+        }
+      ],
+      "images": [
+        {
+          "src": "projects/mosaics-of-urban-giardino/hero-understorey-giardino.png",
+          "caption": "The understorey approaching the giardino Mediterraneo (Rhino, Enscape, Photoshop)",
+          "layout": "hero"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/programme-spatial-strategy.png",
+          "caption": "Programme traces growth, exchange, inhabitation and regeneration; massing strategy (Hand drawn plans, Rhino, Photoshop)",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/retrofitting-piazza-adda.png",
+          "caption": "Retrofitting Piazza Adda — orangerie, colonnade and market frontage (Hand drawn on Procreate; Rhino, Enscape, Photoshop)",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/terraced-giardino-section.png",
+          "caption": "The Terraced Giardino — long section and plans (Hand drawn on paper and Procreate)",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/growth-exchange-regeneration.png",
+          "caption": "Growth, Exchange, Regeneration — breathing edge, drying tower, orangerie and amphitheatre",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/inhabiting-the-facade.png",
+          "caption": "Inhabiting the Facade — detailed elevation and section (AutoCAD, Rhino, Photoshop; hand drawn on paper)",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/inhabiting-the-biome.png",
+          "caption": "Inhabiting the Detail and the Biome — hand drawn moments of public and private inhabitation (Procreate)",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/the-drying-tower.png",
+          "caption": "The Drying Tower — passive stack ventilation and elevation studies (Rhino, Photoshop, hand drawing)",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/creative-process.png",
+          "caption": "The Creative Process — concept models and structural exploration",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain"
+        }
+      ],
+      "relatedProjects": [
+        "syraka",
+        "mycocycle-studio"
+      ],
       "thumbnailFraming": {
-        "focal": "50% 0%",
-        "fit": "contain"
+        "focal": "50% 45%",
+        "fit": "cover"
       }
     },
     {
