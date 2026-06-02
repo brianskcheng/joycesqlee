@@ -127,7 +127,7 @@
       ],
       "images": [
         {
-          "src": "projects/mycocycle-studio/overall-site-red-cropped-mpx250ut.png",
+          "src": "projects/mycocycle-studio/overall-site-red-cropped-mpx288iv.png",
           "caption": "Aerial Visualisation (Rhino, Enscape, Photoshop)",
           "layout": "full"
         },
@@ -139,10 +139,7 @@
         {
           "src": "projects/mycocycle-studio/tree-structure-concept.png",
           "caption": "Hierarchy of Tree Structures diagram",
-          "layout": "half",
-          "aspectRatio": "1/1",
-          "focal": "50% 50%",
-          "fit": "contain"
+          "layout": "half"
         },
         {
           "src": "projects/mycocycle-studio/short-section.jpg",
