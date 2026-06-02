@@ -64,13 +64,33 @@
           return data;
         })
         .catch(function () {
-          self.revealAboutPage();
+          self.revealPage();
         });
     },
 
+    revealPage: function () {
+      var sel = document.querySelector('.about-page, .project-page');
+      if (sel) sel.classList.add('is-ready');
+    },
+
     revealAboutPage: function () {
-      var aboutPage = document.querySelector('.about-page');
-      if (aboutPage) aboutPage.classList.add('is-ready');
+      this.revealPage();
+    },
+
+    whenFontsReady: function (cb) {
+      if (document.fonts && document.fonts.ready) {
+        var done = false;
+        var fire = function () {
+          if (!done) {
+            done = true;
+            cb();
+          }
+        };
+        document.fonts.ready.then(fire);
+        setTimeout(fire, 1500);
+      } else {
+        cb();
+      }
     },
 
     render: function () {
@@ -156,6 +176,8 @@
       var container = document.getElementById('project-content');
       if (!container) return; // Not on project page
 
+      var self = this;
+
       var params = new URLSearchParams(window.location.search);
       var slug = params.get('slug');
       if (!slug) return;
@@ -169,6 +191,7 @@
       }
       if (!project) {
         container.innerHTML = '<p>Project not found.</p>';
+        this.whenFontsReady(function () { self.revealPage(); });
         return;
       }
 
@@ -252,9 +275,8 @@
       }
 
       container.innerHTML = html;
+      this.whenFontsReady(function () { self.revealPage(); });
     },
-
-    renderAboutPage: function () {
       var container = document.getElementById('about-content');
       if (!container || !this.data.about) return;
 
@@ -316,14 +338,16 @@
 
       container.innerHTML = html;
 
+      var self2 = this;
       var photoImg = container.querySelector('#about-photo img');
-      if (photoImg && !photoImg.complete) {
-        var self2 = this;
-        photoImg.addEventListener('load', function () { self2.revealAboutPage(); });
-        photoImg.addEventListener('error', function () { self2.revealAboutPage(); });
-      } else {
-        this.revealAboutPage();
-      }
+      this.whenFontsReady(function () {
+        if (photoImg && !photoImg.complete) {
+          photoImg.addEventListener('load', function () { self2.revealPage(); });
+          photoImg.addEventListener('error', function () { self2.revealPage(); });
+        } else {
+          self2.revealPage();
+        }
+      });
     },
 
     buildFramingStyleAttr: function (framing) {
@@ -443,7 +467,7 @@
   // Load data on page ready
   window.PortfolioApp.loadData();
   setTimeout(function () {
-    window.PortfolioApp.revealAboutPage();
+    window.PortfolioApp.revealPage();
   }, 3000);
 
   // --- Site update detection ---
