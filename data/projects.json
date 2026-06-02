@@ -6,6 +6,23 @@
   },
   "projects": [
     {
+      "slug": "mosaics-of-urban-giardino",
+      "title": "Mosaics of Urban Giardino",
+      "type": "",
+      "cardMeta": "yeah boi",
+      "thumbnail": "projects/mosaics-of-urban-giardino/chatgpt-image-apr-30-2026-01-19-12-am-mpx0hw24.png",
+      "descriptions": [
+        ""
+      ],
+      "meta": [],
+      "images": [],
+      "relatedProjects": [],
+      "thumbnailFraming": {
+        "focal": "50% 0%",
+        "fit": "contain"
+      }
+    },
+    {
       "slug": "syraka",
       "title": "Syraka",
       "type": "Masterplan for Siracusa, Italy",
@@ -422,19 +439,6 @@
         "south-west-campus",
         "syraka"
       ]
-    },
-    {
-      "slug": "mosaics-of-urban-giardino",
-      "title": "Mosaics of Urban Giardino",
-      "type": "",
-      "cardMeta": "",
-      "thumbnail": "",
-      "descriptions": [
-        ""
-      ],
-      "meta": [],
-      "images": [],
-      "relatedProjects": []
     }
   ],
   "about": {
