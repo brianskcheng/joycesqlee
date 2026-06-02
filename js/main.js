@@ -265,6 +265,10 @@
       html += '<div class="about-page__contact">';
       html += '<a href="mailto:' + this.escapeHtml(about.email) + '" id="about-email">' + this.escapeHtml(about.email) + '</a>';
       html += '<a href="tel:' + this.escapeHtml(about.phone.replace(/\s/g, '')) + '" id="about-phone">' + this.escapeHtml(about.phone) + '</a>';
+      if (about.linkedin) {
+        var linkedinUrl = about.linkedin.replace(/^https?:\/\//, '');
+        html += '<a href="https://' + this.escapeHtml(linkedinUrl) + '" id="about-linkedin" target="_blank" rel="noopener">' + this.escapeHtml(about.linkedin) + '</a>';
+      }
       html += '</div></div></div>';
 
       // Sections
