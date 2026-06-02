@@ -69,7 +69,9 @@
         {
           "src": "projects/syraka/masterplan-loop.png",
           "caption": "Plan of the Loop, envisioning Syraka by 2075 (AutoCAD, Photoshop, Procreate)",
-          "layout": "full"
+          "layout": "full",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/syraka/kit-of-parts-walkway.png",
@@ -84,7 +86,9 @@
         {
           "src": "projects/syraka/section-city-systems.png",
           "caption": "Section of city-wide energy, water and waste systems (Photoshop on handdrawing)",
-          "layout": "full"
+          "layout": "full",
+          "focal": "50% 50%",
+          "fit": "contain"
         }
       ],
       "relatedProjects": [
