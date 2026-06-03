@@ -550,49 +550,137 @@
       ],
       "images": [
         {
+          "src": "projects/lucys-room/overall-site-illustration-mpy1f1xr.png",
+          "caption": "Lucy's Room sits between Warneford Hospital and Warneford Meadow, embedded in lush greenery",
+          "layout": "full",
+          "aspectRatio": "4/3",
+          "focal": "50% 50%"
+        },
+        {
           "src": "projects/lucys-room/render-sensory-garden.png",
           "caption": "Visualisation of the sensory garden (Rhino, Enscape)",
-          "layout": "full"
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
-          "src": "projects/lucys-room/location-plan.png",
-          "caption": "Location Plan 1:1000 (AutoCAD, Illustrator, Photoshop)",
-          "layout": "half"
-        },
-        {
-          "src": "projects/lucys-room/massing-strategy-04-cloister.jpg",
-          "caption": "Massing Strategy diagram",
-          "layout": "half"
+          "src": "projects/lucys-room/massing-strategy-cropped-mpy0roov.png",
+          "caption": "A primary axis established through the scheme, connecting to Warneford Hospital",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/lucys-room/long-section.png",
-          "caption": "Long Section 1:200 — progression from public to private spaces (Rhino, Enscape, Photoshop)",
+          "caption": "Long Section 1:200 — progression from public to private spaces",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/louvres-opened-orchestra-mpy1dbs8.png",
+          "caption": "The theatre holds 315 audiences, the glazed folding doors will be shut and mechanical louvers via the clerestory will close for better lighting control for concerts.",
           "layout": "full"
         },
         {
-          "src": "projects/lucys-room/ground-floor-plan.png",
-          "caption": "Ground Floor Plan 1:200 (AutoCAD, Photoshop)",
+          "src": "projects/lucys-room/performance-garden-mpy0w8gq.png",
+          "caption": "The outdoor performance theatre with tiered landscape seating",
           "layout": "half"
         },
         {
-          "src": "projects/lucys-room/render-top-down.png",
-          "caption": "Top-down render (Rhino, Enscape, Photoshop)",
+          "src": "projects/lucys-room/public-axis-mpy0x8hl.png",
+          "caption": "The public realm, the avenue between public engagement and private therapy rooms",
           "layout": "half"
         },
         {
-          "src": "projects/lucys-room/exploded-isometric-rendered.png",
-          "caption": "Exploded isometric diagram (Rhino, Enscape, Illustrator)",
+          "src": "projects/lucys-room/circulation-cloister-cropped-mpy0zpqu.png",
+          "caption": "The cloister provides continuous views to the therapy garden, with waiting pockets inserted between \"therapy pods\"",
+          "layout": "half",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/light-filled-cloister-mpy122of.png",
+          "caption": "Roof lights and the textured terracotta external fabric of \"therapy pods\" makes the cloister a sheltered \"outdoor\" space.",
           "layout": "half"
         },
         {
-          "src": "projects/lucys-room/render-therapy-room.png",
-          "caption": "Internal visualisations — therapy room and cloister",
-          "layout": "half"
+          "src": "projects/lucys-room/exploded-therapy-room-cropped-mpy1744d.png",
+          "caption": "The music therapy room employs acoustic strategies, such as suspended ceiling panels, sound absorbing fabric and angled walls to impove sound qualities and prevent flutter echo.",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%"
         },
         {
-          "src": "projects/lucys-room/detailed-section.png",
-          "caption": "Detailed section 1:20 — blue roof, terracotta cladding, rainchain detail (AutoCAD, Rhino, Illustrator)",
-          "layout": "full"
+          "src": "projects/lucys-room/individual-therapy-room-mpy19470.png",
+          "caption": "Light enters through a clerestory, colourful wall finishes adds visual and tactile appeal. ",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/1-50-auditorium-elevation-cropped-mpy1ha0o.png",
+          "caption": "",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/theatre-techincal-section-cropped-mpy1i3re.png",
+          "caption": "Detailed elevation and section of the performance theatre, its form and ornamentations inspired by a delicate music box",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/planter-facade-elevation-cropped-mpy1ksdx.png",
+          "caption": "New Image",
+          "layout": "half",
+          "fit": "contain",
+          "focal": "50% 50%",
+          "aspectRatio": "original"
+        },
+        {
+          "src": "projects/lucys-room/cloister-techincal-section-cropped-mpy1lpsv.png",
+          "caption": "The cloister and therapy room facade incorporates a blue roof within a green roof, a rain chain that provides drainage to the planters on first floor.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/01-perspective-tectomic-model-mpy1sc3p.png",
+          "caption": "Tectonic model of the cloister facade",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/15-model-close-up-mpy1sr2u.png",
+          "caption": "New Image",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/05-terracotta-material-cropped-mpy1tze6.png",
+          "caption": "1:1 Material sample of texture terracotta panel, made from plaster and sand aggregates",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/lucys-room/06-reclaimed-brick-material-cropped-mpy1uqrv.png",
+          "caption": "1:1 Material sample of reclaimed brick, made from plaster and sand aggregate",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%"
         }
       ],
       "relatedProjects": [
