@@ -434,7 +434,7 @@
         },
         {
           "src": "projects/mycocycle-studio/render-exterior.jpg",
-          "caption": "The long section showing tree structures — roots, trunk, canopy, tracing programmes of discovery, production and engagement.",
+          "caption": "Renders showing tree structure — roots, trunk, canopy",
           "layout": "half",
           "aspectRatio": "16/9",
           "focal": "50% 50%"
@@ -503,32 +503,11 @@
           "layout": "full"
         },
         {
-          "src": "projects/mycocycle-studio/p006-internal-mpy2314l.png",
-          "caption": "The beginning of the spiraling tree walk, propagation of mushrooms are visible and joins in as part of the visitors' journey",
-          "layout": "full"
-        },
-        {
           "src": "projects/mycocycle-studio/overall-journey-01-mpx35aw3.png",
           "caption": "Isometric render of the upper ground floor and first floor, the spiraling movement of the tree walk is designed to echo the way mushrooms emerge from the ground, resonating with the narrative that connects visitors’ spatial experience to the lifecycle of fungi.",
           "layout": "full",
           "aspectRatio": "original",
           "fit": "contain",
-          "focal": "50% 50%"
-        },
-        {
-          "src": "projects/mycocycle-studio/p001-internal-mpy243rt.png",
-          "caption": "Visitors arrive to the first floor which is replete with natural light, where tree canopies hover above them, evoking the feeling of being mushrooms that grow beneath a forest. ",
-          "layout": "full"
-        },
-        {
-          "src": "projects/mycocycle-studio/p004-internal-mpy2764p.png",
-          "caption": "Visitors continue to spiral the tree walk and arrive at the canopy - a visitor experience workshop, a mezzanine space located directly above the fabrication workshop. ",
-          "layout": "full"
-        },
-        {
-          "src": "projects/mycocycle-studio/p003-internal-mpy2542r.png",
-          "caption": "From a mezzanine, visitors observe the moulding of mycelium in the fabrication workshop while actively engaging in the process themselves upstairs.",
-          "layout": "full",
           "focal": "50% 50%"
         }
       ],
@@ -745,17 +724,58 @@
         {
           "src": "projects/south-west-campus/external-render.png",
           "caption": "External render from road junction (Rhino, Vray, Photoshop)",
-          "layout": "full"
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
-          "src": "projects/south-west-campus/design-option-01.png",
+          "src": "projects/south-west-campus/elevation-void-bottom-1-mpy2cb4o.png",
           "caption": "Matrix of design options for tender application",
-          "layout": "half"
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
-          "src": "projects/south-west-campus/massing-study.png",
+          "src": "projects/south-west-campus/elevation-massing-stacking-mpy2bo5b.png",
           "caption": "Stacking masses / Void studies",
-          "layout": "half"
+          "layout": "half",
+          "fit": "contain",
+          "focal": "50% 50%",
+          "aspectRatio": "original"
+        },
+        {
+          "src": "projects/south-west-campus/elevation-void-center-mpy2d0ei.png",
+          "caption": "Void at the centre",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/south-west-campus/elevation-void-top-mpy2dohv.png",
+          "caption": "Void at the top",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/south-west-campus/elevation-massing-circulation-mpy2eovk.png",
+          "caption": "Massing follows circulation",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/south-west-campus/elevation-massing-vertical-foliage-mpy2f2kc.png",
+          "caption": "Vertical foliage",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "",
