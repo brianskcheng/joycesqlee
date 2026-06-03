@@ -96,9 +96,41 @@
           "layout": "half"
         },
         {
-          "src": "projects/mosaics-of-urban-giardino/spatial-strategy5-cropped-mpx9944w.png",
-          "caption": "Lower ground floor plan and upper ground floor plan",
+          "src": "projects/mosaics-of-urban-giardino/plans-cropped-mpxw2717.png",
+          "caption": "Lower Ground Floor Plan",
           "layout": "full",
+          "fit": "contain",
+          "focal": "50% 50%",
+          "aspectRatio": "original"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/plans2-cropped-mpxw435o.png",
+          "caption": "Upper Ground Floor Plan",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/plans3-cropped-mpxw50wj.png",
+          "caption": "First Floor Plan",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/processes-in-plan-cropped-mpxvr0hc.png",
+          "caption": "While residential use begins from the first floor, the activities of growing, exchanging and regenerating the orchard mainly dictates the upper ground floor and lower ground floor. At each stage, flora is taken into a new form and the building traces its life cycle.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/processes-in-plan2-cropped-mpxvrr8j.png",
+          "caption": "",
+          "layout": "half",
           "aspectRatio": "original",
           "fit": "contain",
           "focal": "50% 50%"
@@ -130,11 +162,72 @@
           "layout": "hero"
         },
         {
-          "src": "projects/mosaics-of-urban-giardino/spatial-strategy6-mpx7pufn.png",
-          "caption": "Growth, Exchange, Regeneration — breathing edge, drying tower, orangerie and amphitheatre",
+          "src": "projects/mosaics-of-urban-giardino/section-bb-activity-cropped-mpxvwx8x.png",
+          "caption": "Each level offers different growing conditions, shaded hollows for moisture-dependent plants and suspended planting strung from overhead wires between walkways. The elevated walkways threads through the layers.",
+          "layout": "full"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/exoskeleton-elevation-mpxwdi0a.png",
+          "caption": "Inspired by the logic of coltura promiscua, an independent exoskeleton structure sits outside the thermal envelope, as a living, breathing edge that extends domestic space, shelters non-human residents and performs as a growing facade.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/exoskeleton-facade-mpxwcln3.png",
+          "caption": "",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/exoskeleton-corridor-mpxwf61z.png",
+          "caption": "Vertical louvres and tensioned wire guides provide a climbing structure for plants across the facade, simultaneously giving solar shading for spaces behind it. ",
           "layout": "full",
           "aspectRatio": "original",
-          "fit": "contain"
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/living-experience-cropped-mpxwl0vw.png",
+          "caption": "From the first floor, the building's programme is mainly residential.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/dining-hall-mpxwiryj.png",
+          "caption": "The Dining Hall",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/spatial-strategy9-cropped-mpxwnnri.png",
+          "caption": "The drying tower makes the drying process visible, operates as a passive climate device without mechanical assistance or insulation",
+          "layout": "half",
+          "aspectRatio": "1/1",
+          "focal": "50% 50%",
+          "fit": "cover"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/drying-tower-mpxwogpx.png",
+          "caption": "The Drying Tower",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/materials-mpxwr0yf.png",
+          "caption": "Set within an urban fabric defined by concrete residential buildings, the Orchard Living Lab reframes material selection through the lens of locality, ecological impact and what its surrounding already contain. The process begins with identifying what the land contains, including its remnants, its excesses and its latent resources, acknowledging that can be reused, cultivated and transformed rather than imported.",
+          "layout": "full",
+          "aspectRatio": "16/9",
+          "focal": "50% 50%"
         }
       ],
       "relatedProjects": [
