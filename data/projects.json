@@ -836,27 +836,42 @@
         {
           "src": "projects/residential-works/hamilton-road-proposed-elevation.png",
           "caption": "3 Hamilton Road — Proposed elevation (Vectorworks)",
-          "layout": "half"
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/residential-works/hamilton-road-proposed-plan.png",
           "caption": "3 Hamilton Road — Proposed ground floor plan (Vectorworks)",
-          "layout": "full"
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/residential-works/dower-cottage-proposed-north-elevation.png",
           "caption": "9 Dower Cottage — Proposed north elevation (Vectorworks)",
-          "layout": "half"
+          "layout": "half",
+          "fit": "contain",
+          "focal": "50% 50%",
+          "aspectRatio": "original"
         },
         {
           "src": "projects/residential-works/dower-cottage-proposed-east-elevation.png",
           "caption": "9 Dower Cottage — Proposed east elevation (Vectorworks)",
-          "layout": "half"
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/residential-works/handsketch-the-paddocks.jpg",
           "caption": "Handsketch of proposed scheme of The Paddocks (sketch on paper, Photoshop)",
-          "layout": "full"
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         }
       ],
       "relatedProjects": [
