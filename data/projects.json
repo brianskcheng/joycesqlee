@@ -784,32 +784,9 @@
           "focal": "50% 50%"
         },
         {
-          "src": "projects/south-west-campus/output-w-render-page-03-mpy4vzck.jpg",
-          "caption": "Podium Level",
-          "layout": "half"
-        },
-        {
-          "src": "projects/south-west-campus/output-w-render-page-04-mpy4wiw9.jpg",
-          "caption": "3rd Floor Plan",
-          "layout": "half"
-        },
-        {
-          "src": "projects/south-west-campus/output-w-render-page-08-mpy4yeao.jpg",
-          "caption": "7th Floor Plan",
-          "layout": "half"
-        },
-        {
-          "src": "projects/south-west-campus/output-w-render-page-09-mpy4yq6c.jpg",
-          "caption": "8th Floor Plan",
-          "layout": "half"
-        },
-        {
-          "src": "projects/south-west-campus/output-w-render-page-17-mpy4z8j6.jpg",
-          "caption": "Long Section",
-          "layout": "full",
-          "aspectRatio": "original",
-          "fit": "contain",
-          "focal": "50% 50%"
+          "src": "",
+          "caption": "Tower Plan (8th floor) 1:250 — Technical Feasibility Study (Revit)",
+          "layout": "full"
         }
       ],
       "relatedProjects": [
@@ -822,7 +799,7 @@
       "title": "Residential Works",
       "type": "Extension and Refurbishment of Dwelling",
       "cardMeta": "CaSA Architects · 2022 · North East Somerset",
-      "thumbnail": "projects/residential-works/hamilton-road-proposed-elevation.png",
+      "thumbnail": "projects/residential-works/2022-09-12-handsketch-less-hatches-cropped-mpy56ocp.jpg",
       "descriptions": [
         "I contributed to concept and options development in form, layout and materiality, and preparing full drawing packages for planning applications. A key focus was creating seamless connections with the surrounding landscape and Bath's historic urban fabric, which gave me insight into design development and planning procedures.",
         "<strong>3 Hamilton Road</strong> — Refurbishment including over-cladding and insulation, redevelopment of the first floor and garden extension and enhanced landscaping.",
@@ -885,7 +862,8 @@
       "relatedProjects": [
         "south-west-campus",
         "lucys-room"
-      ]
+      ],
+      "thumbnailFraming": {}
     },
     {
       "slug": "waterway-bridge",
