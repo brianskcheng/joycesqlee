@@ -276,7 +276,10 @@
         {
           "src": "projects/syraka/syraka-vision-panorama.jpg",
           "caption": "The Syraka Vision (Rhino, Enscape, Photoshop)",
-          "layout": "hero"
+          "layout": "hero",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/syraka/principle-parti-cropped-mpx50vrz.png",
