@@ -159,7 +159,10 @@
         {
           "src": "projects/mosaics-of-urban-giardino/hero-understorey-giardino.png",
           "caption": "The understorey approaching the giardino Mediterraneo (Rhino, Enscape, Photoshop)",
-          "layout": "hero"
+          "layout": "hero",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         },
         {
           "src": "projects/mosaics-of-urban-giardino/section-bb-activity-cropped-mpxvwx8x.png",
