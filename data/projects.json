@@ -850,7 +850,7 @@
           "focal": "50% 50%"
         },
         {
-          "src": "projects/residential-works/dower-cottage-proposed-north-elevation.png",
+          "src": "projects/residential-works/dower-cottage-elevation-2-mq0wr21p.png",
           "caption": "9 Dower Cottage — Proposed north elevation (Vectorworks)",
           "layout": "half",
           "fit": "contain",
@@ -858,12 +858,12 @@
           "aspectRatio": "original"
         },
         {
-          "src": "projects/residential-works/dower-cottage-proposed-east-elevation.png",
+          "src": "projects/residential-works/dower-cottage-elevation-1-mq0wr980.png",
           "caption": "9 Dower Cottage — Proposed east elevation (Vectorworks)",
           "layout": "half",
           "aspectRatio": "original",
-          "fit": "contain",
-          "focal": "50% 50%"
+          "focal": "50% 50%",
+          "fit": "contain"
         },
         {
           "src": "projects/residential-works/handsketch-the-paddocks.jpg",
