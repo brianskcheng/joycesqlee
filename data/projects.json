@@ -149,6 +149,13 @@
           "focal": "50% 50%"
         },
         {
+          "src": "projects/mosaics-of-urban-giardino/materials-mpxwr0yf.png",
+          "caption": "Set within an urban fabric defined by concrete residential buildings, the Orchard Living Lab reframes material selection through the lens of locality, ecological impact and what its surrounding already contain. The process begins with identifying what the land contains, including its remnants, its excesses and its latent resources, acknowledging that can be reused, cultivated and transformed rather than imported.",
+          "layout": "full",
+          "aspectRatio": "16/9",
+          "focal": "50% 50%"
+        },
+        {
           "src": "projects/mosaics-of-urban-giardino/section-aa-mpx9319c.png",
           "caption": "The long section traces a continuous journey from arrival to inhabitation, cutting through the entrance foyer, the orangerie and into the productive agroforestry grounds before descending into the giardino mediterraneo. ",
           "layout": "full",
@@ -194,6 +201,30 @@
           "focal": "50% 50%"
         },
         {
+          "src": "projects/mosaics-of-urban-giardino/bird-nook-1-10-cropped-mq0x7hep.png",
+          "caption": "The southeast coast of Siracusa is a major arrival point for bird migrating north from Africa. Bird boxes for Sicilian Hoopoe are integrated within the roof. ",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/brid-box-02-cropped-mq0xgu2g.png",
+          "caption": "1:20 detail model of bird nooks integrated within the roof of the cooking patio, which is supported by rammed earth.",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/exoskeleton-planter-1-20-02-cropped-mq0xi9v3.png",
+          "caption": "Vertical louvres simultaneously become both shading devices and trellises for climbing plants. Terracotta swift bricks are integrated into the planter base",
+          "layout": "full",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
           "src": "projects/mosaics-of-urban-giardino/living-experience-cropped-mpxwl0vw.png",
           "caption": "From the first floor, the building's programme is mainly residential.",
           "layout": "half",
@@ -204,6 +235,22 @@
         {
           "src": "projects/mosaics-of-urban-giardino/dining-hall-mpxwiryj.png",
           "caption": "The Dining Hall",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/market-interface-cropped-mq0wyoe4.png",
+          "caption": "The dining hall blurs the boundary between private dwelling and public realm, with its north facade opening towards the market. ",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/market-interface-cropped-mq0x4ohb.png",
+          "caption": "Above, residential balconies form a colonnade that invites public movement. The units share a continuous balcony, create a semi-private threshold for dwelling and making.",
           "layout": "half",
           "aspectRatio": "original",
           "fit": "contain",
@@ -226,10 +273,24 @@
           "focal": "50% 50%"
         },
         {
-          "src": "projects/mosaics-of-urban-giardino/materials-mpxwr0yf.png",
-          "caption": "Set within an urban fabric defined by concrete residential buildings, the Orchard Living Lab reframes material selection through the lens of locality, ecological impact and what its surrounding already contain. The process begins with identifying what the land contains, including its remnants, its excesses and its latent resources, acknowledging that can be reused, cultivated and transformed rather than imported.",
-          "layout": "full",
-          "aspectRatio": "16/9",
+          "src": "projects/mosaics-of-urban-giardino/waste-hall-mq0xlu32.png",
+          "caption": "The Recyclab, a waste resource facility that transforms pruning waste from the orchard and organic waste from the community kitchen into useful resources such as heat, energy and new materials.  ",
+          "layout": "full"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/workshop-interface-cropped-mq0xnwyq.png",
+          "caption": "The recyclab's orchard interface continues the rammed earth language expressed throughout. ",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
+        },
+        {
+          "src": "projects/mosaics-of-urban-giardino/rammed-earth-insect-hotel-01-cropped-mq0xpcbi.png",
+          "caption": "1:20 detail model of insect hotels and planters embedded within rammed earth ",
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
           "focal": "50% 50%"
         }
       ],
