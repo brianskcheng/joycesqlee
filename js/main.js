@@ -400,6 +400,20 @@
     },
 
     buildImageHtml: function (img, isHalf, imageIndex) {
+      if (img.type === 'video') {
+        var videoHtml = '<figure class="project-page__figure" data-image-index="' + imageIndex + '">';
+        videoHtml += '<div class="project-page__image video">';
+        videoHtml += '<iframe src="https://www.youtube.com/embed/' + this.escapeHtml(img.youtubeId) + '" title="' + this.escapeHtml(img.caption) + '" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe>';
+        videoHtml += '</div>';
+        if (img.caption) {
+          videoHtml += '<figcaption class="project-page__caption">' + this.escapeHtml(img.caption) + '</figcaption>';
+        } else {
+          videoHtml += '<figcaption class="project-page__caption project-page__caption--empty"></figcaption>';
+        }
+        videoHtml += '</figure>';
+        return videoHtml;
+      }
+
       var cls = 'project-page__image';
       if (img.layout === 'hero') cls += ' hero';
       else if (isHalf) cls += ' half';

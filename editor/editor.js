@@ -836,37 +836,44 @@
             self.moveImage(project, imageIndex, 1);
           });
 
-          var setImgBtn = document.createElement('button');
-          setImgBtn.className = 'edit-action-btn';
-          setImgBtn.textContent = 'Set Image';
-          setImgBtn.style.marginTop = '0';
-          setImgBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            self.showImageSourceModal(
-              'Set Image',
-              project.images[imageIndex].src || '',
-              'projects/' + project.slug,
-              function (src) {
-                project.images[imageIndex].src = src;
+          var isVideo = project.images[imageIndex].type === 'video';
+
+          if (!isVideo) {
+            var setImgBtn = document.createElement('button');
+            setImgBtn.className = 'edit-action-btn';
+            setImgBtn.textContent = 'Set Image';
+            setImgBtn.style.marginTop = '0';
+            setImgBtn.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              self.showImageSourceModal(
+                'Set Image',
+                project.images[imageIndex].src || '',
+                'projects/' + project.slug,
+                function (src) {
+                  project.images[imageIndex].src = src;
+                  self.refreshProjectPage();
+                  self.markChanged();
+                }
+              );
+            });
+
+            var framingBtn = document.createElement('button');
+            framingBtn.className = 'edit-action-btn';
+            framingBtn.textContent = 'Crop / Fit';
+            framingBtn.style.marginTop = '0';
+            framingBtn.addEventListener('click', function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              self.showFramingModal(project.images[imageIndex], function () {
                 self.refreshProjectPage();
                 self.markChanged();
-              }
-            );
-          });
+              }, {});
+            });
 
-          var framingBtn = document.createElement('button');
-          framingBtn.className = 'edit-action-btn';
-          framingBtn.textContent = 'Crop / Fit';
-          framingBtn.style.marginTop = '0';
-          framingBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-            self.showFramingModal(project.images[imageIndex], function () {
-              self.refreshProjectPage();
-              self.markChanged();
-            }, {});
-          });
+            controlsDiv.appendChild(setImgBtn);
+            controlsDiv.appendChild(framingBtn);
+          }
 
           var removeImgBtn = document.createElement('button');
           removeImgBtn.className = 'edit-action-btn edit-action-btn--danger';
@@ -882,8 +889,6 @@
 
           controlsDiv.appendChild(upImgBtn);
           controlsDiv.appendChild(downImgBtn);
-          controlsDiv.appendChild(setImgBtn);
-          controlsDiv.appendChild(framingBtn);
           controlsDiv.appendChild(removeImgBtn);
           imgDiv.appendChild(controlsDiv);
 

@@ -455,6 +455,12 @@
           "focal": "50% 50%",
           "fit": "contain",
           "aspectRatio": "original"
+        },
+        {
+          "type": "video",
+          "youtubeId": "vjf28X4mHvY",
+          "caption": "An edited video of our field trip to Siracusa in October, 2025. Where we investigated in the local identity of Siracusa.",
+          "layout": "full"
         }
       ],
       "relatedProjects": [
