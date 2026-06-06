@@ -338,6 +338,12 @@
       ],
       "images": [
         {
+          "type": "video",
+          "youtubeId": "vjf28X4mHvY",
+          "caption": "An edited video from our field trip to Siracusa in October, 2025, from which we explored the local identity and challenges of the city.",
+          "layout": "full"
+        },
+        {
           "src": "projects/syraka/syraka-vision-panorama.jpg",
           "caption": "The Syraka Vision (Rhino, Enscape, Photoshop)",
           "layout": "hero",
@@ -455,12 +461,6 @@
           "focal": "50% 50%",
           "fit": "contain",
           "aspectRatio": "original"
-        },
-        {
-          "type": "video",
-          "youtubeId": "vjf28X4mHvY",
-          "caption": "An edited video of our field trip to Siracusa in October, 2025. Where we investigated in the local identity of Siracusa.",
-          "layout": "full"
         }
       ],
       "relatedProjects": [
