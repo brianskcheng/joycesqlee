@@ -992,12 +992,18 @@
         {
           "src": "projects/waterway-bridge/section-exploded.png",
           "caption": "Section drawings (Rhino, AutoCAD)",
-          "layout": "half"
+          "layout": "half",
+          "fit": "contain",
+          "focal": "50% 50%",
+          "aspectRatio": "original"
         },
         {
           "src": "projects/waterway-bridge/sectional-perspective-01.png",
           "caption": "Sectional perspectives (Rhino, InDesign)",
-          "layout": "half"
+          "layout": "half",
+          "aspectRatio": "original",
+          "fit": "contain",
+          "focal": "50% 50%"
         }
       ],
       "relatedProjects": [
