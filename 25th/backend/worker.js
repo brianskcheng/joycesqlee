@@ -16,7 +16,7 @@ export class GuestList extends DurableObject {
     this.guests = new Guests(ctx.storage.sql, env.BASE_GOING);
   }
   summary() { return this.guests.summary(); }
-  save(rsvp) { return this.guests.save(rsvp); }
+  save(rsvp, by) { return this.guests.save(rsvp, by); }
   full() { return this.guests.full(); }
   setBase(n) { return this.guests.setBase(n); }
   remove(id) { return this.guests.remove(id); }

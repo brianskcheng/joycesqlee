@@ -9,8 +9,14 @@
  *
  * For Joyce (needs the list key, sent as "Authorization: Bearer <key>"):
  *   GET    /admin            the full list, messages included
- *   POST   /admin/base       set how many said yes outside the page
+ *   POST   /admin/guest      add someone, or change an entry (send its id)
  *   DELETE /admin/guest?id=  remove one entry
+ *   POST   /admin/base       set how many told Joyce directly
+ *
+ * Counting. Some people told Joyce they were coming before the page existed
+ * ("base"). When one of them fills in the page they tick "already told
+ * Joyce" ("told"), which uses up one of those places instead of adding a new
+ * one:   going = (base - entries marked told, never below 0) + entries saying yes
  */
 
 const ANSWERS = ["yes", "maybe", "no"];
@@ -50,12 +56,16 @@ export class Guests {
       song TEXT NOT NULL DEFAULT '',
       note TEXT NOT NULL DEFAULT '',
       at INTEGER NOT NULL,
-      updated INTEGER NOT NULL
+      updated INTEGER NOT NULL,
+      told INTEGER NOT NULL DEFAULT 0
     )`);
     sql.exec("CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)");
+    // a list started before "told" existed gets the column added
+    const columns = sql.exec("PRAGMA table_info(guests)").toArray().map((c) => c.name);
+    if (!columns.includes("told")) sql.exec("ALTER TABLE guests ADD COLUMN told INTEGER NOT NULL DEFAULT 0");
   }
 
-  // how many said yes to Joyce directly, before or outside the page
+  // how many told Joyce directly that they are coming, before or outside the page
   base() {
     const saved = this.sql.exec("SELECT value FROM settings WHERE key = 'base'").toArray()[0];
     return (saved && wholeNumber(saved.value)) ?? this.baseFallback;
@@ -64,30 +74,43 @@ export class Guests {
   // every RSVP in full, first to sign up first
   all() {
     return this.sql
-      .exec("SELECT id, name, status, song, note, at, updated FROM guests ORDER BY at, rowid")
+      .exec("SELECT id, name, status, song, note, told, at, updated FROM guests ORDER BY at, rowid")
       .toArray()
-      .map((g) => ({ id: g.id, name: g.name, status: g.status, song: g.song, note: g.note, at: g.at, updated: g.updated }));
+      .map((g) => ({ id: g.id, name: g.name, status: g.status, song: g.song, note: g.note, told: !!g.told, at: g.at, updated: g.updated }));
   }
 
-  // what the invitation page shows: first names only, no messages, nobody who can't come
-  summary() {
-    const shown = this.all().filter((g) => g.status === "yes" || g.status === "maybe");
+  // the list with its sums done
+  tally() {
+    const guests = this.all();
     const base = this.base();
+    const count = (status) => guests.filter((g) => g.status === status).length;
+    // told Joyce directly and not on the page yet: still counted, just not by name
+    const waiting = Math.max(0, base - guests.filter((g) => g.told).length);
+    return { guests, base, waiting, going: waiting + count("yes"), maybe: count("maybe"), no: count("no") };
+  }
+
+  // what the invitation page shows: first names only, no messages, nobody who can't come.
+  // "base" here is how many are counted without being named (the page adds the names to it).
+  summary() {
+    const t = this.tally();
     return {
       ok: true,
-      base,
-      going: base + shown.filter((g) => g.status === "yes").length,
-      maybe: shown.filter((g) => g.status === "maybe").length,
-      guests: shown.map((g) => ({ name: publicName(g.name), status: g.status, song: g.song })),
+      base: t.waiting,
+      going: t.going,
+      maybe: t.maybe,
+      guests: t.guests
+        .filter((g) => g.status === "yes" || g.status === "maybe")
+        .map((g) => ({ name: publicName(g.name), status: g.status, song: g.song })),
     };
   }
 
   // what Joyce sees
   full() {
-    return { ok: true, base: this.base(), guests: this.all() };
+    return { ok: true, ...this.tally() };
   }
 
-  save(d) {
+  // add or change one entry; `by` is "joyce" when it comes from her list page
+  save(d, by) {
     if (!d || typeof d !== "object") return { status: 400, body: { ok: false, error: "Could not read that." } };
     const name = clean(d.name, 60);
     const status = ANSWERS.includes(d.status) ? d.status : "";
@@ -97,20 +120,23 @@ export class Guests {
     let id = (typeof d.id === "string" ? d.id : "").replace(/[^A-Za-z0-9_-]/g, "").slice(0, 40);
     if (id.length < 8) id = crypto.randomUUID();
 
-    const earlier = this.sql.exec("SELECT at FROM guests WHERE id = ?", id).toArray()[0];
+    const earlier = this.sql.exec("SELECT at, told FROM guests WHERE id = ?", id).toArray()[0];
     if (!earlier) {
       const count = this.sql.exec("SELECT COUNT(*) AS n FROM guests").one().n;
       if (count >= MAX_GUESTS) return { status: 429, body: { ok: false, error: "The list is full." } };
     }
 
+    // a page that doesn't say either way (an older copy of it) leaves the tick as it was
+    const told = typeof d.told === "boolean" ? d.told : !!(earlier && earlier.told);
+
     const now = Date.now();
     this.sql.exec(
-      `INSERT INTO guests (id, name, status, song, note, at, updated) VALUES (?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO guests (id, name, status, song, note, told, at, updated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT (id) DO UPDATE SET name = excluded.name, status = excluded.status,
-         song = excluded.song, note = excluded.note, updated = excluded.updated`,
-      id, name, status, status === "no" ? "" : clean(d.song, 120), clean(d.note, 500), earlier ? earlier.at : now, now,
+         song = excluded.song, note = excluded.note, told = excluded.told, updated = excluded.updated`,
+      id, name, status, status === "no" ? "" : clean(d.song, 120), clean(d.note, 500), told ? 1 : 0, earlier ? earlier.at : now, now,
     );
-    return { status: 200, body: this.summary() };
+    return { status: 200, body: by === "joyce" ? this.full() : this.summary() };
   }
 
   setBase(n) {
@@ -141,6 +167,9 @@ function corsFor(request, env) {
   if (known) headers["Access-Control-Allow-Origin"] = origin;
   return { headers, known };
 }
+
+// only the parts of a sign-up the list keeps
+const entry = (d) => ({ id: d.id, name: d.name, status: d.status, song: d.song, note: d.note, told: d.told });
 
 const reply = (data, status, headers) =>
   new Response(JSON.stringify(data), { status, headers: { "Content-Type": "application/json", ...headers } });
@@ -180,7 +209,7 @@ export async function handle(request, env, list) {
       let d;
       try { d = JSON.parse(raw); } catch (e) { d = null; }
       if (!d || typeof d !== "object") return reply({ ok: false, error: "Could not read that." }, 400, headers);
-      const out = await list.save({ id: d.id, name: d.name, status: d.status, song: d.song, note: d.note });
+      const out = await list.save(entry(d), "guest");
       return reply(out.body, out.status, headers);
     }
 
@@ -194,6 +223,13 @@ export async function handle(request, env, list) {
         const base = parseInt(body && body.base, 10);
         if (!Number.isFinite(base) || base < 0 || base > 500) return reply({ ok: false, error: "Give a number from 0 to 500." }, 400, headers);
         return reply(await list.setBase(base), 200, headers);
+      }
+
+      if (path === "/admin/guest" && request.method === "POST") {
+        const d = await request.json().catch(() => null);
+        if (!d || typeof d !== "object") return reply({ ok: false, error: "Could not read that." }, 400, headers);
+        const out = await list.save(entry(d), "joyce");
+        return reply(out.body, out.status, headers);
       }
 
       if (path === "/admin/guest" && request.method === "DELETE") {

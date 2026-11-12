@@ -290,6 +290,9 @@
   const sendBtn = $("#rsvp-send");
   const songField = $("#song-field");
   const useSheet = !!RSVP.endpoint;
+  // Joyce's link for people who had already told her (?told=1) ticks the box for them
+  const toldLink = new URLSearchParams(location.search).has("told");
+  const toldBox = form ? form.elements.told : null; // absent on a stale copy of the page
 
   const newId = () => (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
 
@@ -297,6 +300,7 @@
     const lines = ["RSVP for Joyce's 25th 🪩", "Name: " + d.name, ANSWER[d.status]];
     if (d.song) lines.push("Karaoke song 🎤: " + d.song);
     if (d.note) lines.push("Message: " + d.note);
+    if (d.told) lines.push("(I'd already told you I'm coming)");
     return lines.join("\n");
   }
   const whatsappUrl = (d) => "https://wa.me/" + (RSVP.whatsapp || "") + "?text=" + encodeURIComponent(message(d));
@@ -325,6 +329,7 @@
     form.elements.name.value = d.name || "";
     form.elements.song.value = d.song || "";
     form.elements.note.value = d.note || "";
+    if (toldBox) toldBox.checked = !!d.told || toldLink;
     $$('input[name="status"]', form).forEach((r) => { r.checked = r.value === d.status; });
     songField.hidden = d.status === "no";
   }
@@ -353,6 +358,7 @@
         status: form.elements.status.value,
         song: form.elements.status.value === "no" ? "" : form.elements.song.value.trim(),
         note: form.elements.note.value.trim(),
+        told: toldBox ? toldBox.checked : undefined,
       };
       const fail = (msg, el) => { errorBox.textContent = msg; errorBox.hidden = false; if (el) el.focus(); };
       if (!d.name) return fail("Pop your name in first ✏️", form.elements.name);
@@ -391,6 +397,7 @@
       if (d) toast((await copy(message(d))) ? "Copied. Paste it to Joyce 💌" : "Couldn't copy, sorry");
     });
 
+    if (toldBox) toldBox.checked = toldLink;
     const saved = store.get();
     if (saved && saved.name && ANSWER[saved.status]) { fill(saved); showDone(saved, false); }
   }

@@ -299,7 +299,7 @@ body {
 
 .tally { margin: -.6rem 1.2rem .4rem; text-align: center; font-size: 1.45rem; font-weight: 700; }
 .tally b { font: 400 1.7rem/1 var(--cut); color: var(--pink); margin-right: .15em; }
-.counted { margin: 0 1.6rem 2.1rem; text-wrap: balance; }
+.fine.counted { margin: .3rem 1.6rem 2rem; text-wrap: balance; } /* clear of the tape on the note below */
 
 /* ---------- buttons ---------- */
 .btn {
@@ -507,6 +507,11 @@ body {
 .chip--yes { --c: var(--pink); }
 .chip--maybe { --c: var(--yellow); --t: var(--ink); }
 .chip--no { --c: var(--lilac); --t: var(--ink); }
+
+.tick { display: flex; align-items: flex-start; gap: .65rem; font-size: 1.15rem; line-height: 1.25; cursor: pointer; }
+.tick input { flex: none; width: 1.55rem; height: 1.55rem; margin: 0; accent-color: var(--pink); cursor: pointer; }
+.tick input:focus-visible { outline: 3px solid var(--purple); outline-offset: 2px; }
+.tick em { font-style: normal; font-size: 1rem; color: var(--soft); }
 
 .note .btn { justify-self: start; }
 .note .fine { margin: -.5rem 0 0; text-align: left; }

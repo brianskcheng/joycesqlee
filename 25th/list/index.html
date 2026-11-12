@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Bevan&family=DM+Serif+Display&family=Kalam:wght@400;700&family=Rozha+One&family=Ultra&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../style.css?v=3">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📋%3C/text%3E%3C/svg%3E">
 <style>
   .gl { padding: 2.2rem 1.1rem 3rem; min-height: 100vh; }
@@ -21,15 +21,31 @@
   .gate input { font: 400 1.2rem/1.3 var(--hand); padding: .6rem .7rem .4rem; border: 2px solid var(--ink); border-radius: .5rem; width: 100%; background: #fff; }
   .gate .btn { justify-self: start; }
   .msg { margin: 0; font-weight: 700; color: #a3123f; }
+  .msg--ok { color: #1f7a3a; text-align: center; }
 
   .totals { text-align: center; }
   .totals__n { font: 400 4.2rem/1 var(--cut); color: var(--pink); }
   .totals__l { font-size: 1.5rem; font-weight: 700; margin: 0 0 .6rem; }
-  .totals__split { margin: 0; font-size: 1.12rem; }
+  .totals__split { margin: 0; font-size: 1.12rem; text-wrap: balance; }
   .totals__split b { font-size: 1.3rem; }
   .totals__other { margin: .5rem 0 0; color: var(--soft); }
   .bar { display: flex; flex-wrap: wrap; gap: .7rem; justify-content: center; margin: 1.3rem 0 .4rem; }
   .bar .btn { font-size: 1.05rem; }
+  .bar--left { justify-content: flex-start; margin: .2rem 0 0; }
+
+  .told { margin-top: 1.4rem; background: #fdf3f7; }
+  .told h2, .editor h2 { margin: 0 0 .4rem; font-size: 1.4rem; line-height: 1.2; }
+  .told p { margin: 0 0 .5rem; font-size: 1.08rem; }
+  .told__how { color: var(--pencil); }
+  .told .bar { margin: .9rem 0 .5rem; justify-content: flex-start; }
+  .told details { color: var(--soft); }
+  .told summary { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .told__msg { margin: .5rem 0 0; padding: .6rem .7rem .45rem; background: #fff; border: 1.5px dashed var(--soft); border-radius: .5rem; color: var(--ink); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  .editor { display: grid; gap: 1rem; margin-top: 1.2rem; }
+  .editor[hidden] { display: none; }
+  .editor .chips { gap: .5rem; }
+  .editor .chip span { font-size: 1.02rem; }
 
   .group { margin-top: 1.8rem; }
   .group h2 { margin: 0 0 .6rem; font-size: 1.5rem; display: flex; align-items: baseline; gap: .5rem; }
@@ -37,12 +53,18 @@
   .rows { list-style: none; margin: 0; padding: 0; display: grid; gap: .6rem; }
   .row { display: grid; grid-template-columns: 1fr auto; gap: .1rem .6rem; align-items: start; background: #fffdf8; border: 2px solid var(--ink); border-radius: .6rem; padding: .6rem .7rem .45rem .85rem; }
   .row__name { font-size: 1.3rem; font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
-  .row__song, .row__note, .row__when { grid-column: 1; margin: 0; overflow-wrap: anywhere; }
+  .row__tag { display: inline-block; margin: .15rem 0 .1rem; padding: .12rem .5rem 0; font-size: .88rem; font-weight: 400; line-height: 1.35; color: var(--purple); background: #efe6fb; border-radius: 999px; white-space: nowrap; }
+  .row__song, .row__note, .row__when, .row__tagline { grid-column: 1; margin: 0; overflow-wrap: anywhere; }
   .row__note { color: var(--purple); }
   .row__when { font-size: .92rem; color: var(--soft); }
-  .row__x { grid-column: 2; grid-row: 1; font: 400 1rem/1 var(--hand); color: var(--soft); background: none; border: 1.5px dashed var(--soft); border-radius: 999px; padding: .35rem .6rem .2rem; cursor: pointer; }
-  .row__x:hover { color: #a3123f; border-color: #a3123f; }
-  .row--told { border-style: dashed; background: none; }
+  .row__acts { grid-column: 2; grid-row: 1 / span 2; display: grid; gap: .35rem; justify-items: end; }
+  .row__x { font: 400 1rem/1 var(--hand); color: var(--pencil); background: none; border: 1.5px dashed var(--soft); border-radius: 999px; padding: .38rem .65rem .22rem; cursor: pointer; }
+  .row__x:hover { color: var(--purple); border-color: var(--purple); }
+  .row__x--rm:hover { color: #a3123f; border-color: #a3123f; }
+  .row--told { display: block; border-style: dashed; background: none; }
+  .row--editing { display: block; padding: 0; border: 0; background: none; }
+  .row--editing > :not(form) { display: none; }
+  .row--editing .editor { margin-top: 0; }
   .empty { margin: 0; color: var(--soft); }
 </style>
 </head>
@@ -64,16 +86,66 @@
     <section class="card totals">
       <div class="totals__n" id="t-going">0</div>
       <p class="totals__l">going so far</p>
-      <p class="totals__split"><b id="t-here">0</b> signed up on the page + <b id="t-base">0</b> told you directly</p>
+      <p class="totals__split"><b id="t-here">0</b> on the list below + <b id="t-wait">0</b> who told you and haven’t filled it in yet</p>
       <p class="totals__other" id="t-other"></p>
     </section>
 
+    <section class="card told" aria-labelledby="told-h">
+      <h2 id="told-h">The people who’d already told you</h2>
+      <p id="told-line"></p>
+      <p class="told__how">Send them this link so they can add their name and song. It ticks “already told Joyce” for them, so nobody is counted twice, and they can change their answer later from the same phone.</p>
+      <div class="bar">
+        <a class="btn" id="b-wa" href="#" target="_blank" rel="noopener">Send on WhatsApp <span class="e">💬</span></a>
+        <button class="btn btn--alt" type="button" id="b-msg">Copy the message</button>
+        <button class="btn btn--alt" type="button" id="b-base">Change the number</button>
+      </div>
+      <details>
+        <summary>See the message</summary>
+        <p class="told__msg" id="told-msg"></p>
+      </details>
+    </section>
+
     <div class="bar">
-      <button class="btn btn--alt" type="button" id="b-base">Change “told me directly”</button>
+      <button class="btn" type="button" id="b-add">Add someone <span class="e">✏️</span></button>
       <button class="btn btn--alt" type="button" id="b-copy">Copy the list</button>
       <button class="btn btn--alt" type="button" id="b-refresh">Refresh</button>
     </div>
     <p class="msg" id="board-msg" hidden></p>
+
+    <div id="editor-home">
+      <form class="card editor" id="editor" hidden novalidate>
+        <h2 id="ed-title">Add someone</h2>
+        <label class="field">
+          <span class="field__l">Name</span>
+          <input type="text" name="name" maxlength="60" autocomplete="off">
+        </label>
+        <fieldset class="field">
+          <legend class="field__l">Coming?</legend>
+          <div class="chips">
+            <label class="chip chip--yes"><input type="radio" name="status" value="yes"><span>Going 🪩</span></label>
+            <label class="chip chip--maybe"><input type="radio" name="status" value="maybe"><span>Maybe 🤔</span></label>
+            <label class="chip chip--no"><input type="radio" name="status" value="no"><span>Can’t make it 😢</span></label>
+          </div>
+        </fieldset>
+        <label class="field" id="ed-song">
+          <span class="field__l">Karaoke song 🎤 <em>(optional)</em></span>
+          <input type="text" name="song" maxlength="120" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="field__l">Message or note 💌 <em>(optional)</em></span>
+          <textarea name="note" rows="2" maxlength="500"></textarea>
+        </label>
+        <label class="tick">
+          <input type="checkbox" name="told">
+          <span>One of the people who’d already told me <em>(so they’re only counted once)</em></span>
+        </label>
+        <p class="msg" id="ed-msg" hidden></p>
+        <div class="bar bar--left">
+          <button class="btn" type="submit" id="ed-save">Save</button>
+          <button class="btn btn--alt" type="button" id="ed-cancel">Cancel</button>
+        </div>
+      </form>
+    </div>
 
     <section class="group"><h2>Going <span id="c-yes"></span></h2><ul class="rows" id="l-yes"></ul></section>
     <section class="group"><h2>Maybe <span id="c-maybe"></span></h2><ul class="rows" id="l-maybe"></ul></section>
@@ -81,7 +153,7 @@
   </div>
 </main>
 
-<script src="../config.js"></script>
+<script src="../config.js?v=3"></script>
 <script>
 (() => {
   "use strict";
@@ -89,43 +161,59 @@
   const base = API.replace(/\/+$/, "");
   const KEY = "joyce25-listkey";
   const $ = (id) => document.getElementById(id);
+  const editor = $("editor");
   let key = "";
   let data = null;
+  let editing = null; // the entry being changed, or null when adding someone
+
+  // the invitation, with the "already told Joyce" box ticked
+  const toldLink = new URL("../?told=1", location.href).href;
+  const toldMessage =
+    "Hiii! You’re already on my list for my 25th 🪩 Could you pop your name and karaoke song in here so I know who’s singing what? 🎤 " +
+    "The “already told Joyce” box is ticked for you, so you won’t be counted twice. You can change your answer there any time 💖\n" + toldLink;
 
   const remember = (k) => { try { localStorage.setItem(KEY, k); } catch (e) { /* private mode */ } };
   const recall = () => { try { return localStorage.getItem(KEY) || ""; } catch (e) { return ""; } };
-  const say = (id, text) => { const el = $(id); el.textContent = text || ""; el.hidden = !text; };
+  const say = (id, text, ok) => { const el = $(id); el.textContent = text || ""; el.hidden = !text; el.classList.toggle("msg--ok", !!ok); };
+  const flash = (text) => { say("board-msg", text, true); setTimeout(() => { if ($("board-msg").textContent === text) say("board-msg", ""); }, 2200); };
+  const people = (n) => n + (n === 1 ? " person" : " people");
 
   async function api(path, opts = {}) {
     const res = await fetch(base + path, { ...opts, headers: { Authorization: "Bearer " + key, ...(opts.body ? { "Content-Type": "application/json" } : {}) } });
     const out = await res.json().catch(() => ({ ok: false, error: "Unexpected reply." }));
     if (res.status === 401) throw Object.assign(new Error("key"), { wrongKey: true });
-    if (!out.ok) throw new Error(out.error || "That didn't work.");
+    if (!out.ok) throw Object.assign(new Error(out.error || "That didn't work."), { refused: res.status < 500 });
     return out;
   }
 
+  async function copy(text, done) {
+    try { await navigator.clipboard.writeText(text); flash(done); }
+    catch (e) { say("board-msg", "Couldn’t copy on this browser."); }
+  }
+
   const when = (ms) => ms ? new Date(ms).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" }) : "";
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
 
   function row(g) {
-    const li = document.createElement("li");
-    li.className = "row";
-    const name = document.createElement("div");
-    name.className = "row__name";
-    name.textContent = g.name;
-    li.appendChild(name);
-    const x = document.createElement("button");
-    x.className = "row__x";
+    const li = el("li", "row");
+    li.appendChild(el("div", "row__name", g.name));
+
+    const acts = el("div", "row__acts");
+    const edit = el("button", "row__x", "edit");
+    edit.type = "button";
+    edit.setAttribute("aria-label", "Edit " + g.name);
+    edit.addEventListener("click", () => openEditor(g, li));
+    const x = el("button", "row__x row__x--rm", "remove");
     x.type = "button";
-    x.textContent = "remove";
     x.setAttribute("aria-label", "Remove " + g.name);
     x.addEventListener("click", () => remove(g));
-    li.appendChild(x);
-    if (g.song) { const p = document.createElement("p"); p.className = "row__song"; p.textContent = "🎤 " + g.song; li.appendChild(p); }
-    if (g.note) { const p = document.createElement("p"); p.className = "row__note"; p.textContent = "💌 " + g.note; li.appendChild(p); }
-    const t = document.createElement("p");
-    t.className = "row__when";
-    t.textContent = when(g.updated || g.at);
-    li.appendChild(t);
+    acts.append(edit, x);
+    li.appendChild(acts);
+
+    if (g.told) { const p = el("p", "row__tagline"); p.appendChild(el("span", "row__tag", "✓ had already told you")); li.appendChild(p); }
+    if (g.song) li.appendChild(el("p", "row__song", "🎤 " + g.song));
+    if (g.note) li.appendChild(el("p", "row__note", "💌 " + g.note));
+    li.appendChild(el("p", "row__when", when(g.updated || g.at)));
     return li;
   }
 
@@ -134,30 +222,34 @@
     ul.textContent = "";
     guests.forEach((g) => ul.appendChild(row(g)));
     if (extra) ul.appendChild(extra);
-    if (!guests.length && !extra) {
-      const li = document.createElement("li");
-      li.className = "empty";
-      li.textContent = emptyText;
-      ul.appendChild(li);
-    }
+    if (!guests.length && !extra) ul.appendChild(el("li", "empty", emptyText));
     $(countId).textContent = "(" + guests.length + ")";
   }
 
   function render() {
+    closeEditor(); // it may be sitting inside a row that is about to be redrawn
     const by = (s) => data.guests.filter((g) => g.status === s);
     const yes = by("yes"), maybe = by("maybe"), no = by("no");
-    $("t-going").textContent = data.base + yes.length;
+    const ticked = data.guests.filter((g) => g.told).length;
+
+    $("t-going").textContent = data.going;
     $("t-here").textContent = yes.length;
-    $("t-base").textContent = data.base;
+    $("t-wait").textContent = data.waiting;
     $("t-other").textContent = maybe.length + " maybe · " + no.length + " can’t make it";
-    let told = null;
-    if (data.base > 0) {
-      told = document.createElement("li");
-      told.className = "row row--told";
-      told.textContent = "+ " + data.base + " who told you directly (not listed by name)";
+
+    let line = "You have " + people(data.base) + " down as telling you directly. ";
+    if (!data.base && !ticked) line = "Nobody is down as telling you directly.";
+    else if (ticked > data.base) line += ticked + " have ticked “already told Joyce” on the page, which is more than that. If more people told you, change the number.";
+    else if (!data.waiting) line += "All of them have filled in the page 🎉";
+    else line += ticked + (ticked === 1 ? " has" : " have") + " filled in the page, " + data.waiting + (data.waiting === 1 ? " hasn’t" : " haven’t") + " yet.";
+    $("told-line").textContent = line;
+
+    let waiting = null;
+    if (data.waiting > 0) {
+      waiting = el("li", "row row--told", "+ " + data.waiting + " who told you and " + (data.waiting === 1 ? "hasn’t" : "haven’t") + " filled in the page yet (not listed by name)");
     }
-    fillGroup("l-yes", "c-yes", yes, "Nobody yet.", told);
-    $("c-yes").textContent = "(" + (data.base + yes.length) + ")";
+    fillGroup("l-yes", "c-yes", yes, "Nobody yet.", waiting);
+    $("c-yes").textContent = "(" + data.going + ")";
     fillGroup("l-maybe", "c-maybe", maybe, "Nobody.");
     fillGroup("l-no", "c-no", no, "Nobody.");
     $("loading").hidden = true;
@@ -188,26 +280,86 @@
     catch (e) { say("board-msg", "Couldn’t remove that. Try again."); }
   }
 
+  /* ---------- add someone / change an entry ---------- */
+  const f = editor.elements;
+  const songRow = () => { $("ed-song").hidden = f.status.value === "no"; };
+
+  function openEditor(g, li) {
+    closeEditor();
+    editing = g || null;
+    $("ed-title").textContent = g ? "Edit " + g.name : "Add someone";
+    f.name.value = g ? g.name : "";
+    f.song.value = g ? g.song : "";
+    f.note.value = g ? g.note : "";
+    f.told.checked = g ? !!g.told : false;
+    Array.from(f.status).forEach((r) => { r.checked = g ? r.value === g.status : r.value === "yes"; });
+    songRow();
+    say("ed-msg", "");
+    if (li) { li.classList.add("row--editing"); li.appendChild(editor); }
+    editor.hidden = false;
+    editor.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    if (!g) f.name.focus({ preventScroll: true });
+  }
+
+  function closeEditor() {
+    const li = editor.closest(".row--editing");
+    if (li) li.classList.remove("row--editing");
+    $("editor-home").appendChild(editor);
+    editor.hidden = true;
+    editing = null;
+  }
+
+  editor.addEventListener("change", (e) => { if (e.target.name === "status") songRow(); });
+  $("ed-cancel").addEventListener("click", closeEditor);
+  $("b-add").addEventListener("click", () => openEditor(null));
+
+  editor.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const entry = {
+      name: f.name.value.trim().replace(/\s+/g, " "),
+      status: f.status.value,
+      song: f.status.value === "no" ? "" : f.song.value.trim(),
+      note: f.note.value.trim(),
+      told: f.told.checked,
+    };
+    if (editing) entry.id = editing.id;
+    if (!entry.name) { say("ed-msg", "Pop a name in first."); f.name.focus(); return; }
+    if (!entry.status) return say("ed-msg", "Pick going, maybe or can’t make it.");
+    $("ed-save").disabled = true;
+    try {
+      data = await api("/admin/guest", { method: "POST", body: JSON.stringify(entry) });
+      render();
+      flash("Saved ✓");
+    } catch (err) {
+      say("ed-msg", err.refused ? err.message : "Couldn’t save that. Check your signal and try again.");
+    }
+    $("ed-save").disabled = false;
+  });
+
+  /* ---------- the people who had already told her ---------- */
+  $("told-msg").textContent = toldMessage;
+  $("b-wa").href = "https://wa.me/?text=" + encodeURIComponent(toldMessage);
+  $("b-msg").addEventListener("click", () => copy(toldMessage, "Message copied ✓ Paste it to them"));
+
   $("b-base").addEventListener("click", async () => {
-    const answer = prompt("How many people have told you directly that they’re coming (and haven’t signed up on the page)?", String(data.base));
+    const answer = prompt("How many people told you directly that they’re coming, in total?\n\nInclude the ones who have since filled in the page: they’re marked “had already told you”, so they aren’t counted twice.", String(data.base));
     if (answer === null) return;
     const n = parseInt(answer, 10);
     if (!Number.isFinite(n) || n < 0 || n > 500) return say("board-msg", "That needs to be a number, like 15.");
-    try { data = await api("/admin/base", { method: "POST", body: JSON.stringify({ base: n }) }); say("board-msg", ""); render(); }
+    try { data = await api("/admin/base", { method: "POST", body: JSON.stringify({ base: n }) }); render(); flash("Saved ✓"); }
     catch (e) { say("board-msg", "Couldn’t save that. Try again."); }
   });
 
-  $("b-copy").addEventListener("click", async () => {
+  $("b-copy").addEventListener("click", () => {
     const line = (g) => "- " + g.name + (g.song ? " (🎤 " + g.song + ")" : "") + (g.note ? ": " + g.note : "");
     const by = (s) => data.guests.filter((g) => g.status === s);
     const text = [
-      "Joyce's 25th: " + (data.base + by("yes").length) + " going",
-      "", "GOING", ...by("yes").map(line), data.base ? "+ " + data.base + " who told Joyce directly" : "",
+      "Joyce's 25th: " + data.going + " going",
+      "", "GOING", ...by("yes").map(line), data.waiting ? "+ " + data.waiting + " who told Joyce and haven't filled in the page yet" : "",
       "", "MAYBE", ...by("maybe").map(line),
       "", "CAN'T MAKE IT", ...by("no").map(line),
     ].filter((l, i, a) => !(l === "" && a[i - 1] === "")).join("\n");
-    try { await navigator.clipboard.writeText(text); say("board-msg", "Copied ✓"); setTimeout(() => say("board-msg", ""), 1800); }
-    catch (e) { say("board-msg", "Couldn’t copy on this browser."); }
+    copy(text, "List copied ✓");
   });
 
   $("b-refresh").addEventListener("click", load);

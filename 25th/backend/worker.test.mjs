@@ -125,6 +125,82 @@ assert.deepEqual(r.data.guests.map((g) => g.name), ["Britney S."]);
 // the list survives a restart (a new Guests over the same database)
 assert.equal(new Guests(sql, "15").summary().going, 13);
 
+// ---- the people who had already told Joyce (15 of them), on a fresh list ----
+{
+  const on = new Guests(fakeSql(), "15");
+  const post = (body) => call("/", { method: "POST", body, on });
+  const sums = (d) => [d.base, d.going, d.maybe];
+
+  // one of the 15 fills in the page and ticks "already told Joyce": now named, still counted once
+  r = await post({ id: "told-0001", name: "Gwen Stefani", status: "yes", song: "Hollaback Girl", told: true });
+  assert.deepEqual(sums(r.data), [14, 15, 0]);
+  // someone new is one more
+  r = await post({ id: "fresh-001", name: "Avril", status: "yes" });
+  assert.deepEqual(sums(r.data), [14, 16, 0]);
+  // one of the 15 can't make it after all: their place goes
+  r = await post({ id: "told-0002", name: "Pink", status: "no", told: true });
+  assert.deepEqual(sums(r.data), [13, 15, 0]);
+  // and one is now a maybe
+  r = await post({ id: "told-0003", name: "Dido", status: "maybe", told: true });
+  assert.deepEqual(sums(r.data), [12, 14, 1]);
+  // an older copy of the page doesn't send the tick: it stays as it was
+  r = await post({ id: "told-0002", name: "Pink", status: "no" });
+  assert.deepEqual(sums(r.data), [12, 14, 1]);
+  // unticking it makes them an extra person again; anything but true/false is ignored
+  r = await post({ id: "told-0001", name: "Gwen Stefani", status: "yes", told: false });
+  assert.deepEqual(sums(r.data), [13, 15, 1]);
+  r = await post({ id: "told-0001", name: "Gwen Stefani", status: "yes", told: "yes" });
+  assert.deepEqual(sums(r.data), [13, 15, 1]);
+  r = await post({ id: "told-0001", name: "Gwen Stefani", status: "yes", told: true });
+  assert.deepEqual(sums(r.data), [12, 14, 1]);
+  assert.equal(JSON.stringify(r.data).includes("told"), false); // who had told Joyce is not shown publicly
+
+  // Joyce sees the sums and who ticked the box
+  r = await call("/admin", { key: env.ADMIN_KEY, on });
+  assert.deepEqual([r.data.base, r.data.waiting, r.data.going, r.data.maybe, r.data.no], [15, 12, 14, 1, 1]);
+  assert.deepEqual(r.data.guests.map((g) => [g.name, g.told]), [["Gwen Stefani", true], ["Avril", false], ["Pink", true], ["Dido", true]]);
+
+  // she adds someone herself (no id), who had told her directly
+  assert.equal((await call("/admin/guest", { method: "POST", body: { name: "Shakira", status: "yes" }, on })).status, 401);
+  assert.equal((await call("/admin/guest", { method: "POST", body: { name: "", status: "yes" }, key: env.ADMIN_KEY, on })).status, 400);
+  assert.equal((await call("/admin/guest", { method: "POST", body: "nope", key: env.ADMIN_KEY, on })).status, 400);
+  r = await call("/admin/guest", { method: "POST", body: { name: "Shakira Mebarak", status: "yes", song: "Hips Don't Lie", told: true }, key: env.ADMIN_KEY, on });
+  assert.equal(r.status, 200);
+  assert.deepEqual([r.data.waiting, r.data.going], [11, 14]);
+  const shakira = r.data.guests.at(-1);
+  assert.deepEqual([shakira.name, shakira.status, shakira.song, shakira.told], ["Shakira Mebarak", "yes", "Hips Don't Lie", true]);
+  assert.match(shakira.id, /^[0-9a-f-]{36}$/);
+
+  // she corrects an entry: the name, the answer, the song, the note and the tick
+  r = await call("/admin/guest", { method: "POST", body: { id: "fresh-001", name: "Avril Lavigne", status: "maybe", song: "Complicated", note: "bringing a +1?", told: true }, key: env.ADMIN_KEY, on });
+  const avril = r.data.guests.find((g) => g.id === "fresh-001");
+  assert.deepEqual([avril.name, avril.status, avril.song, avril.note, avril.told], ["Avril Lavigne", "maybe", "Complicated", "bringing a +1?", true]);
+  assert.deepEqual(r.data.guests.map((g) => g.id).slice(0, 2), ["told-0001", "fresh-001"]); // still in sign-up order
+  assert.deepEqual([r.data.waiting, r.data.going, r.data.maybe], [10, 12, 2]);
+  assert.deepEqual((await call("/", { on })).data.guests.map((g) => g.name), ["Gwen S.", "Avril L.", "Dido", "Shakira M."]);
+
+  // more ticks than Joyce's number can never push the count below the names
+  await call("/admin/base", { method: "POST", body: { base: 2 }, key: env.ADMIN_KEY, on });
+  r = await call("/", { on });
+  assert.deepEqual(sums(r.data), [0, 2, 2]);
+
+  // removing an entry gives its place back
+  await call("/admin/base", { method: "POST", body: { base: 15 }, key: env.ADMIN_KEY, on });
+  r = await call("/admin/guest?id=told-0002", { method: "DELETE", key: env.ADMIN_KEY, on });
+  assert.deepEqual([r.data.waiting, r.data.going, r.data.no], [11, 13, 0]);
+}
+
+// a list started before the "already told Joyce" tick existed keeps its entries
+{
+  const old = fakeSql();
+  old.exec("CREATE TABLE guests (id TEXT PRIMARY KEY, name TEXT NOT NULL, status TEXT NOT NULL, song TEXT NOT NULL DEFAULT '', note TEXT NOT NULL DEFAULT '', at INTEGER NOT NULL, updated INTEGER NOT NULL)");
+  old.exec("INSERT INTO guests (id, name, status, song, note, at, updated) VALUES ('early-001', 'Early Bird', 'yes', 'Toxic', 'hi', 1, 1)");
+  const upgraded = new Guests(old, "15");
+  assert.deepEqual(upgraded.all().map((g) => [g.name, g.song, g.told]), [["Early Bird", "Toxic", false]]);
+  assert.equal(upgraded.summary().going, 16);
+  assert.equal(new Guests(old, "15").summary().going, 16); // and starting again changes nothing
+}
+
 // the list cannot be flooded
 for (let i = 0; i < MAX_GUESTS + 20; i++) r = await call("/", { method: "POST", body: { id: "bulk-" + String(i).padStart(4, "0"), name: "G" + i, status: "yes" } });
 assert.equal(r.status, 429);

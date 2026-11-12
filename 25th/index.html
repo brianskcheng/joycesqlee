@@ -18,7 +18,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Bevan&family=DM+Serif+Display&family=Kalam:wght@400;700&family=Rozha+One&family=Silkscreen:wght@400;700&family=Ultra&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=3">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🪩%3C/text%3E%3C/svg%3E">
 </head>
 <body>
@@ -150,7 +150,7 @@
     <h2 class="rhead" id="rsvp-h" aria-label="RSVP"><span class="rline rline--lg" data-ransom aria-hidden="true">RSVP</span></h2>
     <p class="lead">Please RSVP by this Thursday (12th November) <span class="e">💌</span></p>
     <p class="tally" data-going-wrap><b data-going>15</b> going so far <span class="e">🪩</span></p>
-    <p class="fine counted">Already told Joyce you’re coming? You’re counted, no need to sign up again.</p>
+    <p class="fine counted">Already told Joyce you’re coming? You’re counted <span class="e">✅</span> Fill this in anyway so she has your song, and tick the box so you’re only counted once.</p>
 
     <div class="note-wrap">
       <span class="washi washi--l" aria-hidden="true"></span>
@@ -170,6 +170,11 @@
             <label class="chip chip--no"><input type="radio" name="status" value="no"><span>Can’t make it 😢</span></label>
           </div>
         </fieldset>
+
+        <label class="tick">
+          <input type="checkbox" name="told">
+          <span>I’d already told Joyce I’m coming <em>(so I’m only counted once)</em></span>
+        </label>
 
         <label class="field" id="song-field">
           <span class="field__l">Your karaoke song 🎤 <em>(optional)</em></span>
@@ -224,7 +229,7 @@
 
 <div class="fx" id="fx" aria-hidden="true"></div>
 
-<script src="config.js"></script>
-<script src="app.js"></script>
+<script src="config.js?v=3"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
