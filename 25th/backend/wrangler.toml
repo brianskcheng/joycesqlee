@@ -5,6 +5,7 @@ workers_dev = true
 
 # Deploy:            npx wrangler deploy
 # Joyce's list key:  npx wrangler secret put ADMIN_KEY
+# Checks:            node worker.test.mjs
 
 [vars]
 # sites allowed to post RSVPs
@@ -12,6 +13,15 @@ ALLOWED_ORIGIN = "https://joycesqlee.com,https://www.joycesqlee.com"
 # said yes before the page existed; Joyce can change it from her list page
 BASE_GOING = "15"
 
-[[kv_namespaces]]
-binding = "RSVPS"
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+# The guests live in one Durable Object (SQLite), see worker.js
+[[durable_objects.bindings]]
+name = "LIST"
+class_name = "GuestList"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GuestList"]
+
+# keep errors visible in the Cloudflare dashboard (Workers > Logs)
+[observability]
+enabled = true

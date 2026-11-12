@@ -13,12 +13,12 @@ window.PARTY = {
   rsvp: {
     // People who said yes to Joyce before this page existed. They are counted
     // in "going so far" but are not on the sign-up list. Joyce can change the
-    // number from her list page once the sign-up list is connected.
+    // number from her list page (list/); this is only what shows until the
+    // sign-up list answers.
     baseGoing: 15,
-    // Paste the Google Apps Script web app URL here to save sign-ups to a
-    // Google Sheet and show the guest list on the page (see README.md).
+    // Where sign-ups are saved and counted: the worker in backend/.
     // Left empty, the form sends the RSVP as a WhatsApp message instead.
-    endpoint: "",
+    endpoint: "https://joyce-25th-rsvp.brianskcheng.workers.dev",
     // Optional: a WhatsApp number in international format without "+" or
     // spaces (e.g. "447700900123") so RSVPs open straight in that chat.
     // Left empty, the guest picks the chat themselves.

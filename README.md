@@ -40,6 +40,17 @@ The worker handles JSON publish (`/publish`) and image uploads (`/upload`) using
 
 Without the worker, the editor falls back to a manual GitHub token stored in the browser.
 
+## 25th birthday invitation (`25th/`)
+
+A self-contained page at [joycesqlee.com/25th/](https://joycesqlee.com/25th/). Nothing in the portfolio links to it.
+
+- `25th/index.html`, `style.css`, `app.js` — the invitation and RSVP form. The words are in `index.html`.
+- `25th/config.js` — date, venue, and `rsvp.endpoint` (where sign-ups are saved). With `endpoint` empty the form falls back to sending the RSVP by WhatsApp.
+- `25th/list/` — Joyce's guest list: full names, songs, messages, remove an entry, and correct how many told her directly. Opens with her list key: `joycesqlee.com/25th/list/#k=<key>`.
+- `25th/backend/` — the Cloudflare Worker `joyce-25th-rsvp` that stores the sign-ups in a Durable Object (SQLite). The page gets the count and first names; the full list needs the key.
+
+To change the worker: run `node worker.test.mjs` in `25th/backend/`, then `npx wrangler deploy`. The list key is the worker secret `ADMIN_KEY` (`npx wrangler secret put ADMIN_KEY` sets a new one; the old link stops working).
+
 ## Git sync (agents and developers)
 
 The live site deploys from `main` on GitHub. To avoid stale or conflicting work:
